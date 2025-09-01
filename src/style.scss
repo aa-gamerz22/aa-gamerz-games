@@ -1,0 +1,277 @@
+@import url("https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap");
+
+$green: #80c0a1;
+$yellow: #f5fccd;
+$red: #ff7d66;
+$black: #000038;
+$white: #fff;
+$pink: #eb80b1;
+$light-blue: #78d6c6;
+$blue: #419197;
+$dark-blue: #12486b;
+$orange: orange;
+$grey: #919ea3;
+$dark-grey: #66777f;
+
+html {
+  font-size: 3vh;
+  @media (orientation: portrait) {
+    font-size: 2.9vw;
+  }
+}
+
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+  color: $white;
+  background-color: $black;
+  overflow: hidden;
+  font-family: "Archivo Black", sans-serif;
+  font-weight: 700;
+  font-size: 1.5rem;
+}
+
+.level {
+  position: absolute;
+  top: 0.75rem;
+  left: 1rem;
+  @media (min-height: 500px), (orientation: portrait) {
+    top: 0.5rem;
+  }
+}
+
+.refresh,
+.fullscreen {
+  position: absolute;
+  padding: 0.2rem 0.6rem;
+  border: 1px solid $white;
+  font-weight: 500;
+  background-color: $black;
+  cursor: pointer;
+  text-transform: uppercase;
+  &:hover {
+    color: $black;
+    background-color: $white;
+  }
+  @media (min-height: 500px), (orientation: portrait) {
+    font-size: 1rem;
+  }
+}
+
+.refresh {
+  top: 0.5rem;
+  right: 1rem;
+}
+
+.fullscreen {
+  top: 0.5rem;
+  left: 4rem;
+}
+
+.controls {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+  height: 100%;
+  &__arrow {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    &:after {
+      content: "";
+      width: 0;
+      height: 0;
+      margin: 1rem;
+      opacity: 0.3;
+    }
+    &--top,
+    &--bottom {
+      width: 100%;
+      height: 40vh;
+    }
+    &--left,
+    &--right {
+      flex-direction: column;
+      width: 50%;
+      height: 20vh;
+    }
+    &--top,
+    &--left {
+      align-items: flex-start;
+    }
+    &--bottom,
+    &--right {
+      align-items: flex-end;
+    }
+    &--top:after {
+      border-left: 1rem solid transparent;
+      border-right: 1rem solid transparent;
+      border-bottom: 1rem solid $white;
+    }
+    &--left:after {
+      border-top: 1rem solid transparent;
+      border-right: 1rem solid $white;
+      border-bottom: 1rem solid transparent;
+    }
+    &--right:after {
+      border-top: 1rem solid transparent;
+      border-left: 1rem solid $white;
+      border-bottom: 1rem solid transparent;
+    }
+    &--bottom:after {
+      border-left: 1rem solid transparent;
+      border-right: 1rem solid transparent;
+      border-top: 1rem solid $white;
+    }
+  }
+}
+
+.timer {
+  position: absolute;
+  top: 55%;
+  font-size: 3rem;
+}
+
+.title-screen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  background-color: rgba($black, 0.8);
+  &--hidden {
+    display: none;
+  }
+  &__title {
+    position: relative;
+    font-size: 12vw;
+    color: $white;
+  }
+  &__word {
+    color: $pink;
+  }
+  &__button {
+    position: relative;
+    border: 1px solid $white;
+    color: $white;
+    padding: 0.3rem 0.6rem;
+    background-color: transparent;
+    font-size: 3vw;
+    font-family: "Archivo Black", sans-serif;
+    text-transform: uppercase;
+    cursor: pointer;
+    &:hover {
+      color: $black;
+      background-color: $white;
+    }
+  }
+  @media (orientation: portrait) {
+    &__title {
+      font-size: 18vw;
+    }
+    &__button {
+      font-size: 4.5vw;
+    }
+  }
+}
+
+.game {
+  $component-class: &;
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  width: 29.03rem; // .03 for errors when summing cells on Mozilla
+  &--tutorial {
+    &:before {
+      position: absolute;
+      bottom: -4rem;
+      content: "Use arrow keys (recommended) or click the arrows to play";
+      color: $white;
+      font-size: 1.2rem;
+      font-weight: 500;
+      text-align: center;
+      text-transform: uppercase;
+      @media (max-width: 767px) {
+        // Removing arrow keys recommendation for hanheld devices
+        display: none;
+      }
+    }
+  }
+  &--win,
+  &--lose,
+  &--final-win {
+    &:after {
+      position: absolute;
+      top: 0;
+      left: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      height: 100%;
+      color: $white;
+      background-color: rgba($black, 0.5);
+      font-size: 2rem;
+      text-transform: uppercase;
+    }
+  }
+  &--win {
+    &:after {
+      content: "You win! Next level";
+    }
+  }
+  &--lose {
+    &:after {
+      content: "You lose! Try again!";
+    }
+  }
+  &--final-win {
+    &:after {
+      content: "Game completed!";
+    }
+  }
+  &__player {
+    position: absolute;
+    width: var(--cell);
+    height: var(--cell);
+    background-color: $pink;
+    top: calc(var(--positionTop) * var(--cell));
+    left: calc(var(--positionLeft) * var(--cell));
+    transition-property: top, left;
+    transition-duration: 0.2s;
+    transition-timing-function: ease;
+    @media (max-width: 767px) {
+      transition-duration: 0.1s;
+    }
+  }
+  &__cell {
+    width: var(--cell);
+    height: var(--cell);
+    background-color: $white;
+    &--rock {
+      background: $black;
+    }
+    &--lava {
+      background: linear-gradient(45deg, $orange, $red 150%);
+    }
+    &--stop {
+      position: relative;
+      background: linear-gradient(45deg, $light-blue -50%, $white 100%);
+    }
+    &--end {
+      background: $green;
+    }
+  }
+}
