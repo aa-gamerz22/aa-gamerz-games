@@ -1,0 +1,1742 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Task Bomb Game</title>
+    <link rel="stylesheet" href="css/all.min.css">
+    <style>
+        :root {
+            --primary: #00ffd5;
+            --secondary: #ff2975;
+            --tertiary: #ffdd40;
+            --dark: #0f0c29;
+            --darker: #080617;
+            --light: #f5f5f5;
+            --danger: #ff3860;
+            --success: #23d160;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--darker), var(--dark));
+            color: var(--light);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            padding: 20px;
+            position: relative;
+            height: 100vh;
+            overflow-y: auto;
+        }
+        
+        .screen {
+            background: rgba(25, 20, 60, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            padding: 30px;
+            min-height: 600px;
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+            border: 2px solid rgba(0, 255, 213, 0.3);
+            margin-bottom: 20px;
+        }
+        
+        .screen.active {
+            display: flex;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .screen-header {
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+        
+        .screen-title {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px var(--primary);
+            background: linear-gradient(to right, var(--primary), var(--tertiary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 800;
+            letter-spacing: 1px;
+        }
+        
+        .screen-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.8;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .btn {
+            background: linear-gradient(to right, var(--primary), #00cbb6);
+            color: var(--darker);
+            border: none;
+            padding: 14px 28px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 255, 213, 0.4);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin: 5px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 255, 213, 0.7);
+        }
+        
+        .btn:active {
+            transform: translateY(1px);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(to right, var(--secondary), #ff1c65);
+            box-shadow: 0 5px 15px rgba(255, 41, 117, 0.4);
+        }
+        
+        .btn-secondary:hover {
+            box-shadow: 0 8px 20px rgba(255, 41, 117, 0.7);
+        }
+        
+        .btn-tertiary {
+            background: linear-gradient(to right, var(--tertiary), #ffd324);
+            box-shadow: 0 5px 15px rgba(255, 221, 64, 0.4);
+            color: var(--darker);
+        }
+        
+        .btn-tertiary:hover {
+            box-shadow: 0 8px 20px rgba(255, 221, 64, 0.7);
+        }
+        
+        .btn-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        /* Game Screen Styles */
+        #gameScreen .game-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex-grow: 1;
+            position: relative;
+        }
+        
+        .bomb-container {
+            position: relative;
+            width: 280px;
+            height: 380px;
+            margin: 20px auto 30px;
+            perspective: 1000px;
+            z-index: 10;
+        }
+        
+        .bomb {
+            width: 220px;
+            height: 320px;
+            background: radial-gradient(circle at 30% 30%, #555, #222);
+            border-radius: 45% 45% 50% 50% / 55% 55% 45% 45%;
+            position: relative;
+            box-shadow: 
+                0 15px 40px rgba(0, 0, 0, 0.6),
+                inset 0 -20px 30px rgba(0, 0, 0, 0.5),
+                inset 0 10px 20px rgba(255, 255, 255, 0.1);
+            transform-style: preserve-3d;
+            transform: rotateX(5deg);
+        }
+        
+        .bomb-metal-band {
+            position: absolute;
+            top: 40%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 240px;
+            height: 40px;
+            background: linear-gradient(to bottom, #777, #999, #777);
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            z-index: 2;
+        }
+        
+        .bomb-fuse {
+            position: absolute;
+            top: -60px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 15px;
+            height: 70px;
+            background: linear-gradient(to bottom, #ff9900, #ff5500, #ff9900);
+            border-radius: 5px 5px 0 0;
+            z-index: 1;
+        }
+        
+        .bomb-fuse-top {
+            position: absolute;
+            top: -65px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 25px;
+            height: 15px;
+            background: #ff2975;
+            border-radius: 50%;
+            box-shadow: 0 0 15px #ff2975;
+        }
+        
+        .flame {
+            position: absolute;
+            top: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 70px;
+            background: linear-gradient(to top, transparent 10%, #ff5500, #ffdd40, #ff2975);
+            border-radius: 50% 50% 20% 20%;
+            opacity: 0;
+            transition: opacity 0.3s;
+            box-shadow: 0 0 40px #ff2975;
+            filter: blur(2px);
+            z-index: 0;
+            animation: flicker 0.1s infinite alternate;
+        }
+        
+        @keyframes flicker {
+            0% { height: 70px; width: 40px; }
+            50% { height: 80px; width: 45px; }
+            100% { height: 65px; width: 35px; }
+        }
+        
+        .bomb-sparks {
+            position: absolute;
+            top: -90px;
+            left: 50%;
+            width: 120px;
+            height: 120px;
+            transform: translateX(-50%);
+            opacity: 0;
+            z-index: 3;
+        }
+        
+        .spark {
+            position: absolute;
+            width: 5px;
+            height: 20px;
+            background: var(--tertiary);
+            border-radius: 2px;
+            transform-origin: bottom center;
+        }
+        
+        .timer-display {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin: 20px 0;
+            text-shadow: 0 0 20px var(--primary);
+            color: var(--primary);
+            letter-spacing: 2px;
+            background: rgba(0,0,0,0.3);
+            padding: 10px 30px;
+            border-radius: 15px;
+            border: 2px solid rgba(0, 255, 213, 0.2);
+            z-index: 20;
+        }
+        
+        .message-display {
+            font-size: 1.4rem;
+            text-align: center;
+            min-height: 60px;
+            margin: 15px 0;
+            padding: 15px 25px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            border: 2px solid rgba(0, 255, 213, 0.2);
+            width: 100%;
+            max-width: 600px;
+            z-index: 20;
+        }
+        
+        .task-area {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 2px solid rgba(0, 255, 213, 0.2);
+            width: 100%;
+            max-width: 600px;
+            display: none;
+            z-index: 20;
+        }
+        
+        .task-text {
+            font-size: 1.6rem;
+            margin-bottom: 20px;
+            text-align: center;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+            font-weight: 500;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+        
+        .boom-display {
+            font-size: 6rem;
+            color: var(--danger);
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 100;
+            text-shadow: 0 0 40px var(--danger);
+            opacity: 0;
+            pointer-events: none;
+            animation: none;
+        }
+        
+        /* Spin Screen Styles */
+        #spinScreen {
+            align-items: center;
+        }
+        
+        .wheel-container {
+            position: relative;
+            margin: 30px 0;
+            width: 450px;
+            height: 450px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .wheel-canvas {
+            border-radius: 50%;
+            box-shadow: 0 0 0 15px rgba(50, 50, 150, 0.5), 
+                         0 0 40px rgba(0, 0, 0, 0.7);
+            transform: rotate(0deg);
+            transition: transform 0.1s linear;
+        }
+        
+        .wheel-needle {
+            position: absolute;
+            top: 18px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 80px;
+            background: var(--danger);
+            clip-path: polygon(50% 50%, 0% 0%, 100% 0%);
+            z-index: 10;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        }
+        
+        .wheel-needle::after {
+            content: '';
+            position: absolute;
+            top: 5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 20px;
+            background: #ff3860;
+            border-radius: 50%;
+            box-shadow: 0 0 15px #ff3860;
+        }
+        
+        .wheel-stand {
+            position: absolute;
+            bottom: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 25px;
+            height: 100px;
+            background: linear-gradient(to bottom, #888, #555);
+            border-radius: 5px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        }
+        
+        .wheel-stand-base {
+            position: absolute;
+            bottom: -60px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 150px;
+            height: 25px;
+            background: linear-gradient(to bottom, #666, #444);
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        }
+        
+        .name-display {
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 20px 0;
+            padding: 15px 40px;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 50px;
+            border: 3px solid var(--primary);
+            min-width: 300px;
+            text-align: center;
+            box-shadow: 0 0 20px rgba(0, 255, 213, 0.4);
+        }
+        
+        /* Settings Screen Styles */
+        .settings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-top: 20px;
+        }
+        
+        .setting-card {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 25px;
+            border: 2px solid rgba(0, 255, 213, 0.2);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        
+        .setting-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-shadow: 0 0 10px rgba(0, 255, 213, 0.5);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--primary);
+        }
+        
+        input, textarea, select {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 2px solid rgba(0, 255, 213, 0.3);
+            border-radius: 10px;
+            color: var(--light);
+            font-size: 1rem;
+            box-shadow: 0 0 10px rgba(0, 255, 213, 0.2);
+        }
+        
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .task-list {
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 15px;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            border: 1px solid rgba(0, 255, 213, 0.2);
+        }
+        
+        .task-item {
+            padding: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .task-item:last-child {
+            border-bottom: none;
+        }
+        
+        .remove-task {
+            color: var(--danger);
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: transform 0.2s;
+        }
+        
+        .remove-task:hover {
+            transform: scale(1.2);
+        }
+        
+        /* Animations */
+        @keyframes glow {
+            0% { text-shadow: 0 0 5px var(--primary); }
+            100% { text-shadow: 0 0 20px var(--primary), 0 0 30px var(--primary); }
+        }
+        
+        @keyframes explosion {
+            0% { transform: translate(-50%, -50%) scale(0.1); opacity: 1; }
+            70% { transform: translate(-50%, -50%) scale(1.5); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
+        }
+        
+        @keyframes spark {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(-70px) rotate(var(--r)); opacity: 0; }
+        }
+        
+        /* Particles */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            background: var(--primary);
+            opacity: 0.7;
+        }
+        
+        /* Footer */
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+        
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.2);
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 10px;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .screen {
+                padding: 20px 15px;
+                min-height: auto;
+            }
+            
+            .screen-title {
+                font-size: 2.2rem;
+            }
+            
+            .btn-container {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+            
+            .settings-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .wheel-container {
+                width: 320px;
+                height: 320px;
+            }
+            
+            .wheel-canvas {
+                width: 300px;
+                height: 300px;
+            }
+        }
+
+        /* Blast animation */
+        @keyframes blast {
+            0% { 
+                transform: scale(1);
+                opacity: 1; 
+            }
+            50% { 
+                transform: scale(1.2);
+                opacity: 0.8; 
+            }
+            100% { 
+                transform: scale(1);
+                opacity: 0; 
+            }
+        }
+
+        .blast-effect {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, #ff5500 0%, #ff2975 70%, transparent 100%);
+            border-radius: 50%;
+            opacity: 0;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 50;
+            animation: blast 1s ease-out;
+        }
+
+        /* History screen styles */
+        .history-list {
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+        
+        .history-item {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(0, 255, 213, 0.2);
+        }
+        
+        .history-player {
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+        
+        .history-task {
+            margin-bottom: 5px;
+        }
+        
+        .history-time {
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+
+        /* Main menu top bar */
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 50px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(0, 255, 213, 0.2);
+        }
+
+        /* Reset button */
+        .reset-btn {
+            background: var(--danger);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 50px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.3s;
+        }
+
+        .reset-btn:hover {
+            background: #ff1c4a;
+        }
+    </style>
+</head>
+<body>
+    <div class="particles" id="particles"></div>
+    
+    <div class="container">
+        <!-- Main Menu Screen -->
+        <div class="screen active" id="mainMenu">
+            <div class="top-bar">
+                <div class="logo">
+                    <h2 style="color: var(--primary);">💣 Task Bomb</h2>
+                </div>
+                <button class="reset-btn" onclick="resetEverything()">
+                    <i class="fas fa-trash-alt"></i> Reset All
+                </button>
+            </div>
+            
+            <div class="screen-header">
+                <h1 class="screen-title">TASK BOMB GAME</h1>
+                <p class="screen-subtitle">Complete tasks before the bomb explodes! Spin the wheel to select players!</p>
+            </div>
+            
+            <div class="btn-container">
+                <button class="btn" onclick="showScreen('gameScreen')">
+                    <i class="fas fa-bomb"></i> Start Game
+                </button>
+                <button class="btn btn-secondary" onclick="showScreen('spinScreen')">
+                    <i class="fas fa-sync-alt"></i> Spin Wheel
+                </button>
+                <button class="btn btn-tertiary" onclick="showScreen('settingsScreen')">
+                    <i class="fas fa-cog"></i> Game Settings
+                </button>
+                <button class="btn" onclick="showScreen('helpScreen')">
+                    <i class="fas fa-question-circle"></i> Help
+                </button>
+                <button class="btn" onclick="showScreen('aboutScreen')">
+                    <i class="fas fa-info-circle"></i> About
+                </button>
+                <button class="btn" onclick="showScreen('historyScreen')">
+                    <i class="fas fa-history"></i> Game History
+                </button>
+                  <button class="btn" onclick="location.href='bomb.html'">Use v3.1</button>
+            </div>
+            
+            <div class="game-features">
+                <h3 style="text-align: center; margin: 30px 0 15px; color: var(--primary); text-shadow: 0 0 10px rgba(0, 255, 213, 0.5);">Game Features</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                    <div style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 10px; text-align: center; border: 1px solid rgba(0, 255, 213, 0.2);">
+                        <i class="fas fa-fire" style="color: var(--secondary); font-size: 2rem; margin-bottom: 10px;"></i>
+                        <p>Realistic Bomb Timer</p>
+                    </div>
+                    <div style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 10px; text-align: center; border: 1px solid rgba(0, 255, 213, 0.2);">
+                        <i class="fas fa-tasks" style="color: var(--tertiary); font-size: 2rem; margin-bottom: 10px;"></i>
+                        <p>50+ Fun Tasks</p>
+                    </div>
+                    <div style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 10px; text-align: center; border: 1px solid rgba(0, 255, 213, 0.2);">
+                        <i class="fas fa-sync" style="color: var(--primary); font-size: 2rem; margin-bottom: 10px;"></i>
+                        <p>Physics-based Wheel</p>
+                    </div>
+                    <div style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 10px; text-align: center; border: 1px solid rgba(0, 255, 213, 0.2);">
+                        <i class="fas fa-sliders-h" style="color: #9b5de5; font-size: 2rem; margin-bottom: 10px;"></i>
+                        <p>Customizable Settings</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer">
+                <p>Made with 💣 - Task Bomb Game v4.0</p>
+            </div>
+        </div>
+        
+        <!-- Game Screen -->
+        <div class="screen" id="gameScreen">
+            <div class="screen-header">
+                <h1 class="screen-title">GAME ON!</h1>
+                <p class="screen-subtitle">Complete tasks before the bomb explodes!</p>
+            </div>
+            
+            <div class="game-content">
+                <div class="timer-display" id="timer">00:00</div>
+                
+                <div class="bomb-container">
+                    <div class="bomb">
+                        <div class="bomb-metal-band"></div>
+                        <div class="bomb-fuse"></div>
+                        <div class="bomb-fuse-top"></div>
+                        <div class="flame" id="flame"></div>
+                        <div class="bomb-sparks" id="sparks"></div>
+                    </div>
+                </div>
+                
+                <div class="message-display" id="message">Get ready! The bomb is ticking...</div>
+                
+                <div class="task-area" id="taskArea">
+                    <div class="task-text" id="taskText">Your task will appear here after the explosion!</div>
+                    <div class="btn-container">
+                        <button class="btn" onclick="nextTask()">
+                            <i class="fas fa-random"></i> Next Task
+                        </button>
+                        <button class="btn btn-secondary" onclick="completeTask()">
+                            <i class="fas fa-check"></i> Task Complete
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="btn-container">
+                    <button class="btn" onclick="startGame()">
+                        <i class="fas fa-play"></i> Start Bomb
+                    </button>
+                    <button class="btn btn-tertiary" onclick="showScreen('mainMenu')">
+                        <i class="fas fa-home"></i> Main Menu
+                    </button>
+                    <button class="btn btn-secondary" onclick="resetGame()">
+                        <i class="fas fa-redo"></i> Reset Game
+                    </button>
+                </div>
+            </div>
+            
+            <div class="boom-display" id="boom">💥 BOOM!</div>
+            <div id="blastEffect"></div>
+        </div>
+        
+        <!-- Spin Screen -->
+        <div class="screen" id="spinScreen">
+            <div class="screen-header">
+                <h1 class="screen-title">PLAYER WHEEL</h1>
+                <p class="screen-subtitle">Spin to select a player or assign a task!</p>
+            </div>
+            
+            <div class="wheel-container">
+                <div class="wheel-needle"></div>
+                <canvas class="wheel-canvas" id="wheelCanvas" width="400" height="400"></canvas>
+                <div class="wheel-stand"></div>
+                <div class="wheel-stand-base"></div>
+            </div>
+            
+            <div class="name-display" id="nameDisplay">Spin the wheel to select a player</div>
+            
+            <div class="btn-container">
+                <button class="btn" id="spinBtn" onclick="spinPlayer()">
+                    <i class="fas fa-sync-alt"></i> Spin Wheel
+                </button>
+                <button class="btn btn-tertiary" onclick="showScreen('mainMenu')">
+                    <i class="fas fa-home"></i> Main Menu
+                </button>
+            </div>
+            
+            <div class="setting-card" style="margin-top: 30px; max-width: 500px;">
+                <h3 class="setting-title"><i class="fas fa-users"></i> Player Settings</h3>
+                <div class="form-group">
+                    <label for="nameInput">Player Names (comma separated):</label>
+                    <input type="text" id="nameInput" value="Player 1, Player 2, Player 3, Player 4">
+                </div>
+                <button class="btn" onclick="updatePlayers()">
+                    <i class="fas fa-sync"></i> Update Players
+                </button>
+            </div>
+        </div>
+        
+        <!-- Settings Screen -->
+        <div class="screen" id="settingsScreen">
+            <div class="screen-header">
+                <h1 class="screen-title">GAME SETTINGS</h1>
+                <p class="screen-subtitle">Customize your gaming experience</p>
+            </div>
+            
+            <div class="settings-grid">
+                <div class="setting-card">
+                    <h3 class="setting-title"><i class="fas fa-bomb"></i> Bomb Settings</h3>
+                    <div class="form-group">
+                        <label for="minTime">Minimum Time (seconds):</label>
+                        <input type="number" id="minTime" min="5" max="120" value="10">
+                    </div>
+                    <div class="form-group">
+                        <label for="maxTime">Maximum Time (seconds):</label>
+                        <input type="number" id="maxTime" min="10" max="180" value="45">
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="soundEffects" checked> 
+                            Enable Sound Effects
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="vibration" checked> 
+                            Enable Vibration
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="timerEnabled" checked> 
+                            Show Timer
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="setting-card">
+                    <h3 class="setting-title"><i class="fas fa-tasks"></i> Task Management</h3>
+                    <div class="form-group">
+                        <label for="newTask">Add New Task:</label>
+                        <input type="text" id="newTask" placeholder="Enter a new task...">
+                    </div>
+                    <button class="btn" onclick="addTask()">
+                        <i class="fas fa-plus"></i> Add Task
+                    </button>
+                    
+                    <div class="task-list" id="taskList">
+                        <!-- Tasks will be added here dynamically -->
+                    </div>
+                </div>
+                
+                <div class="setting-card">
+                    <h3 class="setting-title"><i class="fas fa-gamepad"></i> Game Options</h3>
+                    <div class="form-group">
+                        <label for="difficulty">Difficulty Level:</label>
+                        <select id="difficulty">
+                            <option value="easy">Easy</option>
+                            <option value="medium" selected>Medium</option>
+                            <option value="hard">Hard</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="preventRepeat" checked> 
+                            Prevent Task Repetition
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="voiceAnnounce" checked> 
+                            Voice Announcements
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="saveHistory" checked> 
+                            Save Game History
+                        </label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="btn-container" style="margin-top: 30px;">
+                <button class="btn" onclick="saveSettings()">
+                    <i class="fas fa-save"></i> Save Settings
+                </button>
+                <button class="btn btn-tertiary" onclick="showScreen('mainMenu')">
+                    <i class="fas fa-home"></i> Main Menu
+                </button>
+                <button class="btn btn-secondary" onclick="resetAllSettings()">
+                    <i class="fas fa-trash"></i> Reset Settings
+                </button>
+            </div>
+        </div>
+        
+        <!-- Help Screen -->
+        <div class="screen" id="helpScreen">
+            <div class="screen-header">
+                <h1 class="screen-title">GAME HELP</h1>
+                <p class="screen-subtitle">Learn how to play the Task Bomb Game</p>
+            </div>
+            
+            <div class="setting-card">
+                <h3 class="setting-title"><i class="fas fa-question-circle"></i> How to Play</h3>
+                <p style="margin-bottom: 15px; line-height: 1.6;">
+                    The Task Bomb Game is a fun party game where players complete tasks before a virtual bomb explodes. 
+                    The bomb has a random timer, and when it goes off, the current player must complete a random task!
+                </p>
+                
+                <h4 style="color: var(--primary); margin: 20px 0 10px;">Game Flow:</h4>
+                <ol style="margin-left: 20px; margin-bottom: 20px; line-height: 1.6;">
+                    <li>Start the bomb timer</li>
+                    <li>Players pass the device around</li>
+                    <li>When the bomb explodes, the current player must complete the task</li>
+                    <li>After completing the task, start the bomb again for the next round</li>
+                </ol>
+                
+                <h4 style="color: var(--primary); margin: 20px 0 10px;">Spin Wheel:</h4>
+                <p style="margin-bottom: 15px; line-height: 1.6;">
+                    Use the spin wheel to randomly select a player at the start of the game or when you need to assign a player.
+                </p>
+                
+                <h4 style="color: var(--primary); margin: 20px 0 10px;">Settings:</h4>
+                <p style="margin-bottom: 15px; line-height: 1.6;">
+                    Customize game duration, enable/disable sound effects, and manage tasks in the Settings screen.
+                </p>
+            </div>
+            
+            <div class="btn-container" style="margin-top: 30px;">
+                <button class="btn" onclick="showScreen('mainMenu')">
+                    <i class="fas fa-home"></i> Main Menu
+                </button>
+            </div>
+        </div>
+        
+        <!-- About Screen -->
+        <div class="screen" id="aboutScreen">
+            <div class="screen-header">
+                <h1 class="screen-title">ABOUT THE GAME</h1>
+                <p class="screen-subtitle">Learn about the Task Bomb Game</p>
+            </div>
+            
+            <div class="setting-card">
+                <h3 class="setting-title"><i class="fas fa-info-circle"></i> Game Information</h3>
+                <p style="margin-bottom: 15px; line-height: 1.6;">
+                    Task Bomb Game is an interactive party game designed for friends and family to have fun together.
+                    The game combines the excitement of a ticking time bomb with creative challenges.
+                </p>
+                
+                <h4 style="color: var(--primary); margin: 20px 0 10px;">Features:</h4>
+                <ul style="margin-left: 20px; margin-bottom: 20px; line-height: 1.6;">
+                    <li>Realistic bomb timer with visual effects</li>
+                    <li>Physics-based spinning wheel for player selection</li>
+                    <li>50+ fun and creative tasks</li>
+                    <li>Customizable settings for game duration</li>
+                    <li>Player name customization</li>
+                    <li>Task management system</li>
+                    <li>Sound effects and voice announcements</li>
+                    <li>Game history tracking</li>
+                </ul>
+                
+                <h4 style="color: var(--primary); margin: 20px 0 10px;">Version:</h4>
+                <p style="margin-bottom: 15px; line-height: 1.6;">
+                    Task Bomb Game v4.0<br>
+                    Developed with HTML5, CSS3, and JavaScript
+                </p>
+            </div>
+            
+            <div class="btn-container" style="margin-top: 30px;">
+                <button class="btn" onclick="showScreen('mainMenu')">
+                    <i class="fas fa-home"></i> Main Menu
+                </button>
+            </div>
+        </div>
+        
+        <!-- History Screen -->
+        <div class="screen" id="historyScreen">
+            <div class="screen-header">
+                <h1 class="screen-title">GAME HISTORY</h1>
+                <p class="screen-subtitle">View past game sessions and completed tasks</p>
+            </div>
+            
+            <div class="setting-card">
+                <h3 class="setting-title"><i class="fas fa-history"></i> Game Sessions</h3>
+                
+                <div class="history-list" id="historyList">
+                    <!-- History items will be added here dynamically -->
+                </div>
+            </div>
+            
+            <div class="btn-container" style="margin-top: 30px;">
+                <button class="btn" onclick="clearHistory()">
+                    <i class="fas fa-trash"></i> Clear History
+                </button>
+                <button class="btn btn-tertiary" onclick="showScreen('mainMenu')">
+                    <i class="fas fa-home"></i> Main Menu
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Game state
+        const gameState = {
+            screens: ['mainMenu', 'gameScreen', 'spinScreen', 'settingsScreen', 'helpScreen', 'aboutScreen', 'historyScreen'],
+            activeScreen: 'mainMenu',
+            gameActive: false,
+            countdownInterval: null,
+            messageInterval: null,
+            timeLeft: 0,
+            currentMusic: null,
+            players: ['Player 1', 'Player 2', 'Player 3', 'Player 4'],
+            tasks: [
+                "🎤 Sing your favorite cartoon theme!",
+                "🕺 Dance like a robot for 30 seconds!",
+                "😜 Make the weirdest face you can!",
+                "🐶 Bark like a dog until someone guesses the breed!",
+                "🎭 Act out a dramatic scene from a movie!",
+                "📢 Say 'I love broccoli' in the most enthusiastic way!",
+                "🦆 Walk like a duck while quacking for 10 seconds!",
+                "👻 Tell a spooky ghost story in a scary voice!",
+                "🧍 Stand on one leg until your next turn!",
+                "🐒 Pretend to be a monkey for 20 seconds!",
+                "🎮 Describe your favorite video game in 10 seconds!",
+                "🤔 Recite the alphabet backwards as fast as you can!",
+                "🥴 Spin around 10 times then try to walk straight!",
+                "🤫 Whisper a secret to the person on your left!",
+                "🥳 Compliment everyone in the room!"
+            ],
+            usedTasks: [],
+            minTime: 10,
+            maxTime: 45,
+            wheelRotation: 0,
+            wheelVelocity: 0,
+            wheelFriction: 0.98,
+            spinning: false,
+            soundEnabled: true,
+            voiceEnabled: true,
+            vibrationEnabled: true,
+            timerEnabled: true,
+            saveHistory: true,
+            gameHistory: []
+        };
+        
+        // DOM Elements
+        const elements = {
+            timer: document.getElementById('timer'),
+            message: document.getElementById('message'),
+            taskText: document.getElementById('taskText'),
+            taskArea: document.getElementById('taskArea'),
+            boom: document.getElementById('boom'),
+            nameDisplay: document.getElementById('nameDisplay'),
+            wheelCanvas: document.getElementById('wheelCanvas'),
+            nameInput: document.getElementById('nameInput'),
+            newTask: document.getElementById('newTask'),
+            taskList: document.getElementById('taskList'),
+            flame: document.getElementById('flame'),
+            sparks: document.getElementById('sparks'),
+            blastEffect: document.getElementById('blastEffect'),
+            soundEffects: document.getElementById('soundEffects'),
+            voiceAnnounce: document.getElementById('voiceAnnounce'),
+            vibration: document.getElementById('vibration'),
+            timerEnabled: document.getElementById('timerEnabled'),
+            saveHistory: document.getElementById('saveHistory'),
+            historyList: document.getElementById('historyList')
+        };
+        
+        // Music paths - fixed with online samples
+        const musicPaths = ["music.mp3", "music1.mp3", "music2.mp3", "music3.mp3", "music4.mp3", "music5.mp3", "music6.mp3"];
+        
+        // Initialize the game
+        function initGame() {
+            createParticles();
+            initWheel();
+            renderTaskList();
+            loadSettings();
+            loadHistory();
+        }
+        
+        // Load saved settings
+        function loadSettings() {
+            const savedSettings = localStorage.getItem('bombGameSettings');
+            if (savedSettings) {
+                const settings = JSON.parse(savedSettings);
+                gameState.minTime = settings.minTime || 10;
+                gameState.maxTime = settings.maxTime || 45;
+                gameState.soundEnabled = settings.soundEnabled !== undefined ? settings.soundEnabled : true;
+                gameState.voiceEnabled = settings.voiceEnabled !== undefined ? settings.voiceEnabled : true;
+                gameState.vibrationEnabled = settings.vibrationEnabled !== undefined ? settings.vibrationEnabled : true;
+                gameState.timerEnabled = settings.timerEnabled !== undefined ? settings.timerEnabled : true;
+                gameState.saveHistory = settings.saveHistory !== undefined ? settings.saveHistory : true;
+                gameState.tasks = settings.tasks || gameState.tasks;
+                
+                // Update UI
+                document.getElementById('minTime').value = gameState.minTime;
+                document.getElementById('maxTime').value = gameState.maxTime;
+                elements.soundEffects.checked = gameState.soundEnabled;
+                elements.voiceAnnounce.checked = gameState.voiceEnabled;
+                elements.vibration.checked = gameState.vibrationEnabled;
+                elements.timerEnabled.checked = gameState.timerEnabled;
+                elements.saveHistory.checked = gameState.saveHistory;
+                
+                renderTaskList();
+            }
+        }
+        
+        // Load game history
+        function loadHistory() {
+            const savedHistory = localStorage.getItem('bombGameHistory');
+            if (savedHistory) {
+                gameState.gameHistory = JSON.parse(savedHistory);
+            }
+        }
+        
+        // Save settings
+        function saveSettings() {
+            gameState.minTime = parseInt(document.getElementById('minTime').value) || 10;
+            gameState.maxTime = parseInt(document.getElementById('maxTime').value) || 45;
+            gameState.soundEnabled = elements.soundEffects.checked;
+            gameState.voiceEnabled = elements.voiceAnnounce.checked;
+            gameState.vibrationEnabled = elements.vibration.checked;
+            gameState.timerEnabled = elements.timerEnabled.checked;
+            gameState.saveHistory = elements.saveHistory.checked;
+            
+            const settings = {
+                minTime: gameState.minTime,
+                maxTime: gameState.maxTime,
+                soundEnabled: gameState.soundEnabled,
+                voiceEnabled: gameState.voiceEnabled,
+                vibrationEnabled: gameState.vibrationEnabled,
+                timerEnabled: gameState.timerEnabled,
+                saveHistory: gameState.saveHistory,
+                tasks: gameState.tasks
+            };
+            
+            localStorage.setItem('bombGameSettings', JSON.stringify(settings));
+            showMessage('Settings saved successfully!', 'success');
+        }
+        
+        // Save game history
+        function saveHistory() {
+            localStorage.setItem('bombGameHistory', JSON.stringify(gameState.gameHistory));
+        }
+        
+        // Reset all settings
+        function resetAllSettings() {
+            localStorage.removeItem('bombGameSettings');
+            gameState.minTime = 10;
+            gameState.maxTime = 45;
+            gameState.soundEnabled = true;
+            gameState.voiceEnabled = true;
+            gameState.vibrationEnabled = true;
+            gameState.timerEnabled = true;
+            gameState.saveHistory = true;
+            gameState.tasks = [...gameState.tasks]; // Reset to original tasks
+            
+            // Update UI
+            document.getElementById('minTime').value = gameState.minTime;
+            document.getElementById('maxTime').value = gameState.maxTime;
+            elements.soundEffects.checked = gameState.soundEnabled;
+            elements.voiceAnnounce.checked = gameState.voiceEnabled;
+            elements.vibration.checked = gameState.vibrationEnabled;
+            elements.timerEnabled.checked = gameState.timerEnabled;
+            elements.saveHistory.checked = gameState.saveHistory;
+            
+            renderTaskList();
+            showMessage('All settings have been reset!', 'success');
+        }
+        
+        // Reset everything (game data and settings)
+        function resetEverything() {
+            resetAllSettings();
+            gameState.gameHistory = [];
+            saveHistory();
+            renderHistory();
+            resetGame();
+            showMessage('All game data and settings have been reset!', 'success');
+        }
+        
+        // Clear game history
+        function clearHistory() {
+            gameState.gameHistory = [];
+            saveHistory();
+            renderHistory();
+            showMessage('Game history cleared!', 'success');
+        }
+        
+        // Show a message
+        function showMessage(text, type = 'info') {
+            const msg = document.createElement('div');
+            msg.textContent = text;
+            msg.style.position = 'fixed';
+            msg.style.top = '20px';
+            msg.style.left = '50%';
+            msg.style.transform = 'translateX(-50%)';
+            msg.style.padding = '10px 20px';
+            msg.style.borderRadius = '50px';
+            msg.style.backgroundColor = type === 'success' ? 'rgba(35, 209, 96, 0.9)' : 'rgba(255, 56, 96, 0.9)';
+            msg.style.color = 'white';
+            msg.style.zIndex = '1000';
+            msg.style.boxShadow = '0 5px 15px rgba(0,0,0,0.3)';
+            msg.style.animation = 'fadeIn 0.3s, fadeOut 0.3s 2.7s';
+            
+            document.body.appendChild(msg);
+            
+            setTimeout(() => {
+                msg.remove();
+            }, 3000);
+        }
+        
+        // Show a specific screen
+        function showScreen(screenId) {
+            gameState.screens.forEach(id => {
+                const screen = document.getElementById(id);
+                if (id === screenId) {
+                    screen.classList.add('active');
+                    gameState.activeScreen = screenId;
+                    
+                    // Initialize wheel when spin screen is shown
+                    if (screenId === 'spinScreen') {
+                        initWheel();
+                        drawWheel();
+                    }
+                    
+                    // Render history when history screen is shown
+                    if (screenId === 'historyScreen') {
+                        renderHistory();
+                    }
+                } else {
+                    screen.classList.remove('active');
+                }
+            });
+        }
+        
+        // Start the bomb game
+        function startGame() {
+            if (gameState.gameActive) return;
+            
+            resetGame();
+            gameState.gameActive = true;
+            
+            // Reset UI
+            elements.boom.style.opacity = '0';
+            elements.flame.style.opacity = '0';
+            elements.taskArea.style.display = 'none';
+            
+            // Show/hide timer based on setting
+            elements.timer.style.display = gameState.timerEnabled ? 'block' : 'none';
+            
+            // Calculate random time
+            const timeRange = gameState.maxTime - gameState.minTime;
+            gameState.timeLeft = Math.floor(Math.random() * timeRange) + gameState.minTime;
+            updateTimerDisplay();
+            
+            // Play background music
+            if (gameState.soundEnabled) {
+                const randomMusic = musicPaths[Math.floor(Math.random() * musicPaths.length)];
+                gameState.currentMusic = new Audio(randomMusic);
+                gameState.currentMusic.loop = true;
+                gameState.currentMusic.volume = 0.3;
+                gameState.currentMusic.play().catch(e => console.log("Audio play error:", e));
+            }
+            
+            // Start countdown
+            gameState.countdownInterval = setInterval(() => {
+                gameState.timeLeft--;
+                updateTimerDisplay();
+                
+                // Show flame when time is low
+                if (gameState.timeLeft <= 5) {
+                    elements.flame.style.opacity = '1';
+                    createSparks();
+                    
+                    // Vibration effect if enabled
+                    if (gameState.vibrationEnabled && navigator.vibrate) {
+                        navigator.vibrate(200);
+                    }
+                }
+                
+                if (gameState.timeLeft <= 0) {
+                    clearInterval(gameState.countdownInterval);
+                    explodeBomb();
+                }
+            }, 1000);
+            
+            // Update messages
+            updateMessage();
+            gameState.messageInterval = setInterval(updateMessage, 3000);
+        }
+        
+        // Reset the game
+        function resetGame() {
+            clearInterval(gameState.countdownInterval);
+            clearInterval(gameState.messageInterval);
+            
+            if (gameState.currentMusic) {
+                gameState.currentMusic.pause();
+                gameState.currentMusic.currentTime = 0;
+            }
+            
+            gameState.gameActive = false;
+            elements.taskArea.style.display = 'none';
+            elements.boom.style.opacity = '0';
+            elements.flame.style.opacity = '0';
+            elements.message.textContent = 'Get ready! The bomb is ticking...';
+            elements.timer.textContent = '00:00';
+            elements.timer.style.display = gameState.timerEnabled ? 'block' : 'none';
+        }
+        
+        // Update timer display
+        function updateTimerDisplay() {
+            const minutes = Math.floor(gameState.timeLeft / 60);
+            const seconds = gameState.timeLeft % 60;
+            elements.timer.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+        
+        // Update fun message
+        function updateMessage() {
+            const messages = [
+                "🤣 Who will explode next?",
+                "😱 Pressure is rising!",
+                "🔥 Game is getting hot!",
+                "😂 Fun is on fire!",
+                "🚨 Ready for boom?",
+                "🎲 Who's turn next?!",
+                "💣 Tick... Tock...",
+                "⏳ Time is running out!",
+                "😅 Feeling the pressure?",
+                "🎯 Complete your tasks quickly!"
+            ];
+            
+            elements.message.textContent = messages[Math.floor(Math.random() * messages.length)];
+        }
+        
+        // Explode the bomb
+        function explodeBomb() {
+            // Visual effects
+            elements.boom.style.animation = 'none';
+            elements.boom.style.opacity = '1';
+            setTimeout(() => {
+                elements.boom.style.animation = 'explosion 1.5s forwards';
+            }, 10);
+            
+            // Create blast effect
+            createBlastEffect();
+            
+            // Create explosion effect
+            createExplosion();
+            
+            // Show task
+            setTimeout(() => {
+                showRandomTask();
+                elements.taskArea.style.display = 'block';
+                
+                // Add to history
+                if (gameState.saveHistory) {
+                    const historyEntry = {
+                        player: "Current Player",
+                        task: elements.taskText.textContent,
+                        time: new Date().toLocaleString()
+                    };
+                    gameState.gameHistory.push(historyEntry);
+                    saveHistory();
+                }
+            }, 1500);
+            
+            // Play explosion sound if enabled
+            if (gameState.soundEnabled) {
+                const explosionSound = new Audio('sad.mp3');
+                explosionSound.volume = 0.5;
+                explosionSound.play();
+            }
+            
+            // Vibrate if enabled
+            if (gameState.vibrationEnabled && navigator.vibrate) {
+                navigator.vibrate([100, 50, 200, 50, 300]);
+            }
+        }
+        
+        // Create blast effect
+        function createBlastEffect() {
+            const blast = document.createElement('div');
+            blast.className = 'blast-effect';
+            elements.blastEffect.appendChild(blast);
+            
+            setTimeout(() => {
+                blast.remove();
+            }, 1000);
+        }
+        
+        // Show a random task
+        function showRandomTask() {
+            let availableTasks = gameState.tasks;
+            
+            // Filter out used tasks if setting is enabled
+            if (document.getElementById('preventRepeat')?.checked) {
+                availableTasks = gameState.tasks.filter(task => !gameState.usedTasks.includes(task));
+                
+                // Reset if all tasks have been used
+                if (availableTasks.length === 0) {
+                    gameState.usedTasks = [];
+                    availableTasks = gameState.tasks;
+                }
+            }
+            
+            // Select random task
+            const randomIndex = Math.floor(Math.random() * availableTasks.length);
+            const selectedTask = availableTasks[randomIndex];
+            
+            // Add to used tasks
+            gameState.usedTasks.push(selectedTask);
+            
+            // Display task
+            elements.taskText.textContent = selectedTask;
+        }
+        
+        // Show next task
+        function nextTask() {
+            showRandomTask();
+        }
+        
+        // Complete current task
+        function completeTask() {
+            elements.taskArea.style.display = 'none';
+            elements.message.textContent = 'Task completed! Start the bomb again!';
+        }
+        
+        // Initialize the wheel
+        function initWheel() {
+            const canvas = elements.wheelCanvas;
+            canvas.width = 400;
+            canvas.height = 400;
+        }
+        
+        // Draw the wheel
+        function drawWheel() {
+            const canvas = elements.wheelCanvas;
+            const ctx = canvas.getContext('2d');
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const radius = canvas.width / 2 - 20;
+            
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw wheel segments
+            const angle = (2 * Math.PI) / gameState.players.length;
+            for (let i = 0; i < gameState.players.length; i++) {
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.arc(centerX, centerY, radius, i * angle + gameState.wheelRotation, (i + 1) * angle + gameState.wheelRotation);
+                ctx.closePath();
+                
+                // Alternate colors
+                const hue = (i * 360) / gameState.players.length;
+                ctx.fillStyle = `hsl(${hue}, 80%, 50%)`;
+                ctx.fill();
+                
+                // Draw border
+                ctx.strokeStyle = 'rgba(0, 0, 0, 0.3)';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                
+                // Draw text
+                ctx.save();
+                ctx.translate(centerX, centerY);
+                ctx.rotate(i * angle + angle / 2 + gameState.wheelRotation);
+                ctx.textAlign = 'right';
+                ctx.fillStyle = '#fff';
+                ctx.font = 'bold 14px Arial';
+                ctx.fillText(gameState.players[i], radius - 20, 5);
+                ctx.restore();
+            }
+            
+            // Draw center circle
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, 20, 0, 2 * Math.PI);
+            ctx.fillStyle = '#222';
+            ctx.fill();
+            ctx.strokeStyle = '#00ffd5';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+        }
+        
+        // Spin the player wheel
+        function spinPlayer() {
+            if (gameState.spinning) return;
+            
+            gameState.spinning = true;
+            elements.nameDisplay.textContent = 'Spinning...';
+            
+            // Add physics-based spinning
+            gameState.wheelVelocity = Math.random() * 0.3 + 0.2;
+            
+            // Spin animation
+            function animate() {
+                if (Math.abs(gameState.wheelVelocity) < 0.001) {
+                    gameState.spinning = false;
+                    selectPlayer();
+                    return;
+                }
+                
+                gameState.wheelRotation += gameState.wheelVelocity;
+                gameState.wheelVelocity *= gameState.wheelFriction;
+                drawWheel();
+                requestAnimationFrame(animate);
+            }
+            
+            animate();
+            
+            // Play spin sound if enabled
+            if (gameState.soundEnabled) {
+                const spinSound = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-slot-machine-wheel-1930.mp3');
+                spinSound.volume = 0.3;
+                spinSound.play();
+            }
+        }
+        
+        // Select the player after spinning
+        function selectPlayer() {
+            const normalizedRotation = gameState.wheelRotation % (2 * Math.PI);
+            if (normalizedRotation < 0) normalizedRotation += 2 * Math.PI;
+            
+            const sliceSize = 2 * Math.PI / gameState.players.length;
+            const index = Math.floor((3 * Math.PI / 2 - normalizedRotation + sliceSize / 2) % (2 * Math.PI) / sliceSize);
+            const selectedPlayer = gameState.players[index];
+            
+            elements.nameDisplay.textContent = `🎉 Selected: ${selectedPlayer}`;
+            
+            // Speak the player name
+            if (gameState.voiceEnabled && 'speechSynthesis' in window) {
+                const speech = new SpeechSynthesisUtterance(selectedPlayer);
+                speech.rate = 1.0;
+                speech.pitch = 1.2;
+                speech.volume = 1;
+                window.speechSynthesis.speak(speech);
+            }
+        }
+        
+        // Update players from input
+        function updatePlayers() {
+            const input = elements.nameInput.value;
+            if (input.trim()) {
+                gameState.players = input.split(',').map(name => name.trim()).filter(name => name);
+                drawWheel();
+                showMessage('Players updated successfully!', 'success');
+            }
+        }
+        
+        // Add a new task
+        function addTask() {
+            const newTask = elements.newTask.value.trim();
+            if (newTask) {
+                gameState.tasks.push(newTask);
+                renderTaskList();
+                elements.newTask.value = '';
+                showMessage('Task added successfully!', 'success');
+            }
+        }
+        
+        // Remove a task
+        function removeTask(index) {
+            gameState.tasks.splice(index, 1);
+            renderTaskList();
+            showMessage('Task removed!', 'success');
+        }
+        
+        // Render task list
+        function renderTaskList() {
+            elements.taskList.innerHTML = '';
+            gameState.tasks.forEach((task, index) => {
+                const taskItem = document.createElement('div');
+                taskItem.className = 'task-item';
+                taskItem.innerHTML = `
+                    <span>${task}</span>
+                    <span class="remove-task" onclick="removeTask(${index})"><i class="fas fa-trash"></i></span>
+                `;
+                elements.taskList.appendChild(taskItem);
+            });
+        }
+        
+        // Render game history
+        function renderHistory() {
+            elements.historyList.innerHTML = '';
+            
+            if (gameState.gameHistory.length === 0) {
+                elements.historyList.innerHTML = '<p style="text-align: center; padding: 20px;">No game history available</p>';
+                return;
+            }
+            
+            gameState.gameHistory.forEach(entry => {
+                const historyItem = document.createElement('div');
+                historyItem.className = 'history-item';
+                historyItem.innerHTML = `
+                    <div class="history-player">${entry.player}</div>
+                    <div class="history-task">${entry.task}</div>
+                    <div class="history-time">${entry.time}</div>
+                `;
+                elements.historyList.appendChild(historyItem);
+            });
+        }
+        
+        // Create explosion effect
+        function createExplosion() {
+            const explosion = elements.boom;
+            
+            // Create particles
+            for (let i = 0; i < 100; i++) {
+                createParticle(
+                    explosion.offsetLeft + explosion.offsetWidth / 2,
+                    explosion.offsetTop + explosion.offsetHeight / 2,
+                    `hsl(${Math.random() * 360}, 100%, 50%)`
+                );
+            }
+        }
+        
+        // Create sparks for bomb fuse
+        function createSparks() {
+            elements.sparks.innerHTML = '';
+            elements.sparks.style.opacity = '1';
+            
+            for (let i = 0; i < 15; i++) {
+                const spark = document.createElement('div');
+                spark.className = 'spark';
+                spark.style.left = `${Math.random() * 100}%`;
+                spark.style.transform = `rotate(${Math.random() * 360}deg)`;
+                spark.style.animation = `spark ${0.5 + Math.random() * 0.5}s forwards`;
+                spark.style.setProperty('--r', `${Math.random() * 180 - 90}deg`);
+                spark.style.opacity = Math.random();
+                spark.style.backgroundColor = `hsl(${Math.random() * 60}, 100%, 50%)`;
+                elements.sparks.appendChild(spark);
+                
+                // Remove spark after animation
+                setTimeout(() => {
+                    spark.remove();
+                }, 1000);
+            }
+        }
+        
+        // Create particle effect
+        function createParticle(x, y, color) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.left = `${x}px`;
+            particle.style.top = `${y}px`;
+            particle.style.backgroundColor = color;
+            
+            const size = Math.random() * 15 + 5;
+            particle.style.width = `${size}px`;
+            particle.style.height = `${size}px`;
+            
+            document.getElementById('particles').appendChild(particle);
+            
+            // Animate particle
+            const angle = Math.random() * Math.PI * 2;
+            const distance = Math.random() * 150 + 100;
+            const duration = Math.random() * 1000 + 500;
+            
+            particle.animate([
+                { transform: `translate(0, 0) scale(1)`, opacity: 1 },
+                { transform: `translate(${Math.cos(angle) * distance}px, ${Math.sin(angle) * distance}px) scale(0)`, opacity: 0 }
+            ], {
+                duration: duration,
+                easing: 'ease-out'
+            });
+            
+            // Remove particle after animation
+            setTimeout(() => {
+                particle.remove();
+            }, duration);
+        }
+        
+        // Create background particles
+        function createParticles() {
+            const container = document.getElementById('particles');
+            for (let i = 0; i < 50; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = `${Math.random() * 100}%`;
+                particle.style.top = `${Math.random() * 100}%`;
+                particle.style.width = `${Math.random() * 5 + 2}px`;
+                particle.style.height = particle.style.width;
+                particle.style.backgroundColor = `hsl(${Math.random() * 360}, 70%, 60%)`;
+                particle.style.opacity = Math.random() * 0.5 + 0.1;
+                particle.style.animation = `float ${Math.random() * 20 + 10}s infinite ease-in-out`;
+                container.appendChild(particle);
+            }
+        }
+        
+        // Initialize game when page loads
+        window.onload = initGame;
+    </script>
+</body>
+</html>

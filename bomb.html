@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+      <meta charset="UTF-8" />  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />  
+  <title>Task Bomb Game</title>  
+  <style>  
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to bottom right, #0f0c29, #302b63, #24243e);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      text-align: center;
+      overflow: hidden;
+    }
+    h1 {
+      font-size: 3rem;
+      margin-bottom: 20px;
+      text-shadow: 0 0 30px #00ffd5;
+      animation: glow 2s infinite alternate;
+    }
+    @keyframes glow {
+      from { text-shadow: 0 0 10px #00ffd5; }
+      to { text-shadow: 0 0 40px #00ffd5, 0 0 60px #00ffd5; }
+    }
+    .btn-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      justify-content: center;
+      margin-top: 20px;
+    }
+    .btn {
+      padding: 12px 24px;
+      font-size: 1.1rem;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      background: #00ffd5;
+      color: #000;
+      font-weight: bold;
+      box-shadow: 0 0 15px #00ffd5;
+      transition: 0.3s ease;
+    }
+    .btn:hover {
+      background: #00cbb6;
+      box-shadow: 0 0 25px #00ffd5;
+    }
+    #boom {
+      font-size: 3.5rem;
+      color: red;
+      animation: shake 0.5s infinite;
+      display: none;
+    }
+    @keyframes shake {
+      0%, 100% { transform: translate(0, 0); }
+      25% { transform: translate(4px, -4px); }
+      50% { transform: translate(-4px, 4px); }
+      75% { transform: translate(4px, 4px); }
+    }
+    #taskText, #message {
+      font-size: 1.4rem;
+      margin-top: 20px;
+      text-shadow: 0 0 10px yellow;
+    }
+    #taskArea {
+      display: none;
+      margin-top: 20px;
+    }
+    #spinScreen {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #111;
+      z-index: 1000;
+    }
+    #needle {
+      width: 0;
+      height: 0;
+      border-left: 15px solid transparent;
+      border-right: 15px solid transparent;
+      border-top: 30px solid red;
+      position: absolute;
+      top: 220px;
+      z-index: 10;
+    }
+    canvas {
+      margin-top: 100px;
+    }
+    #nameDisplay {
+      font-size: 1.5rem;
+      margin-top: 15px;
+    }
+    #customNames {
+      margin-top: 15px;
+      color: white;
+    }
+    #nameInput {
+      padding: 8px;
+      border-radius: 6px;
+      border: none;
+      margin-top: 8px;
+      margin-bottom: 10px;
+      font-size: 1rem;
+      width: 220px;
+      text-align: center;
+      background-color: #222;
+      color: #fff;
+      box-shadow: 0 0 10px #00ffd5;
+    }
+    #backBtn {
+      position: absolute;
+      top: 15px;
+      left: 15px;
+    }
+  </style>
+</head>
+<body>
+  <h1>💣 Task Bomb Game</h1>
+  <p>v3.1</p>
+  <div id="message"></div>
+  <div id="boom">💥 Boom!</div>
+  <div class="btn-container">
+    <button class="btn" onclick="startGame()">Start</button>
+    <button class="btn" onclick="resetGame()">Reset</button>
+    <button class="btn" onclick="showSpinScreen()">Spin</button><br>
+        <button class="btn" onclick="location.href='bomb_update.html'">Use Update v4.0 </button>
+  </div>
+  <div id="taskArea">
+    <div id="taskText"></div>
+    <button class="btn" onclick="nextTask()">Change Task</button>
+  </div>
+  <div id="spinScreen">
+    <button id="backBtn" class="btn" onclick="backToGame()">← Back</button>
+    <div id="needle"></div>
+    <canvas id="wheelCanvas" width="300" height="300"></canvas>
+    <button class="btn" id="spinBtn" onclick="spinPlayer()">Spin</button>
+    <div id="nameDisplay"></div>
+    <div id="customNames">
+      <label>Custom Names (comma separated): </label><br />
+      <input type="text" id="nameInput" placeholder="Abdullah, Shees, ...">
+      <br />
+      <button class="btn" onclick="updatePlayers()">Update</button>
+    </div>
+  </div>
+  <script>
+  // Sample fun messages and tasks
+let funMessages = [
+  "🤣 Who will explode next?",
+  "😱 Pressure is rising!",
+  "🔥 Game is getting hot!",
+  "😂 Fun is on fire!",
+  "🚨 Ready for boom?",
+  "🎲 Who’s turn next?!"
+];
+let tasks = [
+  "🎤 Sing your favorite cartoon theme!",
+  "🕺 Dance like a robot!",
+  "😜 Make the weirdest face!",
+  "🐶 Bark like a dog!",
+  "🎭 Act like a drama queen!",
+  "📢 Say 'Boom Boom' loudly!",
+  "🦆 Walk like a duck for 10 seconds!",
+  "👻 Make spooky ghost sounds!",
+  "🧍 Stand still like a statue!",
+  "🐒 Act like a monkey!"
+];
+
+let musicPaths = ["music.mp3", "music1.mp3", "music2.mp3", "music3.mp3", "music4.mp3", "music5.mp3", "music6.mp3"];
+let currentMusic;
+let countdownInterval;
+let messageInterval;
+
+function startGame() {
+  document.getElementById("boom")?.style.setProperty("display", "none");
+  document.getElementById("taskArea").style.display = "none";
+  const messageDisplay = document.getElementById("message");
+
+  let timeLeft = Math.floor(Math.random() * 51) + 8; // 8 to 58 seconds
+  const musicSrc = musicPaths[Math.floor(Math.random() * musicPaths.length)];
+  currentMusic = new Audio(musicSrc);
+  currentMusic.play();
+
+  messageInterval = setInterval(() => {
+    messageDisplay.textContent = funMessages[Math.floor(Math.random() * funMessages.length)];
+  }, 2000);
+
+  countdownInterval = setTimeout(() => {
+    currentMusic.pause();
+    currentMusic.currentTime = 0;
+    clearInterval(messageInterval);
+    document.getElementById("boom").style.display = "block";
+    showRandomTask();
+  }, timeLeft * 1000);
+}
+
+function resetGame() {
+  clearTimeout(countdownInterval);
+  clearInterval(messageInterval);
+  if (currentMusic) {
+    currentMusic.pause();
+    currentMusic.currentTime = 0;
+  }
+  document.getElementById("boom").style.display = "none";
+  document.getElementById("message").textContent = "";
+  document.getElementById("taskArea").style.display = "none";
+  document.getElementById("nameDisplay").textContent = "";
+  document.getElementById("spinScreen").style.display = "none";
+}
+
+function showRandomTask() {
+  document.getElementById("taskText").textContent = tasks[Math.floor(Math.random() * tasks.length)];
+  document.getElementById("taskArea").style.display = "block";
+}
+
+function nextTask() {
+  showRandomTask();
+}
+    let players = [
+  "Abdullah", "Shees", "Sadiq", "Fatima", "Wajhia", "Maryam", "Muhammad",
+];
+    let rotation = 0;
+    const wheelCanvas = document.getElementById("wheelCanvas");
+    const ctx = wheelCanvas.getContext("2d");function updatePlayers() {
+  const input = document.getElementById("nameInput").value;
+  if (input.trim()) {
+    players = input.split(',').map(name => name.trim()).filter(name => name);
+    drawWheel();
+  }
+}
+
+function drawWheel() {
+  const angle = 2 * Math.PI / players.length;
+  ctx.clearRect(0, 0, 300, 300);
+  for (let i = 0; i < players.length; i++) {
+    ctx.beginPath();
+    ctx.moveTo(150, 150);
+    ctx.arc(150, 150, 150, i * angle + rotation, (i + 1) * angle + rotation);
+    ctx.fillStyle = `hsl(${i * (360 / players.length)}, 100%, 70%)`;
+    ctx.fill();
+    ctx.save();
+    ctx.translate(150, 150);
+    ctx.rotate(i * angle + angle / 2 + rotation);
+    ctx.fillStyle = "#000";
+    ctx.font = "bold 16px Arial";
+    ctx.textAlign = "right";
+    ctx.fillText(players[i], 130, 5);
+    ctx.restore();
+  }
+}
+
+function spinPlayer() {
+  document.getElementById("nameDisplay").textContent = "";
+  let spins = Math.random() * 3 + 4;
+  let totalRotation = spins * 2 * Math.PI;
+  let start = performance.now();
+  function animate(time) {
+    let progress = (time - start) / 2000;
+    if (progress < 1) {
+      rotation += 0.3 * (1 - progress);
+      drawWheel();
+      requestAnimationFrame(animate);
+    } else {
+      rotation %= 2 * Math.PI;
+      const slice = 2 * Math.PI / players.length;
+      let index = Math.floor((3 * Math.PI / 2 - rotation + slice / 2) % (2 * Math.PI) / slice);
+      let chosenName = players[index];
+      document.getElementById("nameDisplay").textContent = `🎉 Player: ${chosenName}`;
+      let speech = new SpeechSynthesisUtterance(chosenName);
+      speech.lang = "en";
+      speech.pitch = 1.1;
+      speech.rate = 1;
+      speech.volume = 1;
+      speechSynthesis.speak(speech);
+    }
+  }
+  requestAnimationFrame(animate);
+}
+
+function showSpinScreen() {
+  drawWheel();
+  document.getElementById("spinScreen").style.display = "flex";
+}
+
+function backToGame() {
+  document.getElementById("spinScreen").style.display = "none";
+}
+
+  </script>
+ </body>
+</html>
