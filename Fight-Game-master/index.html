@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Fight!</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="icon" type="image/x-icon" href="/img/favicon_io/android-chrome-512x512.png">
+    <link href="fonts.css" rel="stylesheet">
+    <link rel="stylesheet" href="index.css">
+</head>
+<body>
+    <!-- red container div -->
+    <div id="topBar">
+        <!-- smaller red container div -->
+        <div id="smallBar">
+            <!-- player health -->
+            <div class="playerHContainer" >
+                <div class="backgroundHealth"></div>
+                <div id="playerHealth"></div>
+            </div>
+            <!-- timer -->
+            <div id="timer">10</div>
+            <!-- enemy health -->
+            <div class="healthContainer">
+                <div class="backgroundHealth"></div>
+                <div id="enemyHealth"></div>
+            </div>
+        </div>
+        <div id="gameStatus">
+            Tie
+        </div>
+        <canvas></canvas>
+    </div>
+    <script src="js/gsap.min.js" integrity="sha512-H6cPm97FAsgIKmlBA4s774vqoN24V5gSQL4yBTDOY2su2DeXZVhQPxFK4P6GPdnZqM9fg1G3cMv5wD7e6cFLZQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/classes.js"></script>
+    <script src="index.js"></script>
+</body>
+</html>
