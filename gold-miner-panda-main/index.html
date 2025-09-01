@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Gold Miner Panda</title>
+    <link rel="stylesheet" href="css/style.css">
+    <meta 
+        name='viewport' 
+        content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' 
+    />
+    <script>
+        var imported = document.createElement('script');
+        var AdsenseId = "ca-pub-6129580795478709"
+        var ChannelId = "4508138255"
+        var adFrequency = "120s";
+        var url = new URLSearchParams(location.search);
+        var testAdsOn = false;
+        window.adsbygoogle = window.adsbygoogle || [];
+        const adBreak = adConfig = function (o) { adsbygoogle.push(o); }
+        adConfig({
+            preloadAdBreaks: 'on',
+            sound: 'on', // This game has sound
+            onReady: () => {
+                console.log("ready");
+            }, // Called when API has initialised and adBreak() is ready
+        });
+        function nextAds() {
+            console.log("showNextAd")
+            adBreak({
+                type: 'start', // ad shows at start of next level
+                name: 'start-game',
+                beforeAd: () => {
+                    console.log("beforeAd")
+                    //Please add pause Game code here
+                },
+                afterAd: () => {
+                    console.log("afterAd")
+                    //Please add resume Game code here
+                },
+                adBreakDone: (placementInfo) => {
+                    console.log("adBreak complete ");
+                    console.log(placementInfo.breakType);
+                    console.log(placementInfo.breakName);
+                    console.log(placementInfo.breakFormat);
+                    console.log(placementInfo.breakStatus);
+                },
+            });
+        }
+        function createAFGScript() {
+            imported.setAttribute('data-ad-client', AdsenseId);
+            imported.setAttribute('data-ad-channel', ChannelId);
+            imported.setAttribute('data-ad-frequency-hint', adFrequency);
+            if (testAdsOn == true) { imported.setAttribute('data-adbreak-test', "on"); }
+            imported.src = 'adsbygoogle.js';
+            imported.setAttribute("type", "text/javascript");
+            imported.async = true;
+            document.head.appendChild(imported);
+        }
+        createAFGScript()
+    </script>
+<script src="prevent-keys.js"></script>
+</head>
+<body></body>
+<script type="text/javascript" src="js/gold.js"></script>
+<script type="text/javascript" src="js/game.js"></script>
+</html>
