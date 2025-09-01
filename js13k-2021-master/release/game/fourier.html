@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="utf-8">
+<title>fourier</title>
+ <link rel="stylesheet" href="css/all.min.css">
+<style>
+
+body
+{
+    background: #1e4969;
+    color: rgb(194, 183, 170);
+}
+ .close-settings {
+            background: var(--danger);
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .Next-settings {
+            background: var(--danger);
+            border: none;
+            border-radius: 50%;
+            width: 90px;
+            height: 90px;
+            color: rgb(171, 182, 157);
+            position: absolute;
+            top: 150px;
+            right: 250px;
+            font-size: 20.5rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+       .hh {
+            border: 2px;
+            color: rgb(171, 182, 157);
+            position: absolute;
+            top: 240px;
+            right: 60px;
+            font-size: 7.5rem;
+        }
+
+</style>
+</head>
+<body>
+    
+    <button class="Next-settings" onclick="location.href='wave.html'">
+                <i class="fab fa-buromobelexperte"></i>
+            </button>
+            <h1 class="hh">More <br> Setting</h1>
+ <button class="close-settings" onclick="location.href='index.html'">
+                <i class="fas fa-arrow-alt-circle-left"></i>
+            </button>
+    <input type="file" accept="audio/*" onclick="this.value=null" onchange="FileSelected(this.files[0])">
+    <br>
+    <div id="datgui-container" style="padding: 8px 0px;"></div>
+    <br>
+    <button onclick="Play()">Play</button>
+    <br>
+    <div>Real</div>
+    <textarea id="real" style="width: 400px; height: 100px;"></textarea>
+    <br>
+    <div>Imaginary</div>
+    <textarea id="imag" style="width: 400px; height: 100px;"></textarea>
+
+<script src="dat.gui/dat.gui.js"></script>
+<script src="fourier.js"></script>
+</body>
+</html>
