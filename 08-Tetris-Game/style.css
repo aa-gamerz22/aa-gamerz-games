@@ -1,0 +1,903 @@
+@import url('Josefin_Slab/fonts.css');
+@import url('Nosifer/fonts.css');
+
+html {
+    user-select: none;
+}
+
+body {
+    margin: 0;
+    width: 100%;
+    height: 600px;
+    background: radial-gradient(white, #6F83BE);
+}
+
+.menu {
+    width: 220px;
+    height: 480px;
+    background-color: #898989;
+    position: absolute;
+    animation: 0.5s linear;
+    animation-fill-mode: forwards;
+    overflow: hidden;
+    top: 0;
+    left: -220px;
+    z-index: 1000;
+    box-shadow: 0 0 10px black;
+}
+
+.listMenu {
+    width: 100%;
+    height: 410px;
+    background-color: transparent;
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
+    flex-wrap: wrap;
+    position: absolute;
+    bottom: 0;
+    z-index: 10;
+    perspective: 400px;
+}
+
+#program {
+    position: absolute;
+    width: 340px;
+    height: 520px;
+    background-color: transparent;
+    top: calc(50% - 260px);
+    left: calc(50% - 170px);
+    box-shadow: 0 0 10px  black;
+    z-index: 10;
+}
+
+.controlPanel {
+    width: 100%;
+    height: 40px;
+    box-sizing: border-box;
+    border: 2px solid black;
+    border-bottom: transparent;
+    border-top: transparent;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.5),
+    inset 0 1px rgba(255,255,255,0.3),
+    inset 0 10px rgba(255,255,255,0.2),
+    inset 0 10px 20px rgba(255,255,255,0.25),
+    inset 0 -15px 30px rgba(0,0,0,0.3);
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: transparent;
+}
+
+#programClose {
+    width: 49px;
+    height: 100%;
+    position: absolute;
+    right: 0;
+    background-color: transparent;
+    cursor: pointer;
+    background: url("http://s019.radikal.ru/i637/1710/7b/b31517e19a30.png") center no-repeat;
+}
+#programClose:hover {
+    background-color: red;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.5),
+    inset 0 1px rgba(255,255,255,0.3),
+    inset 0 10px rgba(255,255,255,0.2),
+    inset 0 10px 20px rgba(255,255,255,0.25),
+    inset 0 -15px 30px rgba(0,0,0,0.3);
+}
+
+#collapse {
+    width: 49px;
+    height: 100%;
+    position: absolute;
+    right: 49px;
+    background-color: transparent;
+    cursor: pointer;
+    background: url("http://s019.radikal.ru/i612/1710/8d/10d0c3fe6706.png") no-repeat;
+    background-position: center 14px;
+}
+#collapse:hover {
+    background-color: #3c2153;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.5),
+    inset 0 1px rgba(255,255,255,0.3),
+    inset 0 10px rgba(255,255,255,0.2),
+    inset 0 10px 20px rgba(255,255,255,0.25),
+    inset 0 -15px 30px rgba(0,0,0,0.3);
+}
+
+#hitbox {
+    height: 100%;
+    width: 238px;
+    position: absolute;
+    left: 0;
+    background-color: transparent;
+    cursor: url('http://s018.radikal.ru/i516/1710/0d/1efea4e7432d.png'), move;
+}
+
+.file {
+    width: 80px;
+    height: 100px;
+    background: url("http://s018.radikal.ru/i524/1710/fb/3cce60cf693e.png") no-repeat;
+    background-position: center center;
+    position: absolute;
+    top: 100px;
+    left: 200px;
+    cursor: pointer;
+    box-sizing: border-box;
+}
+
+.file:hover {
+    background-color: RGBA(200,220,241,0.4);
+    border: 1px solid rgba(31,179,240,0.7);
+}
+
+
+.pixel {
+    width: 10%;
+    height: 4%;
+    border: 1px solid black;
+    box-sizing: border-box;
+}
+
+.figurePixel {
+    background-color: blue;
+    border: 1px solid white;
+    box-shadow: 5px 5px 20px black,
+    inset 0 0 10px black;
+}
+
+#displayWindow {
+    height: 480px;
+    width: 240px;
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-end;
+    position: absolute;
+    top: 0;
+    left: 0;
+    border: 1px solid black;
+    overflow: hidden;
+}
+#screen {
+    height: 480px;
+    width: 340px;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+}
+
+#auxiliaryDisplay {
+    width: 97px;
+    height: 480px;
+    background-color: #372939;
+    border: 1px solid black;
+    box-shadow: inset 0 0 20px black;
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+#display {
+    width: 240px;
+    height: 600px;
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    background-color: #66D7DA;
+}
+
+.nickname {
+    width: 90%;
+    height: 30px;
+    display: flex;
+    color: white;
+    font-size: 15px;
+    box-sizing: border-box;
+    box-shadow: 0 0 10px black;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    font-family: sans-serif;
+    top: 10px;
+    left: 5%;
+}
+
+.nexFigureBox {
+    width: 92%;
+    height: 110px;
+    font-family: sans-serif;
+    display: flex;
+    text-shadow: 0 0 10px black;
+    justify-content: space-around;
+    flex-direction: column;
+    align-items: center;
+    position: absolute;
+    color: white;
+    top: 40%;
+    left: 4%;
+}
+
+#nextFigure {
+    width: 80px;
+    height: 80px;
+    border: 1px solid white;
+    box-shadow: 0 0 20px black;
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    flex-wrap: wrap;
+}
+
+.pixelDisplayNext {
+    width: 20%;
+    height: 20%;
+    box-sizing: border-box;
+    border: 1px solid black;
+}
+
+.pixelNextFigure {
+    background-color: red;
+    box-sizing: border-box;
+    border: 1px solid white;
+}
+
+#points {
+    width: 90%;
+    height: 25px;
+    display: flex;
+    font-size: 20px;
+    padding-top: 3px;
+    box-shadow: 0 0 10px black;
+    font-family: 'Josefin Slab', serif;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    position: absolute;
+    top: 23%;
+    left: 5%;
+}
+
+#pause {
+    width: 90%;
+    height: 25px;
+    display: flex;
+    font-size: 18px;
+    box-sizing: border-box;
+    border: 1px solid white;
+    font-family: sans-serif;
+    transition: 0.3s linear;
+    box-shadow: 0 0 10px black;
+    background-color: red;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    position: absolute;
+    bottom: 15%;
+    left: 5%;
+    cursor: pointer;
+}
+#pause:hover {
+    background-color: #036D49;
+}
+
+#menu {
+    width: 90%;
+    height: 25px;
+    display: flex;
+    font-size: 18px;
+    box-sizing: border-box;
+    border: 1px solid white;
+    font-family: sans-serif;
+    transition: 0.3s linear;
+    box-shadow: 0 0 10px black;
+    background-color: blue;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    position: absolute;
+    bottom: 7%;
+    left: 5%;
+    cursor: pointer;
+}
+#menu:hover {
+    background-color: #6F0317;
+}
+
+.gameOver {
+    width: 200px;
+    height: 250px;
+    box-sizing: border-box;
+    font-family: 'Nosifer', cursive;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-size: 30px;
+    color: black;
+    position: absolute;
+    top: calc(50% - 125px);
+    right: calc(50% - 100px);
+}
+
+.gameOver span:first-child {
+    font-size: 40px;
+    color: red;
+    text-shadow: 0 0 10px #4a1711;
+}
+
+.gameOver span:nth-child(2) {
+    font-size: 20px;
+    color: red;
+    text-shadow: 0 0 10px #4a1711;
+}
+
+.gameOver span:nth-child(3) {
+    font-size: 20px;
+    color: red;
+    text-shadow: 0 0 10px #4a1711;
+    cursor: pointer;
+    transition: 0.3s linear;
+}
+.gameOver span:nth-child(3):hover {
+    font-size: 25px;
+}
+
+.pause {
+    font-size: 30px;
+    color: #114a10;
+    margin-bottom: 0;
+}
+
+.userCreate {
+    position: absolute;
+    top: calc(50% - 150px);
+    left: 1px;
+    width: 99%;
+    height: 300px;
+    background-color: #314255;
+    /*display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;*/
+    box-shadow: 0 0 20px black;
+}
+
+.userCreate span {
+    width: 150px;
+    height: 120px;
+    padding-right: 5px;
+    display: flex;
+    margin: auto;
+    justify-content: center;
+    align-items: flex-end;
+    font-size: 13px;
+    background: url("http://i062.radikal.ru/1710/74/f18bf527966a.png") no-repeat;
+    background-position: center 20px;
+    font-family: sans-serif;
+    color: white;
+}
+
+.userCreate input {
+    border: none;
+    outline: none;
+    background: url("http://s014.radikal.ru/i328/1710/2c/f9e9e7b4d7c7.png") no-repeat;
+    width: 206px;
+    height: 26px;
+    background-color: transparent;
+    box-sizing: border-box;
+    padding: 3px;
+    padding-left: 20px;
+    border-bottom: 1px solid white;
+    color: white;
+    font-size: 20px;
+    position: absolute;
+    left: 15px;
+    top: 160px;
+}
+
+.userCreate div {
+    width: 210px;
+    height: 35px;
+    background-color: #37DCF6;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-family: sans-serif;
+    cursor: pointer;
+    transition: 0.2s linear;
+    position: absolute;
+    left: 14px;
+    top: 230px;
+}
+.userCreate div:hover {
+    background-color: #7cffff;
+}
+.userCreate div:active {
+    box-shadow: inset 0 0 10px black;
+}
+
+.errorMessage {
+    position: absolute;
+    top: calc(50% - 130px);
+    left: 20px;
+    width: 200px;
+    height: 260px;
+    background: url("http://s018.radikal.ru/i519/1710/48/4924b51033a4.png") no-repeat;
+    background-position: center 15px;
+    background-color: #029863;
+    font-family: sans-serif;
+    font-size: 16px;
+    color: white;
+    text-align: center;
+    box-shadow: 0 0 10px black;
+}
+
+.errorMessage span {
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    bottom: 25px;
+    width: 100%;
+    height: 100px;
+}
+
+.errorMessage div {
+    position: absolute;
+    bottom: 10px;
+    width: 100%;
+    height: 30px;
+    background-color: #11174c;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    transition: 0.2s linear;
+}
+.errorMessage div:hover {
+    background-color: #1b156b;
+}
+
+#headerMenu {
+    width: 100%;
+    height: 70px;
+    background-color: #33334C;
+    display: flex;
+    justify-content: space-around;
+    align-items: stretch;
+    box-shadow: 0 -3px 10px 5px black;
+    z-index: 110;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+#headerMenu div {
+    width: 53px;
+    height: 70px;
+    border-right: 1px solid #1D2B46;
+    border-left: 1px solid transparent;
+    background-color: transparent;
+    position: relative;
+    cursor: pointer;
+    z-index: 100;
+}
+#headerMenu div:first-child {
+    border-left: 1px solid transparent;
+    background: url("http://s009.radikal.ru/i309/1710/0a/989c779a1e94.png") no-repeat;
+    background-size: 40px auto;
+    background-position: 6px center;
+}
+
+
+#headerMenu div:nth-child(2) {
+    background: url("http://s018.radikal.ru/i518/1710/43/97215325bb69.png") no-repeat;
+    background-size: 50px auto;
+    background-position: 1px center;
+}
+
+#headerMenu div:nth-child(3) {
+    background: url("http://s019.radikal.ru/i641/1710/a5/369dd823a975.png") no-repeat;
+    background-size: 40px auto;
+    background-position: 5px center;
+}
+
+
+
+#headerMenu div:last-child {
+    border-right: 1px solid transparent;
+    background: url("http://s019.radikal.ru/i603/1710/60/4c9ffa9e5031.png") no-repeat;
+    background-size: 35px auto;
+    background-position: 8px center;
+}
+
+
+
+/* классы кнопок и их псевдоэлементы */
+
+
+.home::before {
+    content: 'home';
+    color: #EAEAEA;
+    font-size: 14px;
+    font-family: sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 54px;
+    height: 25px;
+    background-color: #885F7F;
+    position: absolute;
+    left: -1px;
+    bottom: -25px;
+    transform-origin: 0 0;
+    transform: rotateX(-85deg);
+    animation: exit 1s ease-out;
+    animation-fill-mode: forwards;
+    box-shadow: 0 4px 7px -4px black;
+}
+
+
+
+.records::before {
+    content: 'records';
+    color: #EAEAEA;
+    font-size: 14px;
+    font-family: sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 54px;
+    height: 25px;
+    background-color: #885F7F;
+    position: absolute;
+    left: -1px;
+    bottom: -25px;
+    transform-origin: 0 0;
+    transform: rotateX(-85deg);
+    animation: exit 1s ease-out;
+    animation-fill-mode: forwards;
+    box-shadow: 0 4px 7px -4px black;
+}
+
+
+.saves::before {
+    content: 'saves';
+    color: #EAEAEA;
+    font-size: 14px;
+    font-family: sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 54px;
+    height: 25px;
+    background-color: #885F7F;
+    position: absolute;
+    left: -1px;
+    bottom: -25px;
+    transform-origin: 0 0;
+    transform: rotateX(-85deg);
+    animation: exit 1s ease-out;
+    animation-fill-mode: forwards;
+    box-shadow: 0 4px 7px -4px black;
+}
+
+
+.settings::before {
+    content: 'settings';
+    color: #EAEAEA;
+    font-size: 14px;
+    font-family: sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 54px;
+    height: 25px;
+    background-color: #885F7F;
+    position: absolute;
+    left: -1px;
+    bottom: -25px;
+    transform-origin: 0 0;
+    transform: rotateX(-85deg);
+    animation: exit 1s ease-out;
+    animation-fill-mode: forwards;
+    box-shadow: 0 4px 7px -4px black;
+}
+
+#headerMenu div:hover {
+    background-color: #D64A73;
+}
+
+
+.menuBlock {
+    display: flex;
+    box-sizing: border-box;
+    transition: 0.3s linear;
+    font-family: sans-serif;
+    font-size: 30px;
+    cursor: pointer;
+    color: white;
+    z-index: 1;
+    transform-origin: 100% 0;
+    transform: rotateY(-110deg);
+    animation: menu 0.5s ease-out;
+    animation-fill-mode: forwards;
+    width: 100%;
+}
+
+
+
+
+.resume {
+    background: url("http://s018.radikal.ru/i506/1710/1d/dc9acc1b6205.png") no-repeat;
+    background-position: center 20px;
+    align-items: flex-end;
+    justify-content: center;
+    padding-bottom: 10px;
+    background-color: #EF6363;
+}
+.resume:hover {
+    background-color: #ef8690;
+}
+
+.newGameButton {
+    background: url("http://s41.radikal.ru/i093/1710/47/04967603e60a.png") no-repeat;
+    background-position: center 15px;
+    align-items: flex-end;
+    justify-content: center;
+    padding-bottom: 10px;
+    background-color: #F1B136;
+}
+.newGameButton:hover {
+    background-color: #f1c936;
+}
+
+.fullVersion {
+    background: url("http://i075.radikal.ru/1710/37/4c48a19de8ca.png") no-repeat;
+    background-position: center 5px;
+    align-items: flex-end;
+    justify-content: center;
+    padding-bottom: 10px;
+    background-color: #2b7cff;
+}
+.fullVersion:hover {
+    background-color: #2ba5ff;
+}
+
+
+
+.firstPlace {
+    background: url("http://s018.radikal.ru/i523/1710/9a/f6f4408d6946.png") no-repeat;
+    background-position: 10px center;
+    align-items: center;
+    justify-content: center;
+    background-color: #ea354a;
+}
+
+
+.secondPlace {
+    background: url("http://s019.radikal.ru/i601/1710/93/172f5c72eaaf.png") no-repeat;
+    background-position: 15px center;
+    align-items: center;
+    justify-content: center;
+    background-color: #ea554a;
+}
+
+
+.thirdPlace {
+    background: url("http://s008.radikal.ru/i303/1710/da/cc999f1c4fbb.png") no-repeat;
+    background-position: 15px center;
+    align-items: center;
+    justify-content: center;
+    background-color: #ff644a;
+}
+
+
+.fourthPlace {
+    background: url("http://s015.radikal.ru/i331/1710/01/4fffc0ab9c63.png") no-repeat;
+    background-position: 20px center;
+    align-items: center;
+    justify-content: center;
+    background-color: #ff8d4a;
+}
+
+
+.fifthPlace {
+    background: url("http://s018.radikal.ru/i510/1710/a4/de0ca535dbd2.png") no-repeat;
+    background-position: 20px center;
+    align-items: center;
+    justify-content: center;
+    background-color: #ffaf4a;
+}
+
+
+/* Блоки сохранения */
+
+
+.add {
+    background: url("http://s011.radikal.ru/i316/1710/04/87979664566f.png") no-repeat;
+    background-position: 35px center;
+    align-items: center;
+    justify-content: center;
+}
+
+.save {
+    background: url("http://s018.radikal.ru/i525/1710/05/5bbe4aabdff6.png") no-repeat;
+    background-position: 15px center;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+}
+
+.save span:nth-child(2) {
+    font-size: 15px;
+}
+
+.saveList div:nth-child(1) {
+    background-color: #ffaf4a;
+}
+.saveList div:nth-child(1):hover {
+    background-color: #ffce4a;
+}
+
+.saveList button:nth-child(2) {
+    background-color: #995eff;
+    border: none;
+}
+.saveList button:nth-child(2):hover {
+    background-color: #9986ff;
+}
+
+.saveList button:nth-child(3) {
+    background-color: #55a5ff;
+    border: none;
+}
+.saveList button:nth-child(3):hover {
+    background-color: #55ceff;
+}
+
+.saveList button:nth-child(4) {
+    background-color: #16ff8e;
+    border: none;
+}
+.saveList button:nth-child(4):hover {
+    background-color: #53ff96;
+}
+
+.saveList button:nth-child(5) {
+    background-color: #e164ff;
+    border: none;
+}
+.saveList button:nth-child(5):hover {
+    background-color: #e191ff;
+}
+
+
+/* блоки сложности */
+
+.easy {
+    background: url("http://s016.radikal.ru/i337/1710/0c/1b469cf54d91.png") no-repeat;
+    background-position: center 20px;
+    align-items: flex-end;
+    justify-content: center;
+    padding-bottom: 10px;
+    background-color: #14c925;
+    overflow: hidden;
+}
+.easy:hover {
+    background-color: #14f425;
+}
+.easy div {
+    position: absolute;
+    bottom: -20px;
+    right: -20px;
+    width: 0;
+    height: 0;
+    transition: 0.2s linear;
+}
+
+.middle {
+    background: url("http://s019.radikal.ru/i634/1710/54/62c2fdc95a40.png") no-repeat;
+    background-position: center 20px;
+    align-items: flex-end;
+    justify-content: center;
+    padding-bottom: 10px;
+    background-color: #ff7f1b;
+    overflow: hidden;
+}
+.middle:hover {
+    background-color: #ffaf1b;
+}
+
+.middle div {
+    position: absolute;
+    bottom: -20px;
+    right: -20px;
+    width: 0;
+    height: 0;
+    transition: 0.2s linear;
+}
+
+.hard {
+    background: url("http://s014.radikal.ru/i326/1710/61/2a28dadbc3b7.png") no-repeat;
+    background-position: center 15px;
+    align-items: flex-end;
+    justify-content: center;
+    padding-bottom: 10px;
+    background-color: #ff4120;
+    overflow: hidden;
+}
+.hard:hover {
+    background-color: #ff534d;
+}
+
+.hard div {
+    position: absolute;
+    bottom: -20px;
+    right: -20px;
+    width: 0;
+    height: 0;
+    transition: 0.2s linear;
+}
+
+.indication div{
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: RGBA(0,0,0, 0.4);
+}
+
+
+@keyframes exit {
+
+    0% {
+        transform: rotateX(-85deg);
+    }
+    30% {
+        transform: rotateX(50deg);
+    }
+    60% {
+        transform: rotateX(-30deg);
+    }
+    80% {
+        transform: rotateX(10deg);
+    }
+    100% {
+        transform: rotateX(0deg);
+    }
+
+}
+
+@keyframes menu {
+
+    0% {
+        transform: rotateY(-110deg);
+    }
+    100% {
+        transform: rotateY(0deg);
+    }
+
+}
+
+@keyframes menuShow {
+    0% {
+        left: -220px;
+    }
+    100% {
+        left: 0;
+    }
+}
+
+@keyframes menuClose {
+    0% {
+        left: 0;
+    }
+    100% {
+        left: -220px;
+    }
+}
