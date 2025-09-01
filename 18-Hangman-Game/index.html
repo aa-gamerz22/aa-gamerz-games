@@ -1,0 +1,1953 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prison Break Hangman</title>
+    <link rel="stylesheet" href="css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0c0c17, #1a1a2e);
+            color: #e6e6e6;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        /* Prison wall texture */
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),
+                url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="%2310101a" opacity="0.9"/><path d="M0,0 L100,100 M100,0 L0,100" stroke="%23550000" stroke-width="0.5"/></svg>');
+            background-size: cover;
+            z-index: -1;
+        }
+        
+        .container {
+            width: 95%;
+            max-width: 900px;
+            height: 116vh;
+            border: 4px solid #8b0000;
+            border-radius: 15px;
+            box-shadow: 0 0 30px rgba(139, 0, 0, 0.7);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            background: rgba(10, 10, 20, 0.85);
+        }
+        
+        /* Prison bars overlay */
+        .prison-bars {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                90deg,
+                transparent,
+                transparent 25px,
+                rgba(100, 100, 100, 0.7) 25px,
+                rgba(100, 100, 100, 0.7) 30px
+            );
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .screen {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            padding: 20px;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            z-index: 2;
+        }
+        
+        .active {
+            display: flex;
+            animation: fadeIn 0.6s ease forwards;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Header Styles */
+        .game-header {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            margin-bottom: 20px;
+            background: rgba(30, 10, 10, 0.8);
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+            border-bottom: 3px solid #8b0000;
+        }
+        
+        .game-title {
+            font-size: 1.8rem;
+            text-shadow: 0 0 8px #ff0000;
+            letter-spacing: 2px;
+            background: linear-gradient(to right, #ff4d4d, #ff9999);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-align: center;
+            flex-grow: 1;
+        }
+        
+        /* Button Styles */
+        .menu-btn {
+            padding: 14px 28px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            background: linear-gradient(to bottom, #8b0000, #660000);
+            color: #fff;
+            border: 2px solid #ff4d4d;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+            margin: 8px 0;
+            min-width: 220px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .menu-btn:hover {
+            background: linear-gradient(to bottom, #a30000, #800000);
+            transform: translateY(-5px);
+            box-shadow: 0 6px 15px rgba(255, 0, 0, 0.4);
+        }
+        
+        .menu-btn:active {
+            transform: translateY(0);
+        }
+        
+        .menu-btn::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -60%;
+            width: 20px;
+            height: 200%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(25deg);
+            transition: all 0.6s;
+        }
+        
+        .menu-btn:hover::after {
+            left: 120%;
+        }
+        
+        /* Home Screen */
+        .home-screen {
+            justify-content: center;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400"><rect width="400" height="400" fill="%230a0a14" opacity="0.9"/><path d="M0,0 L400,400 M400,0 L0,400" stroke="%23220000" stroke-width="2" opacity="0.2"/></svg>');
+            background-size: 300px 300px;
+        }
+        
+        .title-container {
+            text-align: center;
+            margin-bottom: 40px;
+            z-index: 5;
+            position: relative;
+            padding: 30px 40px;
+            background: rgba(20, 20, 30, 0.7);
+            border: 3px solid #8b0000;
+            border-radius: 15px;
+            box-shadow: 0 0 40px rgba(139, 0, 0, 0.8);
+        }
+        
+        .title {
+            font-size: 4.5rem;
+            text-shadow: 0 0 15px #ff0000;
+            letter-spacing: 5px;
+            animation: glow 2s infinite alternate;
+            margin-bottom: 10px;
+            background: linear-gradient(to bottom, #ff4d4d, #cc0000);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            position: relative;
+        }
+        
+        .title::after {
+            content: "";
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            height: 4px;
+            background: linear-gradient(to right, transparent, #ff4d4d, transparent);
+            border-radius: 2px;
+        }
+        
+        @keyframes glow {
+            from { text-shadow: 0 0 5px #ff0000, 0 0 10px #ff0000; }
+            to { text-shadow: 0 0 20px #ff0000, 0 0 30px #ff4d4d, 0 0 40px #ff4d4d; }
+        }
+        
+        .subtitle {
+            font-size: 1.4rem;
+            color: #ccc;
+            text-shadow: 0 0 5px #000;
+            margin-top: 10px;
+            letter-spacing: 3px;
+            font-style: italic;
+        }
+        
+        /* Prison Elements */
+        .chain {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            animation: swing 4s infinite ease-in-out;
+            color: #aaa;
+            font-size: 2.5rem;
+            z-index: 2;
+        }
+        
+        .rat {
+            position: absolute;
+            bottom: 20px;
+            left: -60px;
+            width: 40px;
+            height: 30px;
+            color: #777;
+            animation: run 20s infinite linear;
+            font-size: 2rem;
+            z-index: 2;
+        }
+        
+        .barbed-wire {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 20px;
+            background: repeating-linear-gradient(
+                90deg,
+                #666,
+                #666 10px,
+                transparent 10px,
+                transparent 20px
+            );
+            z-index: 3;
+        }
+        
+        .barbed-wire::before {
+            content: "🦔🦔🦔";
+            position: absolute;
+            top: -8px;
+            left: 0;
+            width: 100%;
+            font-size: 1.5rem;
+            color: #aaa;
+            letter-spacing: 15px;
+        }
+        
+        @keyframes swing {
+            0%, 100% { transform: rotate(-15deg); }
+            50% { transform: rotate(15deg); }
+        }
+        
+        @keyframes run {
+            0% { left: -60px; }
+            100% { left: calc(100% + 60px); }
+        }
+        
+        /* Game Screen */
+        .game-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+             height: 10000px;
+            padding: 15px;
+        }
+        
+        .hangman-container {
+            width: 320px;
+            height: 320px;
+            position: relative;
+            margin: 20px auto;
+            background: rgba(20, 20, 30, 0.7);
+            border: 3px solid #8b0000;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .gallows {
+            position: relative;
+            width: 220px;
+            height: 260px;
+        }
+        
+        /* Hangman parts - in correct order */
+        .hangman-part {
+            position: absolute;
+            background: #e6e6e6;
+            display: none;
+        }
+        
+        /* Gallows structure - shown from start */
+        .base { width: 150px; height: 10px; background: #aaa; bottom: 0; left: 15%; transform: translateX(-50%); display: block; }
+        .pole { width: 10px; height: 250px; background: #aaa; bottom: 10px; left: 15%; transform: translateX(-50%); display: block; }
+        .beam { width: 150px; height: 10px; background: #aaa; top: 20px; left: 50%; transform: translateX(-50%); display: block; }
+        .rope { width: 4px; height: 30px; background: #ccc; top: 20px; left: 50%; transform: translateX(-50%); display: block; }
+        
+        /* Hangman body parts - appear in sequence */
+        .head { 
+            width: 40px; 
+            height: 40px; 
+            border-radius: 50%; 
+            top: 50px; 
+            left: 50%; 
+            transform: translateX(-50%); 
+        }
+        .body { 
+            width: 8px; 
+            height: 100px; 
+            top: 90px; 
+            left: 50%; 
+            transform: translateX(-50%); 
+        }
+        .left-arm { 
+            width: 60px; 
+            height: 8px; 
+            top: 110px; 
+            left: 50%; 
+            transform: translateX(-50%) rotate(-45deg); 
+            transform-origin: left center;
+        }
+        .right-arm { 
+            width: 60px; 
+            height: 8px; 
+            top: 110px; 
+            left: 50%; 
+            transform: translateX(-50%) rotate(45deg); 
+            transform-origin: right center;
+        }
+        .left-leg { 
+            width: 70px; 
+            height: 8px; 
+            top: 180px; 
+            left: 65%; 
+            transform: translateX(-50%) rotate(40deg); 
+            transform-origin: left center;
+        }
+        .right-leg { 
+            width: 70px; 
+            height: 8px; 
+            top: 180px; 
+            left: 35%; 
+            transform: translateX(-50%) rotate(-40deg); 
+            transform-origin: right center;
+        }
+        
+        .face {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            top: 57px;
+            left: 54%;
+            transform: translateX(-50%);
+            display: none;
+            z-index: 10;
+        }
+        
+        .word-display {
+            font-size: 2.5rem;
+            letter-spacing: 15px;
+            margin: 25px 0;
+            text-align: center;
+            min-height: 60px;
+            font-family: monospace;
+            font-weight: bold;
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.7);
+            padding: 10px 20px;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 8px;
+            border: 1px solid #8b0000;
+        }
+        
+        .hint-container {
+            margin: 15px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            max-width: 600px;
+        }
+        
+        .hint-box {
+            background: rgba(30, 30, 40, 0.9);
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid #00cc00;
+            text-align: center;
+            width: 100%;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            box-shadow: 0 0 10px rgba(0, 200, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hint-box::before {
+            content: "HINT";
+            position: absolute;
+            top: 5px;
+            left: 10px;
+            font-size: 0.8rem;
+            color: #00cc00;
+            font-weight: bold;
+        }
+        
+        .hint-btn {
+            padding: 10px 20px;
+            font-size: 1.1rem;
+            background: linear-gradient(to bottom, #006600, #004400);
+            color: #fff;
+            border: 2px solid #00cc00;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 200px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hint-btn:hover {
+            background: linear-gradient(to bottom, #008800, #006600);
+            box-shadow: 0 0 15px rgba(0, 200, 0, 0.4);
+        }
+        
+        .hint-btn:disabled {
+            background: #333;
+            border-color: #666;
+            cursor: not-allowed;
+        }
+        
+        .hint-count {
+            font-size: 1.2rem;
+            color: #00cc00;
+            font-weight: bold;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .keyboard {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+            max-width: 600px;
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(30, 30, 40, 0.7);
+            border-radius: 10px;
+            border: 2px solid #8b0000;
+        }
+        
+        .letter-btn {
+            width: 45px;
+            height: 45px;
+            font-size: 1.4rem;
+            font-weight: bold;
+            background: #333;
+            color: #fff;
+            border: 2px solid #555;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 3px 5px rgba(0, 0, 0, 0.3);
+        }
+        
+        .letter-btn:hover {
+            background: #444;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 8px rgba(0, 0, 0, 0.4);
+        }
+        
+        .letter-btn:disabled {
+            background: #8b0000;
+            cursor: not-allowed;
+            opacity: 0.7;
+            transform: none;
+        }
+        
+        .letter-btn.correct {
+            background: #006600;
+            border-color: #00cc00;
+        }
+        
+        /* Settings Screen */
+        .settings-container, .help-container, .history-container, .selection-container {
+            width: 90%;
+            max-width: 600px;
+            background: rgba(30, 30, 40, 0.8);
+            padding: 25px;
+            border: 2px solid #8b0000;
+            border-radius: 10px;
+            margin-top: 20px;
+            overflow-y: auto;
+            max-height: 70%;
+            box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.5);
+        }
+        
+        .setting-item {
+            margin-bottom: 25px;
+            padding: 15px;
+            border-bottom: 1px solid #444;
+            background: rgba(20, 20, 30, 0.6);
+            border-radius: 8px;
+        }
+        
+        .setting-item label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+            color: #ff9999;
+        }
+        
+        .setting-item select, .setting-item input {
+            width: 100%;
+            padding: 10px;
+            background: #222;
+            color: #fff;
+            border: 1px solid #8b0000;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+        
+        .apply-btn {
+            padding: 12px 30px;
+            font-size: 1.1rem;
+            background: linear-gradient(to bottom, #006600, #004400);
+            color: #fff;
+            border: 2px solid #00cc00;
+            border-radius: 5px;
+            cursor: pointer;
+            display: block;
+            margin: 20px auto 0;
+            transition: all 0.3s;
+        }
+        
+        .apply-btn:hover {
+            background: linear-gradient(to bottom, #008800, #006600);
+            transform: translateY(-3px);
+        }
+        
+        /* Selection Screen */
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .category-btn {
+            padding: 20px 15px;
+            background: linear-gradient(to bottom, #1a1a2e, #16213e);
+            border: 2px solid #8b0000;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s;
+            font-size: 1.2rem;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .category-btn:hover {
+            background: linear-gradient(to bottom, #2a2a3e, #26314e);
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+            border-color: #ff4d4d;
+        }
+        
+        .category-btn i {
+            display: block;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        /* History Screen */
+        .history-list {
+            margin-top: 20px;
+            width: 100%;
+        }
+        
+        .history-item {
+            padding: 15px;
+            border-bottom: 1px solid #444;
+            background: rgba(20, 20, 30, 0.6);
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .history-info {
+            flex-grow: 1;
+        }
+        
+        .history-status {
+            font-weight: bold;
+            color: #00cc00;
+        }
+        
+        .history-status.lost {
+            color: #ff4d4d;
+        }
+        
+        .reset-btn {
+            padding: 12px 30px;
+            font-size: 1.1rem;
+            background: linear-gradient(to bottom, #8b0000, #660000);
+            color: #fff;
+            border: 2px solid #ff4d4d;
+            border-radius: 5px;
+            cursor: pointer;
+            display: block;
+            margin: 20px auto 0;
+            transition: all 0.3s;
+        }
+        
+        .reset-btn:hover {
+            background: linear-gradient(to bottom, #a30000, #800000);
+            transform: translateY(-3px);
+        }
+        
+        /* Result Screen */
+        .result-content {
+            text-align: center;
+            padding: 30px;
+            background: rgba(30, 30, 40, 0.8);
+            border: 3px solid #8b0000;
+            border-radius: 15px;
+            box-shadow: 0 0 25px rgba(139, 0, 0, 0.7);
+            max-width: 500px;
+            width: 90%;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .result-message {
+            font-size: 3rem;
+            text-align: center;
+            margin: 20px 0;
+            text-shadow: 0 0 10px #ff0000;
+            background: linear-gradient(to bottom, #ff4d4d, #cc0000);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: pulse 1.5s infinite alternate;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.05); }
+        }
+        
+        .result-word {
+            font-size: 2rem;
+            color: #ff9999;
+            margin: 15px 0;
+            font-style: italic;
+        }
+        
+        .result-stats {
+            margin: 25px 0;
+            font-size: 1.2rem;
+            background: rgba(20, 20, 30, 0.7);
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #8b0000;
+        }
+        
+        .result-stats p {
+            margin: 10px 0;
+        }
+        
+        .play-again-btn {
+            padding: 15px 40px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            background: linear-gradient(to bottom, #006600, #004400);
+            color: #fff;
+            border: 2px solid #00cc00;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 20px 10px;
+            transition: all 0.3s;
+            position: relative;
+            z-index: 10;
+        }
+        
+        .play-again-btn:hover {
+            background: linear-gradient(to bottom, #008800, #006600);
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 200, 0, 0.4);
+        }
+        
+        /* New Home Screen Elements */
+        .prison-lights {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255,0,0,0.2) 0%, transparent 70%);
+            animation: pulse 4s infinite alternate;
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        .escape-notice {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(139, 0, 0, 0.7);
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-size: 1.1rem;
+            animation: blink 2s infinite;
+            z-index: 10;
+        }
+        
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .buttons-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            z-index: 10;
+        }
+        
+        /* Blood effect */
+        .blood {
+            position: absolute;
+            top: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 50px;
+            background: #8b0000;
+            border-radius: 50%;
+            display: none;
+            z-index: 20;
+            animation: bloodDrip 2s forwards;
+        }
+        
+        @keyframes bloodDrip {
+            0% { transform: translateX(-50%) translateY(0); opacity: 1; }
+            100% { transform: translateX(-50%) translateY(150px); opacity: 0; }
+        }
+        
+        /* Difficulty indicators */
+        .difficulty-indicator {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: rgba(30, 30, 40, 0.8);
+            padding: 5px 10px;
+            border-radius: 20px;
+            border: 2px solid #ff4d4d;
+            font-size: 0.9rem;
+            z-index: 10;
+        }
+        
+        /* Timer */
+        .timer {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(30, 30, 40, 0.8);
+            padding: 5px 10px;
+            border-radius: 20px;
+            border: 2px solid #00cc00;
+            font-size: 0.9rem;
+            z-index: 10;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .title { font-size: 3.5rem; }
+            .game-title { font-size: 1.5rem; }
+            .word-display { font-size: 2rem; letter-spacing: 10px; }
+            .category-grid { grid-template-columns: 1fr; }
+            .letter-btn { width: 35px; height: 35px; font-size: 1.2rem; }
+            .hangman-container { width: 280px; height: 280px; }
+            .buttons-container { gap: 10px; }
+        }
+        
+        /* Concrete texture for background */
+        .concrete-texture {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(rgba(20, 20, 30, 0.8), rgba(10, 10, 20, 0.9)),
+                url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200"><rect width="200" height="200" fill="%23202030"/><path d="M0,100 Q50,80 100,100 T200,100" stroke="%23303040" stroke-width="2" fill="none"/><path d="M100,0 Q80,50 100,100 T100,200" stroke="%23303040" stroke-width="2" fill="none"/></svg>');
+            background-size: 300px 300px;
+            z-index: -1;
+        }
+        html, boby {
+            overflow: auto !important;
+            height:auto !important;
+        }
+        * {
+            touch-action: auto !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="concrete-texture"></div>
+    <div class="container">
+        <div class="prison-bars"></div>
+        
+        <!-- Home Screen -->
+        <div class="screen home-screen active">
+            <div class="prison-lights"></div>
+            <div class="chain">⛓️</div>
+            <div class="rat">🐀</div>
+            <div class="barbed-wire"></div>
+            
+            <div class="title-container">
+                <h1 class="title">PRISON BREAK</h1>
+                <div class="subtitle">HANGMAN ESCAPE</div>
+            </div>
+            
+            <div class="buttons-container">
+                <button class="menu-btn" id="start-btn">
+                    <i class="fas fa-play"></i> START GAME
+                </button>
+                <button class="menu-btn" id="settings-btn">
+                    <i class="fas fa-cog"></i> SETTINGS
+                </button>
+                <button class="menu-btn" id="history-btn">
+                    <i class="fas fa-history"></i> HISTORY
+                </button>
+                <button class="menu-btn" id="help-btn">
+                    <i class="fas fa-question-circle"></i> HELP
+                </button>
+            </div>
+            
+            <div class="escape-notice">
+                ESCAPE BEFORE IT'S TOO LATE!
+            </div>
+        </div>
+        
+        <!-- Selection Screen -->
+        <div class="screen selection-screen">
+            <div class="game-header">
+                <button class="menu-btn back-btn">
+                    <i class="fas fa-arrow-left"></i> BACK
+                </button>
+                <h2 class="game-title">SELECT YOUR CHALLENGE</h2>
+            </div>
+            <div class="selection-container">
+                <h3 style="text-align: center; margin-bottom: 20px; color: #ff9999;">Choose a Category:</h3>
+                <div class="category-grid">
+                    <div class="category-btn" data-category="movies">
+                        <i class="fas fa-film"></i> MOVIES
+                    </div>
+                    <div class="category-btn" data-category="countries">
+                        <i class="fas fa-globe"></i> COUNTRIES
+                    </div>
+                    <div class="category-btn" data-category="characters">
+                        <i class="fas fa-user"></i> CHARACTERS
+                    </div>
+                    <div class="category-btn" data-category="animals">
+                        <i class="fas fa-paw"></i> ANIMALS
+                    </div>
+                    <div class="category-btn" data-category="cities">
+                        <i class="fas fa-city"></i> CITIES
+                    </div>
+                    <div class="category-btn" data-category="food">
+                        <i class="fas fa-utensils"></i> FOOD
+                    </div>
+                </div>
+                
+                <div class="setting-item">
+                    <label for="difficulty">DIFFICULTY LEVEL:</label>
+                    <select id="difficulty">
+                        <option value="easy">Easy (8 attempts)</option>
+                        <option value="medium" selected>Medium (7 attempts)</option>
+                        <option value="hard">Hard (6 attempts)</option>
+                    </select>
+                </div>
+                
+                <button class="apply-btn" id="start-game-btn">
+                    <i class="fas fa-lock-open"></i> START ESCAPE
+                </button>
+            </div>
+        </div>
+        
+        <!-- Game Screen -->
+        <div class="screen game-screen">
+            <div class="game-header">
+                <button class="menu-btn back-btn">
+                    <i class="fas fa-arrow-left"></i> MENU
+                </button>
+                <h2 class="game-title">PRISON BREAK HANGMAN</h2>
+                <div class="hint-count">
+                    <i class="fas fa-lightbulb"></i> Hints: <span id="hint-count">2</span>
+                </div>
+            </div>
+            
+            <div class="difficulty-indicator" id="difficulty-indicator">
+                Difficulty: Medium
+            </div>
+            
+            <div class="timer" id="timer">
+                <i class="fas fa-clock"></i> Time: 00:00
+            </div>
+            
+            <div class="game-content">
+                <div class="hangman-container">
+                    <div class="gallows">
+                        <!-- Gallows structure -->
+                        <div class="hangman-part base"></div>
+                        <div class="hangman-part pole"></div>
+                        <div class="hangman-part beam"></div>
+                        <div class="hangman-part rope"></div>
+                        
+                        <!-- Hangman body parts -->
+                        <div class="hangman-part head"></div>
+                        <div class="hangman-part body"></div>
+                        <div class="hangman-part left-arm"></div>
+                        <div class="hangman-part right-arm"></div>
+                        <div class="hangman-part left-leg"></div>
+                        <div class="hangman-part right-leg"></div>
+                        
+                        <!-- Face expressions -->
+                        <div class="face" id="face-normal">😐</div>
+                        <div class="face" id="face-worried">😟</div>
+                        <div class="face" id="face-scared">😨</div>
+                        <div class="face" id="face-dead">💀</div>
+                        
+                        <!-- Blood effect -->
+                        <div class="blood" id="blood"></div>
+                    </div>
+                </div>
+                
+                <div class="word-display" id="word-display">_ _ _ _ _ _</div>
+                
+                <div class="hint-container">
+                    <div class="hint-box" id="hint-box">
+                        Click "Use Hint" to reveal a clue
+                    </div>
+                    <button class="hint-btn" id="hint-btn">
+                        <i class="fas fa-lightbulb"></i> USE HINT
+                    </button>
+                </div>
+                
+                <div class="keyboard" id="keyboard">
+                    <!-- Keyboard will be generated here -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- Settings Screen -->
+        <div class="screen settings-screen">
+            <div class="game-header">
+                <button class="menu-btn back-btn">
+                    <i class="fas fa-arrow-left"></i> BACK
+                </button>
+                <h2 class="game-title">PRISON SETTINGS</h2>
+            </div>
+            <div class="settings-container">
+                <div class="setting-item">
+                    <label for="theme">THEME:</label>
+                    <select id="theme">
+                        <option value="prison" selected>Prison Break</option>
+                        <option value="dark">Dark Mode</option>
+                        <option value="classic">Classic</option>
+                    </select>
+                </div>
+                <div class="setting-item">
+                    <label for="animations">ANIMATIONS:</label>
+                    <select id="animations">
+                        <option value="high" selected>High</option>
+                        <option value="medium">Medium</option>
+                        <option value="low">Low</option>
+                    </select>
+                </div>
+                <div class="setting-item">
+                    <label for="sound">SOUND EFFECTS:</label>
+                    <select id="sound">
+                        <option value="on" selected>On</option>
+                        <option value="off">Off</option>
+                    </select>
+                </div>
+                <div class="setting-item">
+                    <label for="hints">HINTS AVAILABLE:</label>
+                    <select id="hints-setting">
+                        <option value="1">1</option>
+                        <option value="2" selected>2</option>
+                        <option value="3">3</option>
+                    </select>
+                </div>
+                <div class="setting-item">
+                    <label for="graphics">GRAPHICS QUALITY:</label>
+                    <select id="graphics">
+                        <option value="high" selected>High</option>
+                        <option value="medium">Medium</option>
+                        <option value="low">Low</option>
+                    </select>
+                </div>
+                <button class="apply-btn" id="apply-settings">
+                    <i class="fas fa-save"></i> APPLY SETTINGS
+                </button>
+            </div>
+        </div>
+        
+        <!-- History Screen -->
+        <div class="screen history-screen">
+            <div class="game-header">
+                <button class="menu-btn back-btn">
+                    <i class="fas fa-arrow-left"></i> BACK
+                </button>
+                <h2 class="game-title">ESCAPE HISTORY</h2>
+            </div>
+            <div class="history-container">
+                <h3 style="text-align: center; margin-bottom: 20px; color: #ff9999;">Past Escape Attempts</h3>
+                <div class="history-list" id="history-list">
+                    <div class="history-item">
+                        <div class="history-info">No escape attempts recorded yet</div>
+                    </div>
+                </div>
+                <button class="reset-btn" id="reset-btn">
+                    <i class="fas fa-trash"></i> RESET HISTORY
+                </button>
+            </div>
+        </div>
+        
+        <!-- Help Screen -->
+        <div class="screen help-screen">
+            <div class="game-header">
+                <button class="menu-btn back-btn">
+                    <i class="fas fa-arrow-left"></i> BACK
+                </button>
+                <h2 class="game-title">PRISONER'S GUIDE</h2>
+            </div>
+            <div class="help-container">
+                <h3 style="color: #ff9999; margin-bottom: 15px;">How to Escape:</h3>
+                <p>1. Guess the hidden word by selecting letters to avoid execution.</p>
+                <p>2. Each incorrect guess adds a part to the hangman. Wrong guesses allowed:</p>
+                <ul>
+                    <li>Easy: 8 attempts</li>
+                    <li>Medium: 7 attempts</li>
+                    <li>Hard: 6 attempts</li>
+                </ul>
+                <p>3. Use hints when you're stuck - but use them wisely as they reduce your final score.</p>
+                <p>4. Complete the word before the hangman is fully drawn to escape.</p>
+                
+                <h3 style="color: #ff9999; margin: 20px 0 15px;">Hangman Sequence:</h3>
+                <p>1. Rope appears (always visible)</p>
+                <p>2. Head appears (1st wrong guess)</p>
+                <p>3. Body appears (2nd wrong guess)</p>
+                <p>4. Left arm (3rd wrong guess)</p>
+                <p>5. Right arm (4th wrong guess)</p>
+                <p>6. Left leg (5th wrong guess)</p>
+                <p>7. Right leg (6th wrong guess) - GAME OVER!</p>
+                
+                <h3 style="color: #ff9999; margin: 20px 0 15px;">Scoring System:</h3>
+                <p>- Each correct letter: +10 points</p>
+                <p>- Each hint used: -25 points</p>
+                <p>- Winning without hints: Bonus +50 points</p>
+                <p>- Each remaining life: +15 points</p>
+                <p>- Time bonus: +1 point per second remaining</p>
+                
+                <p style="margin-top: 25px; text-align: center; font-style: italic; color: #ff4d4d;">
+                    Escape the prison before it's too late!
+                </p>
+            </div>
+        </div>
+        
+        <!-- Result Screen -->
+        <div class="screen result-screen">
+            <div class="result-content">
+                <div class="result-message" id="result-message">YOU ESCAPED!</div>
+                <div class="result-word" id="result-word">Word: FREEDOM</div>
+                
+                <div class="result-stats">
+                    <p>Attempts: <span id="attempts-stat">5</span>/<span id="max-attempts">6</span></p>
+                    <p>Hints Used: <span id="hints-stat">1</span></p>
+                    <p>Time: <span id="time-stat">00:45</span></p>
+                    <p>Score: <span id="score-stat">175</span></p>
+                </div>
+                
+                <button class="play-again-btn" id="play-again-btn">
+                    <i class="fas fa-redo"></i> PLAY AGAIN
+                </button>
+                <button class="menu-btn back-btn">
+                    <i class="fas fa-home"></i> MAIN MENU
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Enhanced word bank with difficulty levels
+         const wordBank = {
+    movies: {
+        easy: [
+            { word: "TITANIC", hint: "A ship that sank on its maiden voyage" },
+            { word: "JURASSIC", hint: "Dinosaurs come back to life" },
+            { word: "ROCKY", hint: "Boxing underdog story" },
+            { word: "JAWS", hint: "Shark attack thriller" },
+            { word: "FROZEN", hint: "Animated film with ice powers" },
+            { word: "TOYSTORY", hint: "Adventures of sentient toys" },
+            { word: "BATMAN", hint: "Caped crusader of Gotham" },
+            { word: "AVATAR", hint: "Blue aliens on Pandora" },
+            { word: "ET", hint: "Friendly stranded alien" },
+            { word: "GHOSTBUSTERS", hint: "Paranormal exterminators" },
+            { word: "MADMAX", hint: "Post-apocalyptic road warrior" },
+            { word: "SHREK", hint: "Grumpy green ogre" },
+            { word: "ALADDIN", hint: "Street rat with a magic lamp" },
+            { word: "JUMANJI", hint: "Dangerous jungle board game" },
+            { word: "GREMLINS", hint: "Mischievous creatures after midnight" },
+            { word: "BACKTOTHEFUTURE", hint: "Time-traveling DeLorean" },
+            { word: "JOKER", hint: "Origin story of Batman's nemesis" },
+            { word: "SCOOBYDOO", hint: "Mystery-solving talking dog" },
+            { word: "WALL-E", hint: "Lonely trash-compacting robot" },
+            { word: "SPIDERMAN", hint: "Web-slinging superhero" }
+        ],
+        medium: [
+            { word: "INCEPTION", hint: "A dream within a dream within a dream" },
+            { word: "GLADIATOR", hint: "Roman general who became a gladiator" },
+            { word: "MATRIX", hint: "Virtual reality simulation" },
+            { word: "GRAVITY", hint: "Astronauts stranded in space" },
+            { word: "CASABLANCA", hint: "WWII romance in Morocco" },
+            { word: "PSYCHOPASS", hint: "Crime-predicting system" },
+            { word: "INTOUCHABLES", hint: "Quadriplegic and his caretaker" },
+            { word: "AMERICANBEAUTY", hint: "Suburban midlife crisis" },
+            { word: "BRAVEHEART", hint: "Scottish freedom fighter" },
+            { word: "GOODFELLAS", hint: "Life in the mafia" },
+            { word: "PARASITE", hint: "Class struggle in South Korea" },
+            { word: "WHIPLASH", hint: "Drummer and abusive instructor" },
+            { word: "REQUIEMFORADREAM", hint: "Devastating addiction stories" },
+            { word: "BLADERUNNER", hint: "Neo-noir future with replicants" },
+            { word: "SILENCEOFTHELAMBS", hint: "Cannibalistic psychiatrist" },
+            { word: "DEPARTED", hint: "Undercover cops in Irish mob" },
+            { word: "PRESTIGE", hint: "Rival magicians' dangerous feud" },
+            { word: "FIFTHELEMENT", hint: "Sci-fi with cosmic elements" },
+            { word: "SINCE", hint: "Man wrongly imprisoned" },
+            { word: "FARGO", hint: "Minnesota crime gone wrong" }
+        ],
+        hard: [
+            { word: "INTERSTELLAR", hint: "Space exploration through wormholes" },
+            { word: "PSYCHO", hint: "Classic Hitchcock thriller" },
+            { word: "METROPOLIS", hint: "Futuristic dystopian city" },
+            { word: "APOCALYPSE", hint: "Vietnam war epic" },
+            { word: "CITIZENKANE", hint: "Rosebud mystery" },
+            { word: "SEVEN", hint: "Seven deadly sins murders" },
+            { word: "MEMENTO", hint: "Reverse-chronology amnesia thriller" },
+            { word: "APOCALYPTONOW", hint: "Surreal Vietnam war journey" },
+            { word: "CLOCKWORKORANGE", hint: "Dystopian ultraviolence" },
+            { word: "AMADEUS", hint: "Mozart and Salieri rivalry" },
+            { word: "PANS", hint: "Spanish Civil War fantasy" },
+            { word: "SHINING", hint: "Isolated hotel descent into madness" },
+            { word: "GOODBADUGLY", hint: "Spaghetti Western standoff" },
+            { word: "VERTIGO", hint: "Hitchcock's obsession thriller" },
+            { word: "SOLARIS", hint: "Sentient ocean psychological drama" },
+            { word: "RASHOMON", hint: "Contradictory witness accounts" },
+            { word: "DOGVILLE", hint: "Minimalist morality play" },
+            { word: "IKIRU", hint: "Dying bureaucrat's final quest" },
+            { word: "PERSONA", hint: "Identity-swapping psychological drama" },
+            { word: "STALKER", hint: "Journey to the forbidden Zone" }
+        ]
+    },
+    countries: {
+        easy: [
+            { word: "CHINA", hint: "Most populous country" },
+            { word: "EGYPT", hint: "Pyramids and Nile river" },
+            { word: "ITALY", hint: "Shaped like a boot" },
+            { word: "JAPAN", hint: "Land of the rising sun" },
+            { word: "INDIA", hint: "Taj Mahal and Bollywood" },
+            { word: "BRAZIL", hint: "Amazon rainforest and Carnival" },
+            { word: "CANADA", hint: "Maple syrup and moose" },
+            { word: "FRANCE", hint: "Eiffel Tower and baguettes" },
+            { word: "GERMANY", hint: "Oktoberfest and autobahns" },
+            { word: "MEXICO", hint: "Day of the Dead and tacos" },
+            { word: "SPAIN", hint: "Flamenco and paella" },
+            { word: "GREECE", hint: "Birthplace of democracy" },
+            { word: "TURKEY", hint: "Connects Europe and Asia" },
+            { word: "KENYA", hint: "Safaris and Maasai warriors" },
+            { word: "RUSSIA", hint: "Largest country by area" },
+            { word: "SWEDEN", hint: "IKEA and ABBA" },
+            { word: "NIGERIA", hint: "Nollywood and oil reserves" },
+            { word: "THAILAND", hint: "Land of smiles" },
+            { word: "POLAND", hint: "Pierogi and Chopin" },
+            { word: "ARGENTINA", hint: "Tango and Patagonia" }
+        ],
+        medium: [
+            { word: "ARGENTINA", hint: "Tango and Patagonia" },
+            { word: "AUSTRALIA", hint: "Kangaroos and koalas" },
+            { word: "MOROCCO", hint: "Gateway to the Sahara" },
+            { word: "VIETNAM", hint: "Southeast Asian country" },
+            { word: "COLOMBIA", hint: "Coffee and emeralds" },
+            { word: "PERU", hint: "Machu Picchu and llamas" },
+            { word: "UKRAINE", hint: "Sunflower fields and Chernobyl" },
+            { word: "BELGIUM", hint: "EU headquarters and chocolates" },
+            { word: "AUSTRIA", hint: "Sound of Music and Alps" },
+            { word: "MALAYSIA", hint: "Petronas Towers and diverse culture" },
+            { word: "SOUTHAFRICA", hint: "Nelson Mandela and safari" },
+            { word: "PORTUGAL", hint: "Vasco da Gama and pastéis de nata" },
+            { word: "NORWAY", hint: "Fjords and Northern Lights" },
+            { word: "FINLAND", hint: "Midnight sun and saunas" },
+            { word: "PHILIPPINES", hint: "Archipelago with 7,000+ islands" },
+            { word: "ROMANIA", hint: "Transylvania and Dracula" },
+            { word: "CHILE", hint: "Longest north-south country" },
+            { word: "HUNGARY", hint: "Thermal baths and paprika" },
+            { word: "DENMARK", hint: "LEGO and Vikings" },
+            { word: "CZECHIA", hint: "Bohemian crystal and Prague" }
+        ],
+        hard: [
+            { word: "MADAGASCAR", hint: "Island nation with unique wildlife" },
+            { word: "KAZAKHSTAN", hint: "Largest landlocked country" },
+            { word: "AZERBAIJAN", hint: "Caucasus region country" },
+            { word: "KYRGYZSTAN", hint: "Central Asian mountainous country" },
+            { word: "TUVALU", hint: "Pacific island nation sinking" },
+            { word: "LIECHTENSTEIN", hint: "Microstate between Switzerland/Austria" },
+            { word: "ANDORRA", hint: "Tiny country in Pyrenees mountains" },
+            { word: "BHUTAN", hint: "Measures Gross National Happiness" },
+            { word: "COMOROS", hint: "Volcanic islands near Madagascar" },
+            { word: "DJIBOUTI", hint: "Strategic Horn of Africa port" },
+            { word: "EQUATORIALGUINEA", hint: "Only Spanish-speaking African nation" },
+            { word: "KIRIBATI", hint: "First country to see new day" },
+            { word: "MICRONESIA", hint: "Pacific nation of 600+ islands" },
+            { word: "NAURU", hint: "World's smallest island nation" },
+            { word: "PALAU", hint: "Rock Islands and jellyfish lakes" },
+            { word: "SURINAME", hint: "South American Dutch-speaking country" },
+            { word: "TONGA", hint: "Pacific kingdom of 170 islands" },
+            { word: "VANUATU", hint: "Volcanic islands with cargo cults" },
+            { word: "SANMARINO", hint: "Oldest surviving sovereign state" },
+            { word: "MONACO", hint: "Billionaires and Grand Prix" }
+        ]
+    },
+    characters: {
+        easy: [
+            { word: "HULK", hint: "Big green superhero" },
+            { word: "ZORRO", hint: "Masked swordsman" },
+            { word: "JOKER", hint: "Batman's nemesis" },
+            { word: "ELSA", hint: "Frozen queen with powers" },
+            { word: "MICKEYMOUSE", hint: "Disney's iconic mouse" },
+            { word: "SUPERMAN", hint: "Kryptonian hero" },
+            { word: "WONDERWOMAN", hint: "Amazonian warrior princess" },
+            { word: "HARRYPOTTER", hint: "Boy with lightning scar" },
+            { word: "SPONGEBOB", hint: "Porous yellow sea creature" },
+            { word: "POKEMON", hint: "Pocket monsters" },
+            { word: "BATMAN", hint: "Dark knight detective" },
+            { word: "CINDERELLA", hint: "Glass slipper princess" },
+            { word: "DONALDDUCK", hint: "Temperamental Disney duck" },
+            { word: "SHREK", hint: "Ogre in a swamp" },
+            { word: "PETERPAN", hint: "Boy who never grows up" },
+            { word: "MINION", hint: "Yellow capsule-shaped henchmen" },
+            { word: "JAMESBOND", hint: "British secret agent 007" },
+            { word: "MULAN", hint: "Chinese warrior maiden" },
+            { word: "SIMBA", hint: "Lion King heir" },
+            { word: "PUSSINBOOTS", hint: "Swashbuckling feline" }
+        ],
+        medium: [
+            { word: "SHERLOCK", hint: "Brilliant detective at 221B" },
+            { word: "GANDALF", hint: "Grey wizard from Middle-earth" },
+            { word: "SCARLETT", hint: "Avengers character with red hair" },
+            { word: "WOLVERINE", hint: "Mutant with adamantium claws" },
+            { word: "NEO", hint: "The One in the Matrix" },
+            { word: "LEGOLAS", hint: "Elven archer in LOTR" },
+            { word: "KHALEESI", hint: "Mother of Dragons" },
+            { word: "OBIWANKENOBI", hint: "Jedi master" },
+            { word: "WONDERWOMAN", hint: "Diana Prince" },
+            { word: "TONYSTARK", hint: "Iron Man" },
+            { word: "ARAGORN", hint: "Ranger who became king" },
+            { word: "KATNISS", hint: "Girl on fire" },
+            { word: "DAREDEVIL", hint: "Blind vigilante" },
+            { word: "ELEVEN", hint: "Psychokinetic girl from Hawkins" },
+            { word: "VOLDEMORT", hint: "He-Who-Must-Not-Be-Named" },
+            { word: "SAURON", hint: "Lord of the Rings' dark lord" },
+            { word: "TYRION", hint: "Game of Thrones dwarf character" },
+            { word: "MORPHEUS", hint: "Matrix red pill offerer" },
+            { word: "JOHNWICK", hint: "Baba Yaga assassin" },
+            { word: "BLACKWIDOW", hint: "Russian spy Avenger" }
+        ],
+        hard: [
+            { word: "DARTHVADER", hint: "Sith Lord with heavy breathing" },
+            { word: "MAGNIFICENT", hint: "Western film characters" },
+            { word: "BOROMIR", hint: "Lord of the Rings character" },
+            { word: "TYRION", hint: "Game of Thrones dwarf character" },
+            { word: "RORSCHACH", hint: "Watchmen's uncompromising vigilante" },
+            { word: "BENJAMINBUTTON", hint: "Man who aged backwards" },
+            { word: "KEVINMCCALLISTER", hint: "Home Alone kid" },
+            { word: "LISBETH", hint: "Hacker in Dragon Tattoo series" },
+            { word: "ATTICUSFINCH", hint: "To Kill a Mockingbird lawyer" },
+            { word: "HANNIBAL", hint: "Cannibalistic psychiatrist" },
+            { word: "PATRICKBATEMAN", hint: "Psychopathic businessman" },
+            { word: "DONNIE", hint: "Troubled teen in Darko" },
+            { word: "ROCKYBALBOA", hint: "Philadelphia boxer" },
+            { word: "WALTERWHITE", hint: "Chemistry teacher turned meth kingpin" },
+            { word: "TYLERDURDEN", hint: "Fight Club anarchist" },
+            { word: "AMELIE", hint: "Whimsical Parisian waitress" },
+            { word: "LELOU", hint: "Fifth Element's perfect being" },
+            { word: "BEATRIXKIDDO", hint: "Bride seeking vengeance" },
+            { word: "ANTON", hint: "No Country for Old Men's hitman" },
+            { word: "GOLLUM", hint: "Ring-obsessed creature" }
+        ]
+    },
+    animals: {
+        easy: [
+            { word: "LION", hint: "King of the jungle" },
+            { word: "TIGER", hint: "Striped big cat" },
+            { word: "BEAR", hint: "Hibernating forest animal" },
+            { word: "WOLF", hint: "Pack hunting canine" },
+            { word: "ELEPHANT", hint: "Large mammal with trunk" },
+            { word: "GIRAFFE", hint: "Long-necked herbivore" },
+            { word: "MONKEY", hint: "Tree-swinging primate" },
+            { word: "KANGAROO", hint: "Hopping marsupial" },
+            { word: "ZEBRA", hint: "Black and white striped horse" },
+            { word: "CROCODILE", hint: "Large aquatic reptile" },
+            { word: "HIPPO", hint: "Large semi-aquatic mammal" },
+            { word: "PANDA", hint: "Bamboo-eating bear" },
+            { word: "KOALA", hint: "Eucalyptus-eating marsupial" },
+            { word: "PENGUIN", hint: "Flightless Antarctic bird" },
+            { word: "CHEETAH", hint: "Fastest land animal" },
+            { word: "GORILLA", hint: "Largest primate" },
+            { word: "RHINO", hint: "Horned herbivore" },
+            { word: "LEOPARD", hint: "Spotted big cat" },
+            { word: "EAGLE", hint: "Majestic bird of prey" },
+            { word: "DOLPHIN", hint: "Intelligent marine mammal" }
+        ],
+        medium: [
+            { word: "GORILLA", hint: "Largest primate" },
+            { word: "PANTHER", hint: "Black big cat" },
+            { word: "OCTOPUS", hint: "Eight-armed sea creature" },
+            { word: "GIRAFFE", hint: "Long-necked herbivore" },
+            { word: "CHEETAH", hint: "Spotted speedster" },
+            { word: "KOMODO", hint: "World's largest lizard" },
+            { word: "MANATEE", hint: "Gentle sea cow" },
+            { word: "WALRUS", hint: "Tusked Arctic pinniped" },
+            { word: "AARDVARK", hint: "Ant-eating nocturnal mammal" },
+            { word: "MEERKAT", hint: "Desert-dwelling mongoose" },
+            { word: "CARACAL", hint: "Tufted-eared wild cat" },
+            { word: "BINTURONG", hint: "Smells like popcorn" },
+            { word: "TASMANIANDEVIL", hint: "Aggressive marsupial" },
+            { word: "QUOKKA", hint: "Smiling Australian marsupial" },
+            { word: "FENNEC", hint: "Desert fox with big ears" },
+            { word: "SAIGA", hint: "Antelope with trunk-like nose" },
+            { word: "MARKHOR", hint: "Screw-horned goat" },
+            { word: "BABIRUSA", hint: "Tusked pig-deer" },
+            { word: "OKAPI", hint: "Forest giraffe relative" },
+            { word: "TAPIR", hint: "Prehensile-snouted herbivore" }
+        ],
+        hard: [
+            { word: "PLATYPUS", hint: "Egg-laying mammal" },
+            { word: "NARWHAL", hint: "Unicorn of the sea" },
+            { word: "MANTIS", hint: "Praying insect" },
+            { word: "CHAMELEON", hint: "Color-changing lizard" },
+            { word: "AXOLOTL", hint: "Mexican walking fish" },
+            { word: "SOLENODON", hint: "Venomous shrew-like mammal" },
+            { word: "ECHIDNA", hint: "Spiny egg-laying mammal" },
+            { word: "AYEAYE", hint: "Long-fingered lemur" },
+            { word: "PANGOLIN", hint: "Scaly anteater" },
+            { word: "TARSIER", hint: "Giant-eyed nocturnal primate" },
+            { word: "KAKAPO", hint: "Flightless parrot" },
+            { word: "QUETZAL", hint: "Resplendent Central American bird" },
+            { word: "SAOLA", hint: "Asian unicorn" },
+            { word: "MATAMATA", hint: "Knobby-shelled turtle" },
+            { word: "GAVIAL", hint: "Thin-snouted crocodilian" },
+            { word: "DIABLOTIN", hint: "Black-capped petrel" },
+            { word: "FOSSA", hint: "Madagascar's top predator" },
+            { word: "MIMIC", hint: "Octopus with shape-shifting abilities" },
+            { word: "DUGONG", hint: "Marine cousin of manatee" },
+            { word: "PROBOSCIS", hint: "Long-nosed monkey" }
+        ]
+    },
+    cities: {
+        easy: [
+            { word: "PARIS", hint: "City of light and love" },
+            { word: "TOKYO", hint: "High-tech Japanese capital" },
+            { word: "CAIRO", hint: "Egyptian city near pyramids" },
+            { word: "ROME", hint: "Eternal city with ancient ruins" },
+            { word: "NEWYORK", hint: "Big Apple" },
+            { word: "LONDON", hint: "Thames and Big Ben" },
+            { word: "SYDNEY", hint: "Opera House and Harbour Bridge" },
+            { word: "BEIJING", hint: "Forbidden City capital" },
+            { word: "MOSCOW", hint: "Red Square and Kremlin" },
+            { word: "BERLIN", hint: "Berlin Wall history" },
+            { word: "DUBAI", hint: "Skyscrapers and artificial islands" },
+            { word: "DELHI", hint: "Capital of India" },
+            { word: "TORONTO", hint: "CN Tower metropolis" },
+            { word: "SINGAPORE", hint: "Garden city-state" },
+            { word: "AMSTERDAM", hint: "Canals and bicycles" },
+            { word: "ATHENS", hint: "Acropolis and ancient gods" },
+            { word: "RIO", hint: "Christ the Redeemer statue" },
+            { word: "MUMBAI", hint: "Bollywood and Gateway of India" },
+            { word: "SEOUL", hint: "K-Pop capital" },
+            { word: "HONGKONG", hint: "Skyscrapers and Victoria Harbour" }
+        ],
+        medium: [
+            { word: "ISTANBUL", hint: "Transcontinental city" },
+            { word: "BANGKOK", hint: "Thai capital with temples" },
+            { word: "PRAGUE", hint: "City of a hundred spires" },
+            { word: "VIENNA", hint: "City of music and waltzes" },
+            { word: "BUDAPEST", hint: "Danube River divided city" },
+            { word: "OSLO", hint: "Nobel Peace Prize ceremony" },
+            { word: "HELSINKI", hint: "Design capital on Baltic Sea" },
+            { word: "LISBON", hint: "Seven hills and trams" },
+            { word: "DUBLIN", hint: "Guinness and literary history" },
+            { word: "COPENHAGEN", hint: "Nyhavn harbor and Little Mermaid" },
+            { word: "EDINBURGH", hint: "Medieval Old Town" },
+            { word: "MONTREAL", hint: "French-speaking Canadian city" },
+            { word: "KYOTO", hint: "Ancient capital of Japan" },
+            { word: "FLORENCE", hint: "Renaissance art hub" },
+            { word: "VENICE", hint: "Canals and gondolas" },
+            { word: "MUNICH", hint: "Oktoberfest headquarters" },
+            { word: "BRUSSELS", hint: "EU capital and Manneken Pis" },
+            { word: "WARSAW", hint: "Phoenix city of Europe" },
+            { word: "ZURICH", hint: "Banking hub on Lake Zurich" },
+            { word: "STPETERSBURG", hint: "Venice of the North" }
+        ],
+        hard: [
+            { word: "BARCELONA", hint: "Spanish city with Gaudi architecture" },
+            { word: "STOCKHOLM", hint: "Scandinavian capital spread across islands" },
+            { word: "BUENOSAIRES", hint: "Paris of South America" },
+            { word: "KATHMANDU", hint: "Capital of Nepal" },
+            { word: "ULAANBAATAR", hint: "Coldest capital city" },
+            { word: "PORTVILA", hint: "Volcanic Vanuatu capital" },
+            { word: "THIMPHU", hint: "Himalayan capital with no traffic lights" },
+            { word: "PORTMORESBY", hint: "Papua New Guinea's capital" },
+            { word: "BISSAU", hint: "Guinea-Bissau capital" },
+            { word: "ASUNCION", hint: "Landlocked Paraguay capital" },
+            { word: "SUCRE", hint: "Constitutional capital of Bolivia" },
+            { word: "DUSHANBE", hint: "Tajikistan's capital" },
+            { word: "BISHKEK", hint: "Kyrgyzstan's capital" },
+            { word: "DODOMA", hint: "Tanzania's official capital" },
+            { word: "YAMOUSSOUKRO", hint: "Ivory Coast's political capital" },
+            { word: "PORTLOUIS", hint: "Mauritius capital" },
+            { word: "VADUZ", hint: "Liechtenstein's castle capital" },
+            { word: "ANDORRALAVELLA", hint: "Highest European capital" },
+            { word: "TASHKENT", hint: "Uzbekistan's largest city" },
+            { word: "ASHGABAT", hint: "Turkmenistan's marble city" }
+        ]
+    },
+    food: {
+        easy: [
+            { word: "PIZZA", hint: "Italian flatbread with toppings" },
+            { word: "SUSHI", hint: "Japanese rice and fish dish" },
+            { word: "TACOS", hint: "Mexican folded tortillas" },
+            { word: "PASTA", hint: "Italian dough-based dishes" },
+            { word: "BURGER", hint: "Patty in a bun" },
+            { word: "CURRY", hint: "Spiced sauce dish" },
+            { word: "SALAD", hint: "Mixed raw vegetables" },
+            { word: "STEAK", hint: "Grilled beef cut" },
+            { word: "RAMEN", hint: "Japanese noodle soup" },
+            { word: "DONUTS", hint: "Ring-shaped fried dough" },
+            { word: "PAELLA", hint: "Spanish saffron rice dish" },
+            { word: "GYROS", hint: "Greek rotating meat wrap" },
+            { word: "FALAFEL", hint: "Middle Eastern chickpea fritters" },
+            { word: "DIMSUM", hint: "Chinese bite-sized portions" },
+            { word: "BURRITO", hint: "Large wheat flour tortilla wrap" },
+            { word: "LASAGNA", hint: "Layered pasta dish" },
+            { word: "RISOTTO", hint: "Creamy Italian rice" },
+            { word: "WAFFLES", hint: "Grid-patterned breakfast" },
+            { word: "PANCAKES", hint: "Flat breakfast cakes" },
+            { word: "OMELET", hint: "Beaten eggs fried with filling" }
+        ],
+        medium: [
+            { word: "LASAGNA", hint: "Layered pasta dish" },
+            { word: "RATATOUILLE", hint: "French vegetable stew" },
+            { word: "GUACAMOLE", hint: "Avocado-based Mexican dip" },
+            { word: "MOUSSAKA", hint: "Greek eggplant dish" },
+            { word: "BOEUFBOURGUIGNON", hint: "French beef stew" },
+            { word: "TIRAMISU", hint: "Coffee-flavored Italian dessert" },
+            { word: "CEVICHE", hint: "Peruvian citrus-marinated seafood" },
+            { word: "HUMMUS", hint: "Chickpea and tahini spread" },
+            { word: "DOLMADES", hint: "Stuffed grape leaves" },
+            { word: "GAZPACHO", hint: "Cold Spanish tomato soup" },
+            { word: "PHO", hint: "Vietnamese noodle soup" },
+            { word: "BIBIMBAP", hint: "Korean mixed rice bowl" },
+            { word: "BOUNTY", hint: "Coconut chocolate bar" },
+            { word: "EMPANADAS", hint: "Latin American stuffed pastries" },
+            { word: "BRATWURST", hint: "German sausage" },
+            { word: "CANNOLI", hint: "Sicilian pastry tubes" },
+            { word: "CHIMICHURRI", hint: "Argentinian green sauce" },
+            { word: "MOCHI", hint: "Japanese rice cake" },
+            { word: "BAKLAVA", hint: "Layered nut pastry" },
+            { word: "POUTINE", hint: "Canadian fries with gravy" }
+        ],
+        hard: [
+            { word: "BOUILLABAISSE", hint: "French fish stew" },
+            { word: "BRUSCHETTA", hint: "Italian toasted bread appetizer" },
+            { word: "PHILLYSTEAK", hint: "American sandwich with cheese" },
+            { word: "FONDUE", hint: "Melted cheese dish" },
+            { word: "CONSOMME", hint: "Clear refined broth" },
+            { word: "SOUFFLE", hint: "Light baked egg dish" },
+            { word: "QUESADILLA", hint: "Grilled cheese tortilla" },
+            { word: "ESCARGOT", hint: "Edible land snails" },
+            { word: "BOEUFEN", hint: "French beef in pastry" },
+            { word: "BEARNAISE", hint: "French emulsified sauce" },
+            { word: "MENUDO", hint: "Mexican tripe soup" },
+            { word: "ADOBO", hint: "Filipino vinegar stew" },
+            { word: "BOUDIN", hint: "Cajun sausage" },
+            { word: "HAGGIS", hint: "Scottish sheep platter" },
+            { word: "MOLE", hint: "Mexican chili-chocolate sauce" },
+            { word: "PAVLOVA", hint: "Meringue-based dessert" },
+            { word: "CASSATA", hint: "Sicilian layered cake" },
+            { word: "SAVOR", hint: "Umami-rich Japanese taste" },
+            { word: "TABBOULEH", hint: "Levantine parsley salad" },
+            { word: "BORSCHT", hint: "Eastern European beet soup" }
+        ]
+    }
+};
+        
+        // DOM Elements
+        const screens = {
+            home: document.querySelector('.home-screen'),
+            selection: document.querySelector('.selection-screen'),
+            game: document.querySelector('.game-screen'),
+            settings: document.querySelector('.settings-screen'),
+            history: document.querySelector('.history-screen'),
+            help: document.querySelector('.help-screen'),
+            result: document.querySelector('.result-screen')
+        };
+        
+        // Game state
+        let gameState = {
+            word: "",
+            hint: "",
+            category: "",
+            difficulty: "medium",
+            guessedLetters: [],
+            incorrectAttempts: 0,
+            maxAttempts: 7,
+            hints: 2,
+            status: "playing",
+            score: 0,
+            startTime: null,
+            hintParts: [],
+            currentHintPart: 0,
+            timerInterval: null,
+            elapsedTime: 0
+        };
+        
+        // Navigation
+        document.getElementById('start-btn').addEventListener('click', () => showScreen('selection'));
+        document.getElementById('settings-btn').addEventListener('click', () => showScreen('settings'));
+        document.getElementById('history-btn').addEventListener('click', () => {
+            showScreen('history');
+            loadHistory();
+        });
+        document.getElementById('help-btn').addEventListener('click', () => showScreen('help'));
+        
+        // Back buttons
+        document.querySelectorAll('.back-btn').forEach(btn => {
+            btn.addEventListener('click', () => showScreen('home'));
+        });
+        
+        // Category selection
+        document.querySelectorAll('.category-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Remove active class from all buttons
+                document.querySelectorAll('.category-btn').forEach(b => {
+                    b.style.borderColor = "#8b0000";
+                    b.style.boxShadow = "0 4px 8px rgba(0, 0, 0, 0.3)";
+                });
+                
+                // Add active class to clicked button
+                btn.style.borderColor = "#ff4d4d";
+                btn.style.boxShadow = "0 0 15px rgba(255, 0, 0, 0.6)";
+                gameState.category = btn.dataset.category;
+            });
+        });
+        
+        // Start game
+        document.getElementById('start-game-btn').addEventListener('click', () => {
+            if (!gameState.category) {
+                alert("Please select a category!");
+                return;
+            }
+            
+            gameState.difficulty = document.getElementById('difficulty').value;
+            showScreen('game');
+            initGame();
+        });
+        
+        // Apply settings
+        document.getElementById('apply-settings').addEventListener('click', () => {
+            gameState.hints = parseInt(document.getElementById('hints-setting').value);
+            const graphics = document.getElementById('graphics').value;
+            
+            // Apply graphics setting
+            if(graphics === 'high') {
+                document.body.style.background = 'linear-gradient(135deg, #0c0c17, #1a1a2e)';
+                document.querySelector('.concrete-texture').style.opacity = '1';
+            } else if(graphics === 'medium') {
+                document.body.style.background = 'linear-gradient(135deg, #1a1a2e, #16213e)';
+                document.querySelector('.concrete-texture').style.opacity = '0.7';
+            } else {
+                document.body.style.background = '#16213e';
+                document.querySelector('.concrete-texture').style.opacity = '0.4';
+            }
+            
+            alert("Settings applied successfully!");
+        });
+        
+        // Reset history
+        document.getElementById('reset-btn').addEventListener('click', () => {
+            localStorage.removeItem('hangmanHistory');
+            loadHistory();
+        });
+        
+        // Play again
+        document.getElementById('play-again-btn').addEventListener('click', () => {
+            showScreen('selection');
+        });
+        
+        // Utility functions
+        function showScreen(screenName) {
+            // Hide all screens
+            Object.values(screens).forEach(screen => screen.classList.remove('active'));
+            // Show requested screen
+            screens[screenName].classList.add('active');
+        }
+        
+        function loadHistory() {
+            const historyList = document.getElementById('history-list');
+            const history = JSON.parse(localStorage.getItem('hangmanHistory')) || [];
+            
+            if (history.length === 0) {
+                historyList.innerHTML = '<div class="history-item"><div class="history-info">No escape attempts recorded yet</div></div>';
+                return;
+            }
+            
+            historyList.innerHTML = '';
+            history.slice(0, 10).forEach((item, index) => {
+                const historyItem = document.createElement('div');
+                historyItem.className = 'history-item';
+                historyItem.innerHTML = `
+                    <div class="history-info">
+                        <strong>${item.status === 'won' ? 'Escaped' : 'Executed'}</strong> - 
+                        Word: ${item.word}, 
+                        Score: ${item.score}
+                    </div>
+                    <div class="history-status ${item.status === 'lost' ? 'lost' : ''}">${item.status === 'won' ? '✓' : '✗'}</div>
+                `;
+                historyList.appendChild(historyItem);
+            });
+        }
+        
+        // Initialize game
+        function initGame() {
+            // Reset game state
+            gameState.guessedLetters = [];
+            gameState.incorrectAttempts = 0;
+            gameState.status = "playing";
+            gameState.score = 0;
+            gameState.startTime = new Date();
+            gameState.currentHintPart = 0;
+            gameState.hintParts = [];
+            gameState.elapsedTime = 0;
+            
+            // Clear timer
+            if (gameState.timerInterval) {
+                clearInterval(gameState.timerInterval);
+            }
+            
+            // Set max attempts based on difficulty
+            if (gameState.difficulty === 'easy') {
+                gameState.maxAttempts = 8;
+            } else if (gameState.difficulty === 'medium') {
+                gameState.maxAttempts = 7;
+            } else {
+                gameState.maxAttempts = 6;
+            }
+            
+            // Update difficulty indicator
+            document.getElementById('difficulty-indicator').textContent = 
+                `Difficulty: ${gameState.difficulty.charAt(0).toUpperCase() + gameState.difficulty.slice(1)}`;
+            
+            // Start timer
+            gameState.timerInterval = setInterval(updateTimer, 1000);
+            
+            // Select a random word from the category and difficulty
+            const words = wordBank[gameState.category][gameState.difficulty];
+            const randomWord = words[Math.floor(Math.random() * words.length)];
+            gameState.word = randomWord.word;
+            gameState.hint = randomWord.hint;
+            
+            // Split hint into parts for progressive reveal
+            const wordsArr = gameState.hint.split(' ');
+            const partLength = Math.ceil(wordsArr.length / 3);
+            for (let i = 0; i < 3; i++) {
+                gameState.hintParts.push(wordsArr.slice(i * partLength, (i+1) * partLength).join(' '));
+            }
+            
+            // Reset hint box
+            document.getElementById('hint-box').textContent = "Click 'Use Hint' to reveal a clue";
+            
+            // Reset hangman display
+            const parts = ['head', 'body', 'left-arm', 'right-arm', 'left-leg', 'right-leg'];
+            parts.forEach(part => {
+                document.querySelector(`.${part}`).style.display = 'none';
+            });
+            
+            // Reset faces
+            document.querySelectorAll('.face').forEach(face => {
+                face.style.display = 'none';
+            });
+            
+            // Hide blood
+            document.getElementById('blood').style.display = 'none';
+            
+            // Show gallows structure
+            document.querySelector('.base').style.display = 'block';
+            document.querySelector('.pole').style.display = 'block';
+            document.querySelector('.beam').style.display = 'block';
+            document.querySelector('.rope').style.display = 'block';
+            
+            // Show normal face
+            document.getElementById('face-normal').style.display = 'block';
+            
+            // Update word display
+            updateWordDisplay();
+            
+            // Reset hint count
+            gameState.hints = parseInt(document.getElementById('hints-setting').value);
+            document.getElementById('hint-count').textContent = gameState.hints;
+            document.getElementById('hint-btn').disabled = false;
+            
+            // Create keyboard
+            const keyboard = document.getElementById('keyboard');
+            keyboard.innerHTML = '';
+            
+            'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').forEach(letter => {
+                const btn = document.createElement('button');
+                btn.className = 'letter-btn';
+                btn.textContent = letter;
+                btn.addEventListener('click', () => handleLetterClick(letter, btn));
+                keyboard.appendChild(btn);
+            });
+        }
+        
+        // Update timer
+        function updateTimer() {
+            if (gameState.status !== 'playing') return;
+            
+            gameState.elapsedTime++;
+            const minutes = Math.floor(gameState.elapsedTime / 60).toString().padStart(2, '0');
+            const seconds = (gameState.elapsedTime % 60).toString().padStart(2, '0');
+            document.getElementById('timer').innerHTML = `<i class="fas fa-clock"></i> Time: ${minutes}:${seconds}`;
+        }
+        
+        // Update the word display with guessed letters
+        function updateWordDisplay() {
+            const display = gameState.word.split('').map(letter => 
+                gameState.guessedLetters.includes(letter) ? letter : '_'
+            ).join(' ');
+            
+            document.getElementById('word-display').textContent = display;
+            
+            // Check if player has won
+            if (!display.includes('_')) {
+                endGame('won');
+            }
+        }
+        
+        // Handle letter button click
+        function handleLetterClick(letter, btn) {
+            if (gameState.status !== 'playing') return;
+            
+            btn.disabled = true;
+            gameState.guessedLetters.push(letter);
+            
+            // Check if letter is in the word
+            if (gameState.word.includes(letter)) {
+                btn.classList.add('correct');
+                gameState.score += 10;
+            } else {
+                // Wrong guess
+                gameState.incorrectAttempts++;
+                showHangmanPart();
+                
+                // Update face expression
+                updateFaceExpression();
+                
+                if (gameState.incorrectAttempts >= gameState.maxAttempts) {
+                    endGame('lost');
+                }
+            }
+            
+            updateWordDisplay();
+        }
+        
+        // Show next hangman part in correct sequence
+        function showHangmanPart() {
+            const parts = ['head', 'body', 'left-arm', 'right-arm', 'left-leg', 'right-leg'];
+            if (gameState.incorrectAttempts <= parts.length) {
+                document.querySelector(`.${parts[gameState.incorrectAttempts - 1]}`).style.display = 'block';
+            }
+        }
+        
+        // Update face expression based on attempts
+        function updateFaceExpression() {
+            // Hide all faces
+            document.querySelectorAll('.face').forEach(face => {
+                face.style.display = 'none';
+            });
+            
+            // Show appropriate face
+            if (gameState.incorrectAttempts >= gameState.maxAttempts - 1) {
+                document.getElementById('face-dead').style.display = 'block';
+            } else if (gameState.incorrectAttempts >= gameState.maxAttempts - 2) {
+                document.getElementById('face-scared').style.display = 'block';
+            } else if (gameState.incorrectAttempts >= gameState.maxAttempts / 2) {
+                document.getElementById('face-worried').style.display = 'block';
+            } else {
+                document.getElementById('face-normal').style.display = 'block';
+            }
+        }
+        
+        // Handle hint button
+        document.getElementById('hint-btn').addEventListener('click', () => {
+            if (gameState.hints <= 0 || gameState.status !== 'playing') return;
+            
+            // Show the next part of the hint
+            if (gameState.currentHintPart < gameState.hintParts.length) {
+                const hintToShow = gameState.hintParts.slice(0, gameState.currentHintPart + 1).join(' ');
+                document.getElementById('hint-box').textContent = hintToShow;
+                gameState.currentHintPart++;
+                
+                // Update hint count and score
+                gameState.hints--;
+                document.getElementById('hint-count').textContent = gameState.hints;
+                gameState.score -= 25;
+                
+                if (gameState.hints <= 0) {
+                    document.getElementById('hint-btn').disabled = true;
+                }
+            }
+        });
+        
+        // End game
+        function endGame(status) {
+            gameState.status = status;
+            
+            // Clear timer
+            clearInterval(gameState.timerInterval);
+            
+            // Calculate time bonus (1 point per second remaining)
+            const maxTimeBonus = 300; // 5 minutes
+            const timeBonus = Math.max(0, maxTimeBonus - gameState.elapsedTime);
+            gameState.score += timeBonus;
+            
+            // Calculate final score
+            if (status === 'won') {
+                gameState.score += (gameState.maxAttempts - gameState.incorrectAttempts) * 15;
+                if (gameState.hints === parseInt(document.getElementById('hints-setting').value)) {
+                    gameState.score += 50; // Bonus for no hints used
+                }
+                
+                document.getElementById('result-message').textContent = "YOU ESCAPED!";
+                document.getElementById('result-message').style.background = "linear-gradient(to bottom, #00cc00, #009900)";
+            } else {
+                document.getElementById('result-message').textContent = "EXECUTED!";
+                document.getElementById('result-message').style.background = "linear-gradient(to bottom, #ff4d4d, #cc0000)";
+                
+                // Show blood effect
+                document.getElementById('blood').style.display = 'block';
+                
+                // Show dead face
+                document.querySelectorAll('.face').forEach(face => {
+                    face.style.display = 'none';
+                });
+                document.getElementById('face-dead').style.display = 'block';
+            }
+            
+            // Format time
+            const minutes = Math.floor(gameState.elapsedTime / 60).toString().padStart(2, '0');
+            const seconds = (gameState.elapsedTime % 60).toString().padStart(2, '0');
+            
+            // Update result screen
+            document.getElementById('attempts-stat').textContent = gameState.incorrectAttempts;
+            document.getElementById('max-attempts').textContent = gameState.maxAttempts;
+            document.getElementById('hints-stat').textContent = parseInt(document.getElementById('hints-setting').value) - gameState.hints;
+            document.getElementById('time-stat').textContent = `${minutes}:${seconds}`;
+            document.getElementById('score-stat').textContent = gameState.score;
+            document.getElementById('result-word').textContent = `Word: ${gameState.word}`;
+            
+            // Save to history
+            const history = JSON.parse(localStorage.getItem('hangmanHistory')) || [];
+            history.unshift({
+                word: gameState.word,
+                status: status,
+                score: gameState.score,
+                date: new Date().toLocaleString(),
+                difficulty: gameState.difficulty
+            });
+            localStorage.setItem('hangmanHistory', JSON.stringify(history));
+            
+            // Show result screen
+            setTimeout(() => showScreen('result'), 1000);
+        }
+        
+        // Initialize
+        loadHistory();
+
+        
+    document.documentElement.style.overflow
+    ='auto';
+     document.body.style.overflow ='auto';
+    </script>
+</body>
+</html>
