@@ -1,0 +1,1093 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cosmic Hypercube Explorer</title>
+  <style>
+    :root {
+      --primary: #00ffcc;
+      --secondary: #8a2be2;
+      --tertiary: #ff00ff;
+      --bg-dark: #0a0a1a;
+      --bg-darker: #050510;
+      --text-light: #f0f0ff;
+      --text-dimmed: #a0a0c0;
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      margin: 0;
+      background: var(--bg-darker);
+      color: var(--text-light);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      overflow-x: hidden;
+      position: relative;
+    }
+    
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: 
+        radial-gradient(circle at 10% 20%, rgba(138, 43, 226, 0.1) 0%, transparent 20%),
+        radial-gradient(circle at 90% 80%, rgba(0, 255, 204, 0.1) 0%, transparent 20%),
+        radial-gradient(circle at 50% 50%, rgba(255, 0, 255, 0.05) 0%, transparent 30%);
+      z-index: -1;
+      pointer-events: none;
+    }
+    
+    .header {
+      text-align: center;
+      margin: 20px 0;
+      position: relative;
+      padding: 20px 0;
+      width: 100%;
+    }
+    
+    h1 {
+      font-size: 2.8rem;
+      margin-bottom: 10px;
+      background: linear-gradient(90deg, var(--primary), var(--secondary), var(--tertiary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 15px rgba(0, 255, 204, 0.3);
+      letter-spacing: 2px;
+      position: relative;
+      display: inline-block;
+      padding: 0 20px;
+    }
+    
+    h1::after {
+      content: "";
+      position: absolute;
+      bottom: -10px;
+      left: 20%;
+      right: 20%;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, var(--primary), var(--secondary), transparent);
+      border-radius: 50%;
+    }
+    
+    .subtitle {
+      font-size: 1.2rem;
+      color: var(--text-dimmed);
+      max-width: 800px;
+      margin: 0 auto 20px;
+      line-height: 1.6;
+    }
+    
+    .main-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+      flex: 1;
+    }
+    
+    .visualization-section {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 30px;
+      width: 100%;
+      margin-bottom: 30px;
+    }
+    
+    .canvas-wrapper {
+      position: relative;
+      background: rgba(10, 15, 30, 0.7);
+      border: 1px solid rgba(0, 255, 204, 0.3);
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 0 30px rgba(0, 255, 204, 0.1), 0 0 60px rgba(138, 43, 226, 0.1);
+      width: 600px;
+      height: 500px;
+    }
+    
+    canvas {
+      background: rgba(0, 0, 0, 0.3);
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+    
+    .controls-section {
+      background: rgba(10, 15, 30, 0.7);
+      border: 1px solid rgba(138, 43, 226, 0.3);
+      border-radius: 15px;
+      padding: 20px;
+      box-shadow: 0 0 30px rgba(138, 43, 226, 0.1);
+      width: 100%;
+      max-width: 900px;
+    }
+    
+    .controls-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    
+    .panel-title {
+      font-size: 1.5rem;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .dimension-display {
+      font-size: 1.3rem;
+      color: var(--tertiary);
+      background: rgba(20, 25, 50, 0.5);
+      padding: 5px 15px;
+      border-radius: 20px;
+      border: 1px solid rgba(0, 255, 204, 0.3);
+    }
+    
+    .controls-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 15px;
+    }
+    
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    
+    label {
+      font-size: 0.9rem;
+      color: var(--text-dimmed);
+    }
+    
+    .btn {
+      background: linear-gradient(135deg, rgba(0, 255, 204, 0.2), rgba(138, 43, 226, 0.2));
+      border: 1px solid rgba(0, 255, 204, 0.3);
+      color: var(--text-light);
+      padding: 12px 15px;
+      border-radius: 8px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-align: center;
+      font-size: 0.95rem;
+    }
+    
+    .btn:hover {
+      background: linear-gradient(135deg, rgba(0, 255, 204, 0.3), rgba(138, 43, 226, 0.3));
+      box-shadow: 0 0 15px rgba(0, 255, 204, 0.3);
+      transform: translateY(-2px);
+    }
+    
+    .btn:active {
+      transform: translateY(0);
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: var(--bg-darker);
+      font-weight: bold;
+    }
+    
+    .btn-primary:hover {
+      box-shadow: 0 0 20px rgba(0, 255, 204, 0.5);
+    }
+    
+    select, input[type="range"] {
+      background: rgba(20, 25, 50, 0.5);
+      border: 1px solid rgba(0, 255, 204, 0.3);
+      color: var(--text-light);
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+    }
+    
+    select:focus, input[type="range"]:focus {
+      outline: none;
+      box-shadow: 0 0 10px rgba(0, 255, 204, 0.3);
+    }
+    
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(5, 5, 20, 0.95);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.4s ease;
+      backdrop-filter: blur(10px);
+    }
+    
+    .modal.active {
+      opacity: 1;
+      visibility: visible;
+    }
+    
+    .modal-content {
+      background: rgba(10, 15, 30, 0.95);
+      border: 1px solid rgba(0, 255, 204, 0.3);
+      border-radius: 15px;
+      width: 90%;
+      max-width: 800px;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 30px;
+      position: relative;
+      box-shadow: 0 0 50px rgba(0, 255, 204, 0.2);
+    }
+    
+    .close-modal {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: transparent;
+      border: none;
+      color: var(--primary);
+      font-size: 1.5rem;
+      cursor: pointer;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+    }
+    
+    .close-modal:hover {
+      background: rgba(255, 255, 255, 0.1);
+      transform: rotate(90deg);
+    }
+    
+    .dimension-card {
+      background: rgba(20, 25, 50, 0.7);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+      border: 1px solid rgba(138, 43, 226, 0.3);
+      transition: all 0.3s ease;
+    }
+    
+    .dimension-card.active {
+      border-color: var(--primary);
+      box-shadow: 0 0 20px rgba(0, 255, 204, 0.3);
+    }
+    
+    .dimension-card h3 {
+      font-size: 1.4rem;
+      color: var(--primary);
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .dimension-card p {
+      color: var(--text-dimmed);
+      line-height: 1.7;
+      font-size: 1.05rem;
+      margin-bottom: 15px;
+    }
+    
+    .dimension-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 15px;
+    }
+    
+    .stat-item {
+      background: rgba(0, 0, 0, 0.3);
+      padding: 10px;
+      border-radius: 8px;
+      text-align: center;
+    }
+    
+    .stat-label {
+      font-size: 0.85rem;
+      color: var(--text-dimmed);
+      margin-bottom: 5px;
+    }
+    
+    .stat-value {
+      font-size: 1.3rem;
+      color: var(--tertiary);
+      font-weight: bold;
+    }
+    
+    .physics-concept {
+      background: rgba(138, 43, 226, 0.1);
+      border-left: 3px solid var(--secondary);
+      padding: 15px;
+      margin: 15px 0;
+      border-radius: 0 8px 8px 0;
+    }
+    
+    .physics-concept h4 {
+      color: var(--secondary);
+      margin-bottom: 8px;
+    }
+    
+    .footer {
+      text-align: center;
+      color: var(--text-dimmed);
+      font-size: 0.9rem;
+      padding: 20px;
+      width: 100%;
+      margin-top: auto;
+    }
+    
+    .time-display {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: rgba(10, 15, 30, 0.7);
+      border: 1px solid rgba(0, 255, 204, 0.3);
+      border-radius: 10px;
+      padding: 10px 20px;
+      font-size: 0.9rem;
+      color: var(--text-light);
+      box-shadow: 0 0 15px rgba(0, 255, 204, 0.1);
+    }
+    
+    .vertex-info {
+      position: absolute;
+      background: rgba(10, 15, 30, 0.9);
+      border: 1px solid var(--primary);
+      border-radius: 8px;
+      padding: 10px;
+      color: var(--text-light);
+      font-size: 0.9rem;
+      max-width: 220px;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.3s;
+      z-index: 10;
+    }
+    
+    .dimension-btn {
+      background: rgba(138, 43, 226, 0.2);
+      border: 1px solid rgba(138, 43, 226, 0.4);
+      color: var(--text-light);
+      padding: 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.3s;
+      font-weight: 500;
+      width: 70px;
+      margin-bottom: 10px;
+    }
+    
+    .dimension-btn:hover {
+      background: rgba(138, 43, 226, 0.3);
+      transform: translateY(-2px);
+    }
+    
+    .dimension-btn.active {
+      background: rgba(138, 43, 226, 0.4);
+      border-color: var(--primary);
+      box-shadow: 0 0 10px rgba(138, 43, 226, 0.5);
+    }
+    
+    @media (max-width: 1100px) {
+      .visualization-section {
+        flex-direction: column;
+        align-items: center;
+      }
+      
+      .canvas-wrapper {
+        width: 90%;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      h1 {
+        font-size: 2.2rem;
+      }
+      
+      .subtitle {
+        font-size: 1rem;
+        padding: 0 15px;
+      }
+      
+      .canvas-wrapper {
+        height: 400px;
+      }
+      
+      .controls-grid {
+        grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      }
+      
+      .dimension-btn {
+        width: 60px;
+        padding: 8px 5px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>Cosmic Hypercube Explorer</h1>
+    <p class="subtitle">Visualize projections of multi-dimensional cubes from 1D to 8D. Explore the mysteries of higher dimensions through interactive visualization.</p>
+  </div>
+  
+  <div class="main-container">
+    <div class="visualization-section">
+      <div class="canvas-wrapper">
+        <canvas id="canvas" width="600" height="500"></canvas>
+        <div class="vertex-info" id="vertexInfo"></div>
+      </div>
+      
+      <div class="dimension-selector">
+        <div class="dimension-display">
+          Current Dimension: <span id="currentDimension">4D</span>
+        </div>
+        <div class="dimension-buttons">
+          <div class="dimension-btn" data-dim="1">1D</div>
+          <div class="dimension-btn" data-dim="2">2D</div>
+          <div class="dimension-btn" data-dim="3">3D</div>
+          <div class="dimension-btn active" data-dim="4">4D</div>
+          <div class="dimension-btn" data-dim="5">5D</div>
+          <div class="dimension-btn" data-dim="6">6D</div>
+          <div class="dimension-btn" data-dim="7">7D</div>
+          <div class="dimension-btn" data-dim="8">8D</div>
+        </div>
+        <button class="btn btn-primary" onclick="toggleLessons()" style="margin-top: 20px; width: 100%;">
+          Dimension Lessons
+        </button>
+      </div>
+    </div>
+    
+    <div class="controls-section">
+      <div class="controls-header">
+        <div class="panel-title">
+          <span>Visualization Controls</span>
+        </div>
+        <div class="stats-display">
+          Vertices: <span id="vertexCount">16</span> | 
+          Edges: <span id="edgeCount">32</span> | 
+          Rotation: <span id="rotationValue">0.0°</span>
+        </div>
+      </div>
+      
+      <div class="controls-grid">
+        <button class="btn" onclick="startDrawing()">Start</button>
+        <button class="btn" onclick="stopDrawing()">Stop</button>
+        <button class="btn" onclick="resetDrawing()">Reset</button>
+        <button class="btn" onclick="toggleMotion()">Motion</button>
+        <button class="btn" onclick="toggleHighlight()">Highlight</button>
+        <button class="btn" onclick="toggleBold()">Bold Lines</button>
+        <button class="btn" onclick="drawShape()">Draw Shape</button>
+        <button class="btn" onclick="invertColors()">Invert Colors</button>
+        <button class="btn" onclick="randomizeColors()">Random Colors</button>
+        <button class="btn" onclick="saveImage()">Screenshot</button>
+        
+        <div class="control-group">
+          <label for="zoomRange">Zoom Level</label>
+          <input type="range" id="zoomRange" min="50" max="300" step="5" value="100" />
+        </div>
+        
+        <div class="control-group">
+          <label for="speedRange">Build Speed</label>
+          <input type="range" id="speedRange" min="50" max="500" step="10" value="300" />
+        </div>
+        
+        <div class="control-group">
+          <label for="motionSpeed">Motion Speed</label>
+          <input type="range" id="motionSpeed" min="1" max="10" step="1" value="3" />
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="modal" id="lessonsModal">
+    <div class="modal-content">
+      <button class="close-modal" onclick="toggleLessons()">&times;</button>
+      <h2 style="color: var(--primary); margin-bottom: 20px; text-align: center;">Dimensions of Reality</h2>
+      <p style="color: var(--text-dimmed); margin-bottom: 30px; line-height: 1.7; text-align: center;">
+        Explore the nature of dimensions, from the simple 1D line to the complex 8D hypercube. Each dimension adds a new degree of freedom and complexity to the structure. 
+        In physics, higher dimensions are theorized in models like string theory, which proposes 10 or 11 dimensions to unify all fundamental forces.
+      </p>
+      
+      <div class="dimension-card active" data-dim="4">
+        <h3><span style="color: var(--tertiary);">4D</span> Tesseract</h3>
+        <p>A tesseract is the 4-dimensional analog of a cube. It has 16 vertices, 32 edges, 24 square faces, and 8 cubic cells. In physics, the 4th dimension is often associated with time in spacetime models.</p>
+        
+        <div class="physics-concept">
+          <h4>Physics Connection: Spacetime</h4>
+          <p>Einstein's theory of relativity combines 3D space with time to form a 4D spacetime continuum. Gravity is explained as the curvature of this spacetime.</p>
+        </div>
+        
+        <div class="dimension-stats">
+          <div class="stat-item">
+            <div class="stat-label">Vertices</div>
+            <div class="stat-value">16</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">Edges</div>
+            <div class="stat-value">32</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">Faces</div>
+            <div class="stat-value">24</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="dimension-card" data-dim="1">
+        <h3><span style="color: var(--tertiary);">1D</span> Line Segment</h3>
+        <p>The simplest dimension with only length. Represented by two points connected by a line. In physics, 1D models are used to simplify complex systems.</p>
+        
+        <div class="physics-concept">
+          <h4>Physics Connection: String Theory</h4>
+          <p>In string theory, fundamental particles are modeled as 1D strings whose vibrations determine particle properties.</p>
+        </div>
+        
+        <div class="dimension-stats">
+          <div class="stat-item">
+            <div class="stat-label">Vertices</div>
+            <div class="stat-value">2</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">Edges</div>
+            <div class="stat-value">1</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="dimension-card" data-dim="2">
+        <h3><span style="color: var(--tertiary);">2D</span> Square</h3>
+        <p>Adds width to length, creating a plane. Objects in 2D have area but no depth. This dimension is where flatland "beings" would exist.</p>
+        
+        <div class="physics-concept">
+          <h4>Physics Connection: Holographic Principle</h4>
+          <p>The holographic principle suggests that all information in a volume of space can be represented on its boundary, like a 2D surface.</p>
+        </div>
+        
+        <div class="dimension-stats">
+          <div class="stat-item">
+            <div class="stat-label">Vertices</div>
+            <div class="stat-value">4</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">Edges</div>
+            <div class="stat-value">4</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="dimension-card" data-dim="3">
+        <h3><span style="color: var(--tertiary);">3D</span> Cube</h3>
+        <p>The dimension we experience daily, adding depth to create volume. All physical objects in our universe exist in 3 spatial dimensions.</p>
+        
+        <div class="physics-concept">
+          <h4>Physics Connection: Our Reality</h4>
+          <p>We perceive a 3D universe with time as the fourth dimension. The laws of physics as we know them operate in this 3+1 dimensional spacetime.</p>
+        </div>
+        
+        <div class="dimension-stats">
+          <div class="stat-item">
+            <div class="stat-label">Vertices</div>
+            <div class="stat-value">8</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">Edges</div>
+            <div class="stat-value">12</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">Faces</div>
+            <div class="stat-value">6</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="dimension-card" data-dim="5">
+        <h3><span style="color: var(--tertiary);">5D</span> Penteract</h3>
+        <p>The fifth dimension is where possibilities branch. In physics, this could represent different possible futures and pasts.</p>
+        
+        <div class="physics-concept">
+          <h4>Physics Connection: Kaluza-Klein Theory</h4>
+          <p>This theory unifies gravity and electromagnetism by introducing a 5th dimension that is compactified to a very small scale.</p>
+        </div>
+        
+        <div class="dimension-stats">
+          <div class="stat-item">
+            <div class="stat-label">Vertices</div>
+            <div class="stat-value">32</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">Edges</div>
+            <div class="stat-value">80</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="dimension-card" data-dim="6">
+        <h3><span style="color: var(--tertiary);">6D</span> Hexeract</h3>
+        <p>The sixth dimension contains all possible universes with the same initial conditions. A plane of possible world-lines.</p>
+        
+        <div class="physics-concept">
+          <h4>Physics Connection: Calabi-Yau Manifolds</h4>
+          <p>In string theory, the extra dimensions required for consistency are compactified into Calabi-Yau manifolds, often 6D shapes.</p>
+        </div>
+        
+        <div class="dimension-stats">
+          <div class="stat-item">
+            <div class="stat-label">Vertices</div>
+            <div class="stat-value">64</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">Edges</div>
+            <div class="stat-value">192</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="dimension-card" data-dim="7">
+        <h3><span style="color: var(--tertiary);">7D</span> Hepteract</h3>
+        <p>The seventh dimension contains all possible universes with different initial conditions. All possible physical laws and constants.</p>
+        
+        <div class="physics-concept">
+          <h4>Physics Connection: M-Theory</h4>
+          <p>M-theory, which unifies all string theories, requires 11 dimensions - 7 of which are compactified at the Planck scale.</p>
+        </div>
+        
+        <div class="dimension-stats">
+          <div class="stat-item">
+            <div class="stat-label">Vertices</div>
+            <div class="stat-value">128</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">Edges</div>
+            <div class="stat-value">448</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="dimension-card" data-dim="8">
+        <h3><span style="color: var(--tertiary);">8D</span> Octeract</h3>
+        <p>The eighth dimension brings all these possible universe histories together. A multi-verse of all physically possible universes.</p>
+        
+        <div class="physics-concept">
+          <h4>Physics Connection: F-Theory</h4>
+          <p>F-theory is a branch of string theory that describes 12-dimensional spacetime, with 8 dimensions compactified.</p>
+        </div>
+        
+        <div class="dimension-stats">
+          <div class="stat-item">
+            <div class="stat-label">Vertices</div>
+            <div class="stat-value">256</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">Edges</div>
+            <div class="stat-value">1024</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="time-display">
+    Cosmic Time: <span id="currentTime">00:00:00</span>
+  </div>
+  
+  <div class="footer">
+    Cosmic Hypercube Explorer | A Journey Through Dimensions | Time is the 4th Dimension
+  </div>
+
+  <script>
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
+    const vertexInfo = document.getElementById("vertexInfo");
+    const vertexCountEl = document.getElementById("vertexCount");
+    const edgeCountEl = document.getElementById("edgeCount");
+    const rotationValueEl = document.getElementById("rotationValue");
+    const timeDisplay = document.getElementById("currentTime");
+    const lessonsModal = document.getElementById("lessonsModal");
+    const currentDimensionEl = document.getElementById("currentDimension");
+    
+    // Initialize canvas size
+    function resizeCanvas() {
+      canvas.width = canvas.parentElement.clientWidth;
+      canvas.height = canvas.parentElement.clientHeight;
+    }
+    window.addEventListener("resize", resizeCanvas);
+    resizeCanvas();
+    
+    // State variables
+    let dimension = 4;
+    let vertices = [], edges = [], edgeColors = [];
+    let angle = 0;
+    let animationId = null;
+    let step = 0;
+    let running = false;
+    let motion = false;
+    let highlight = false;
+    let boldLines = false;
+    let scale = 100;
+    let speed = 300;
+    let motionSpeed = 3;
+    let frozenProjection = [];
+    let invert = false;
+    let hoveredVertex = -1;
+    
+    // Dimension scale factors
+    const dimensionScales = {
+      1: 150,
+      2: 140,
+      3: 130,
+      4: 120,
+      5: 110,
+      6: 100,
+      7: 90,
+      8: 80
+    };
+    
+    // Event listeners
+    document.getElementById("speedRange").addEventListener("input", function() {
+      speed = parseInt(this.value);
+    });
+    
+    document.getElementById("motionSpeed").addEventListener("input", function() {
+      motionSpeed = parseInt(this.value);
+    });
+    
+    document.getElementById("zoomRange").addEventListener("input", function() {
+      scale = parseInt(this.value);
+      draw();
+    });
+    
+    // Dimension buttons
+    document.querySelectorAll('.dimension-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const dim = parseInt(this.dataset.dim);
+        changeDimension(dim);
+        
+        // Update active button
+        document.querySelectorAll('.dimension-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        
+        // Update zoom slider for this dimension
+        document.getElementById("zoomRange").value = dimensionScales[dim];
+        scale = dimensionScales[dim];
+      });
+    });
+    
+    // Lesson cards
+    document.querySelectorAll('.dimension-card').forEach(card => {
+      card.addEventListener('click', function() {
+        const dim = parseInt(this.dataset.dim);
+        changeDimension(dim);
+        
+        // Update active card
+        document.querySelectorAll('.dimension-card').forEach(c => c.classList.remove('active'));
+        this.classList.add('active');
+      });
+    });
+    
+    canvas.addEventListener("mousemove", handleCanvasHover);
+    canvas.addEventListener("mouseout", () => {
+      vertexInfo.style.opacity = "0";
+      hoveredVertex = -1;
+    });
+    
+    // Initialize time display
+    function updateTime() {
+      const now = new Date();
+      timeDisplay.textContent = now.toLocaleTimeString();
+    }
+    setInterval(updateTime, 1000);
+    updateTime();
+    
+    // Generate vertices for n-dimensional cube
+    function generateVertices(d) {
+      const out = [];
+      const total = 1 << d; // 2^d vertices
+      for (let i = 0; i < total; i++) {
+        const point = [];
+        for (let j = 0; j < d; j++) {
+          point.push((i >> j) & 1 ? 1 : -1);
+        }
+        out.push(point);
+      }
+      return out;
+    }
+    
+    // Generate edges by connecting vertices that differ by one bit
+    function generateEdges(vertices) {
+      const out = [];
+      for (let i = 0; i < vertices.length; i++) {
+        for (let j = i + 1; j < vertices.length; j++) {
+          let diffCount = 0;
+          for (let k = 0; k < vertices[i].length; k++) {
+            if (vertices[i][k] !== vertices[j][k]) diffCount++;
+          }
+          if (diffCount === 1) out.push([i, j]);
+        }
+      }
+      return out;
+    }
+    
+    // Initialize dimension
+    function initDimension(d) {
+      dimension = d;
+      scale = dimensionScales[d];
+      vertices = generateVertices(d);
+      edges = generateEdges(vertices);
+      
+      // Generate colors for edges
+      edgeColors = edges.map((_, i) => {
+        const hue = (i * 360) / edges.length;
+        return `hsl(${hue}, 80%, 60%)`;
+      });
+      
+      // Update stats display
+      vertexCountEl.textContent = vertices.length;
+      edgeCountEl.textContent = edges.length;
+      currentDimensionEl.textContent = `${d}D`;
+      
+      step = 0;
+    }
+    
+    // Rotate point in plane defined by axisA and axisB
+    function rotate(point, axisA, axisB, theta) {
+      const sin = Math.sin(theta);
+      const cos = Math.cos(theta);
+      const rotated = [...point];
+      const a = point[axisA];
+      const b = point[axisB];
+      rotated[axisA] = a * cos - b * sin;
+      rotated[axisB] = a * sin + b * cos;
+      return rotated;
+    }
+    
+    // Project n-dimensional point to 2D canvas
+    function projectND(point) {
+      let rotated = [...point];
+      
+      // Apply rotations in multiple planes for higher dimensions
+      for (let i = 0; i < dimension - 1; i++) {
+        rotated = rotate(rotated, i, i + 1, angle * (i % 2 === 0 ? 0.5 : 0.3));
+      }
+      
+      // Perspective projection for dimensions higher than 3
+      let w = 1;
+      if (dimension > 3) {
+        for (let i = 3; i < rotated.length; i++) {
+          w = w / (1.5 + rotated[i]);
+        }
+      }
+      
+      const x = rotated[0] * w;
+      const y = rotated.length > 1 ? rotated[1] * w : 0;
+      
+      return [
+        canvas.width / 2 + x * scale,
+        canvas.height / 2 + y * scale
+      ];
+    }
+    
+    // Draw a line between two points
+    function drawLine(a, b, color = "#00ffcc") {
+      ctx.beginPath();
+      ctx.moveTo(a[0], a[1]);
+      ctx.lineTo(b[0], b[1]);
+      ctx.strokeStyle = invert ? "#000" : color;
+      ctx.lineWidth = boldLines ? 3 : 1.5;
+      ctx.stroke();
+    }
+    
+    // Draw the hypercube
+    function draw() {
+      ctx.fillStyle = invert ? "#fff" : "rgba(0, 0, 0, 0.2)";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
+      const projected = vertices.map(projectND);
+      if (motion) frozenProjection = [...projected];
+      
+      // Draw edges
+      for (let i = 0; i < step; i++) {
+        const [a, b] = edges[i];
+        const color = highlight ? edgeColors[i] : "#00ffcc";
+        drawLine(projected[a], projected[b], color);
+      }
+      
+      // Draw vertices
+      projected.forEach((p, idx) => {
+        ctx.beginPath();
+        ctx.arc(p[0], p[1], 4, 0, Math.PI * 2);
+        ctx.fillStyle = invert ? "#000" : "#ff00ff";
+        ctx.fill();
+      });
+      
+      // Update rotation display
+      rotationValueEl.textContent = (angle * 180 / Math.PI).toFixed(1) + "°";
+      
+      if (motion) angle += 0.01 * motionSpeed;
+      if (running || motion) {
+        animationId = requestAnimationFrame(draw);
+      }
+    }
+    
+    // Handle canvas hover for vertex info
+    function handleCanvasHover(e) {
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      
+      const projected = vertices.map(projectND);
+      let closest = -1;
+      let minDist = 30; // Minimum distance to show tooltip
+      
+      // Find closest vertex to mouse
+      projected.forEach((p, idx) => {
+        const dist = Math.sqrt(Math.pow(p[0] - x, 2) + Math.pow(p[1] - y, 2));
+        if (dist < minDist) {
+          minDist = dist;
+          closest = idx;
+        }
+      });
+      
+      if (closest !== -1) {
+        hoveredVertex = closest;
+        const vertex = vertices[closest];
+        vertexInfo.textContent = `Vertex ${closest+1}: [${vertex.join(', ')}]`;
+        vertexInfo.style.left = (x + 10) + "px";
+        vertexInfo.style.top = (y - 30) + "px";
+        vertexInfo.style.opacity = "1";
+      } else {
+        hoveredVertex = -1;
+        vertexInfo.style.opacity = "0";
+      }
+    }
+    
+    // Build edges step by step
+    function buildEdges() {
+      function drawStep() {
+        if (running && step < edges.length) {
+          step++;
+          setTimeout(drawStep, speed);
+        }
+      }
+      drawStep();
+    }
+    
+    // Control functions
+    function startDrawing() {
+      if (!running) {
+        running = true;
+        if (!motion) step = 0;
+        draw();
+        buildEdges();
+      }
+    }
+    
+    function stopDrawing() {
+      running = false;
+      motion = false;
+      cancelAnimationFrame(animationId);
+    }
+    
+    function resetDrawing() {
+      stopDrawing();
+      step = 0;
+      angle = 0;
+      frozenProjection = [];
+      draw();
+    }
+    
+    function toggleMotion() {
+      motion = !motion;
+      if (!motion) frozenProjection = vertices.map(projectND);
+      draw();
+    }
+    
+    function toggleHighlight() {
+      highlight = !highlight;
+      draw();
+    }
+    
+    function toggleBold() {
+      boldLines = !boldLines;
+      draw();
+    }
+    
+    function drawShape() {
+      if (motion) {
+        alert("Please stop motion before using Draw Shape.");
+        return;
+      }
+      if (frozenProjection.length === 0) {
+        frozenProjection = vertices.map(projectND);
+      }
+      step = 0;
+      function drawSteps() {
+        if (step < edges.length) {
+          step++;
+          draw();
+          setTimeout(drawSteps, speed);
+        }
+      }
+      drawSteps();
+    }
+    
+    function changeDimension(dim) {
+      dimension = dim;
+      resetDrawing();
+      initDimension(dimension);
+      draw();
+    }
+    
+    function toggleLessons() {
+      lessonsModal.classList.toggle("active");
+    }
+    
+    function invertColors() {
+      invert = !invert;
+      draw();
+    }
+    
+    function randomizeColors() {
+      edgeColors = edges.map(() =>
+        `hsl(${Math.floor(Math.random() * 360)}, 80%, 60%)`
+      );
+      draw();
+    }
+    
+    function saveImage() {
+      const link = document.createElement('a');
+      link.download = `hypercube_${dimension}D.png`;
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+    }
+    
+    // Initialize
+    initDimension(dimension);
+    draw();
+  </script>
+</body>
+</html>
