@@ -1,0 +1,1106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ultimate Ping Pong Game</title>
+   <link rel="stylesheet" href="css/all.min.css">
+  <link href="orbitron/fonts.css" rel="stylesheet">
+   <link href="roboto/fonts.css" rel="stylesheet">
+
+   <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      color: white;
+      overflow-x: hidden;
+    }
+    
+    .header {
+      text-align: center;
+      margin-bottom: 20px;
+      width: 100%;
+    }
+    
+    .header h1 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 2.8rem;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      margin-bottom: 10px;
+      text-shadow: 0 0 10px rgba(255, 255, 255, 0.7),
+                   0 0 20px rgba(255, 255, 255, 0.5),
+                   0 0 30px rgba(255, 255, 255, 0.3);
+      background: linear-gradient(to right, #ff7e5f, #feb47b);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .game-container {
+      display: flex;
+      width: 100%;
+      max-width: 1200px;
+      gap: 30px;
+      margin-bottom: 30px;
+    }
+    
+    .game-area {
+      flex: 1;
+      background: rgba(0, 0, 0, 0.7);
+      border-radius: 15px;
+      padding: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(10px);
+      border: 2px solid rgba(255, 255, 255, 0.1);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .game-area::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: radial-gradient(circle at center, transparent 10%, rgba(0, 0, 0, 0.8) 100%);
+      pointer-events: none;
+    }
+    
+    .canvas-container {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+    
+    canvas {
+      background: #0a1929;
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(0, 100, 255, 0.5);
+      border: 2px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .score-display {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 15px;
+      padding: 10px 20px;
+      background: rgba(0, 30, 60, 0.7);
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .player-score {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    
+    .player-name {
+      font-size: 1.2rem;
+      margin-bottom: 5px;
+      color: #ff7e5f;
+    }
+    
+    .score-value {
+      font-size: 2.5rem;
+      font-weight: bold;
+      font-family: 'Orbitron', sans-serif;
+      color: #4dabf7;
+    }
+    
+    .controls {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      flex-wrap: wrap;
+      margin-bottom: 15px;
+    }
+    
+    .btn {
+      background: linear-gradient(to right, #ff7e5f, #feb47b);
+      border: none;
+      color: white;
+      padding: 12px 25px;
+      text-align: center;
+      font-size: 1rem;
+      font-weight: 500;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+    }
+    
+    .btn:active {
+      transform: translateY(1px);
+    }
+    
+    .btn i {
+      font-size: 1.2rem;
+    }
+    
+    .btn-secondary {
+      background: linear-gradient(to right, #4facfe, #00f2fe);
+    }
+    
+    .btn-warning {
+      background: linear-gradient(to right, #ff9966, #ff5e62);
+    }
+    
+    .btn-info {
+      background: linear-gradient(to right, #7f00ff, #e100ff);
+    }
+    
+    .control-info {
+      text-align: center;
+      font-size: 1rem;
+      color: #a0d2ff;
+      padding: 10px;
+      background: rgba(0, 20, 40, 0.5);
+      border-radius: 10px;
+      margin-top: 10px;
+    }
+    
+    .sidebar {
+      width: 300px;
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+    }
+    
+    .panel {
+      background: rgba(0, 0, 0, 0.7);
+      border-radius: 15px;
+      padding: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(10px);
+      border: 2px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .panel-title {
+      font-size: 1.4rem;
+      margin-bottom: 15px;
+      color: #ff7e5f;
+      text-align: center;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .history-list {
+      max-height: 200px;
+      overflow-y: auto;
+      padding-right: 10px;
+    }
+    
+    .history-list::-webkit-scrollbar {
+      width: 6px;
+    }
+    
+    .history-list::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 3px;
+    }
+    
+    .history-list::-webkit-scrollbar-thumb {
+      background: linear-gradient(to bottom, #ff7e5f, #feb47b);
+      border-radius: 3px;
+    }
+    
+    .history-item {
+      padding: 10px;
+      margin-bottom: 10px;
+      background: rgba(0, 30, 60, 0.5);
+      border-radius: 8px;
+      font-size: 0.9rem;
+    }
+    
+    .history-item:last-child {
+      margin-bottom: 0;
+    }
+    
+    .history-winner {
+      color: #4dabf7;
+      font-weight: bold;
+    }
+    
+    .settings-form {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    
+    .form-group label {
+      font-size: 0.9rem;
+      color: #a0d2ff;
+    }
+    
+    .form-group input, .form-group select {
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(0, 20, 40, 0.5);
+      color: white;
+      font-size: 1rem;
+    }
+    
+    .form-group input:focus {
+      outline: none;
+      border-color: #4dabf7;
+    }
+    
+    .footer {
+      text-align: center;
+      margin-top: 20px;
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 0.9rem;
+    }
+    
+    .footer a {
+      color: #ff7e5f;
+      text-decoration: none;
+    }
+    
+    .footer a:hover {
+      text-decoration: underline;
+    }
+    
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    
+    .modal.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+    
+    .modal-content {
+      background: rgba(10, 25, 47, 0.95);
+      border-radius: 15px;
+      width: 90%;
+      max-width: 500px;
+      padding: 30px;
+      box-shadow: 0 0 40px rgba(0, 100, 255, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      position: relative;
+      transform: translateY(20px);
+      transition: transform 0.3s ease;
+    }
+    
+    .modal.active .modal-content {
+      transform: translateY(0);
+    }
+    
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .modal-title {
+      font-size: 1.8rem;
+      color: #ff7e5f;
+    }
+    
+    .close-modal {
+      background: none;
+      border: none;
+      color: #a0d2ff;
+      font-size: 1.5rem;
+      cursor: pointer;
+      transition: color 0.3s ease;
+    }
+    
+    .close-modal:hover {
+      color: #ff7e5f;
+    }
+    
+    .modal-body {
+      margin-bottom: 20px;
+    }
+    
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+    
+    @media (max-width: 900px) {
+      .game-container {
+        flex-direction: column;
+      }
+      
+      .sidebar {
+        width: 100%;
+        flex-direction: row;
+        flex-wrap: wrap;
+      }
+      
+      .history-panel, .settings-panel {
+        flex: 1;
+        min-width: 300px;
+      }
+    }
+    
+    @media (max-width: 600px) {
+      .header h1 {
+        font-size: 2rem;
+      }
+      
+      .controls {
+        flex-direction: column;
+        align-items: center;
+      }
+      
+      .btn {
+        width: 100%;
+        max-width: 300px;
+      }
+      
+      .sidebar {
+        flex-direction: column;
+      }
+    }
+    
+    /* Animations */
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+    
+    .pulse {
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes float {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+      100% { transform: translateY(0px); }
+    }
+    
+    .float {
+      animation: float 3s ease-in-out infinite;
+    }
+    
+    .ball-trail {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.5);
+      pointer-events: none;
+      z-index: -1;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1><i class="fas fa-table-tennis-paddle-ball"></i> Ultimate Ping Pong</h1>
+    <p>Challenge your reflexes in this modern table tennis experience</p>
+  </div>
+  
+  <div class="game-container">
+    <div class="game-area">
+      <div class="canvas-container">
+        <canvas id="canvas" width="600" height="400"></canvas>
+      </div>
+      
+      <div class="score-display">
+        <div class="player-score">
+          <div class="player-name" id="player1-name">Player 1</div>
+          <div class="score-value" id="player1-score">0</div>
+        </div>
+        <div class="player-score">
+          <div class="player-name" id="player2-name">Player 2</div>
+          <div class="score-value" id="player2-score">0</div>
+        </div>
+      </div>
+      
+      <div class="controls">
+        <button id="start-btn" class="btn pulse">
+          <i class="fas fa-play"></i> Start Game
+        </button>
+        <button id="pause-btn" class="btn btn-secondary">
+          <i class="fas fa-pause"></i> Pause
+        </button>
+        <button id="restart-btn" class="btn btn-warning">
+          <i class="fas fa-redo"></i> Restart
+        </button>
+        <button id="history-btn" class="btn btn-info">
+          <i class="fas fa-history"></i> History
+        </button>
+        <button id="settings-btn" class="btn">
+          <i class="fas fa-cog"></i> Settings
+        </button>
+      </div>
+      
+      <div class="control-info">
+        <p>Control: Player Left (W and S) | Player Right (↑ and ↓)</p>
+      </div>
+    </div>
+    
+    <div class="sidebar">
+      <div class="panel history-panel">
+        <h2 class="panel-title"><i class="fas fa-trophy"></i> Recent Matches</h2>
+        <div class="history-list" id="history-list">
+          <!-- History items will be added here -->
+        </div>
+      </div>
+      
+      <div class="panel settings-panel">
+        <h2 class="panel-title"><i class="fas fa-user"></i> Player Setup</h2>
+        <div class="settings-form">
+          <div class="form-group">
+            <label for="player1-input">Player 1 Name</label>
+            <input type="text" id="player1-input" value="Player 1">
+          </div>
+          <div class="form-group">
+            <label for="player2-input">Player 2 Name</label>
+            <input type="text" id="player2-input" value="Player 2">
+          </div>
+          <button id="update-names" class="btn">
+            <i class="fas fa-sync"></i> Update Names
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- History Modal -->
+  <div class="modal" id="history-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title"><i class="fas fa-history"></i> Game History</h2>
+        <button class="close-modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div id="full-history-list"></div>
+      </div>
+      <div class="modal-footer">
+        <button id="clear-history" class="btn btn-warning">
+          <i class="fas fa-trash"></i> Clear History
+        </button>
+        <button class="btn close-modal">
+          <i class="fas fa-times"></i> Close
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Settings Modal -->
+  <div class="modal" id="settings-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title"><i class="fas fa-cog"></i> Game Settings</h2>
+        <button class="close-modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="settings-form">
+          <div class="form-group">
+            <label for="max-score">Points to Win</label>
+            <select id="max-score">
+              <option value="5">5 points</option>
+              <option value="10" selected>10 points</option>
+              <option value="15">15 points</option>
+              <option value="20">20 points</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="ball-speed">Ball Speed</label>
+            <select id="ball-speed">
+              <option value="4">Slow</option>
+              <option value="5" selected>Medium</option>
+              <option value="6">Fast</option>
+              <option value="7">Very Fast</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="paddle-size">Paddle Size</label>
+            <select id="paddle-size">
+              <option value="60">Small</option>
+              <option value="80" selected>Medium</option>
+              <option value="100">Large</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>
+              <input type="checkbox" id="sound-effects" checked> 
+              Sound Effects
+            </label>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn close-modal">
+          <i class="fas fa-times"></i> Close
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Win Modal -->
+  <div class="modal" id="win-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title"><i class="fas fa-trophy"></i> Victory!</h2>
+        <button class="close-modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <h3 id="winner-message">Player wins the game!</h3>
+        <div class="score-display" style="justify-content: center; gap: 30px; margin: 20px 0;">
+          <div class="player-score">
+            <div class="player-name" id="modal-player1">Player 1</div>
+            <div class="score-value" id="modal-score1">0</div>
+          </div>
+          <div class="player-score">
+            <div class="player-name" id="modal-player2">Player 2</div>
+            <div class="score-value" id="modal-score2">0</div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="new-game" class="btn pulse">
+          <i class="fas fa-plus-circle"></i> New Game
+        </button>
+        <button class="btn close-modal">
+          <i class="fas fa-times"></i> Close
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <div class="footer">
+    <p>Created with <i class="fas fa-heart" style="color: #ff7e5f;"></i> | More projects at <a href="https://github.com/he-is-talha" target="_blank">github.com/he-is-talha</a></p>
+  </div>
+  
+  <script>
+    // Initialize canvas
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    
+    // Game elements
+    const player1NameElement = document.getElementById('player1-name');
+    const player2NameElement = document.getElementById('player2-name');
+    const player1ScoreElement = document.getElementById('player1-score');
+    const player2ScoreElement = document.getElementById('player2-score');
+    
+    // Buttons
+    const startBtn = document.getElementById('start-btn');
+    const pauseBtn = document.getElementById('pause-btn');
+    const restartBtn = document.getElementById('restart-btn');
+    const historyBtn = document.getElementById('history-btn');
+    const settingsBtn = document.getElementById('settings-btn');
+    const updateNamesBtn = document.getElementById('update-names');
+    
+    // Modals
+    const historyModal = document.getElementById('history-modal');
+    const settingsModal = document.getElementById('settings-modal');
+    const winModal = document.getElementById('win-modal');
+    const closeModalButtons = document.querySelectorAll('.close-modal');
+    
+    // Settings
+    const player1Input = document.getElementById('player1-input');
+    const player2Input = document.getElementById('player2-input');
+    const maxScoreSelect = document.getElementById('max-score');
+    const ballSpeedSelect = document.getElementById('ball-speed');
+    const paddleSizeSelect = document.getElementById('paddle-size');
+    const soundEffectsCheckbox = document.getElementById('sound-effects');
+    
+    // History
+    const historyList = document.getElementById('history-list');
+    const fullHistoryList = document.getElementById('full-history-list');
+    const clearHistoryBtn = document.getElementById('clear-history');
+    
+    // Game state
+    let animationId;
+    let gameRunning = false;
+    let gameHistory = JSON.parse(localStorage.getItem('pingPongHistory')) || [];
+    
+    // Game variables with default values
+    let ballRadius = 10;
+    let ballX = canvas.width / 2;
+    let ballY = canvas.height / 2;
+    let ballSpeedX = 5;
+    let ballSpeedY = 5;
+    let paddleHeight = 80;
+    let paddleWidth = 10;
+    let leftPaddleY = canvas.height / 2 - paddleHeight / 2;
+    let rightPaddleY = canvas.height / 2 - paddleHeight / 2;
+    let paddleSpeed = 10;
+    let leftPlayerScore = 0;
+    let rightPlayerScore = 0;
+    let maxScore = 10;
+    let player1Name = "Player 1";
+    let player2Name = "Player 2";
+    
+    // Key states
+    let upPressed = false;
+    let downPressed = false;
+    let wPressed = false;
+    let sPressed = false;
+    
+    // Initialize the game
+    function initGame() {
+      // Load settings from localStorage if available
+      const savedSettings = JSON.parse(localStorage.getItem('pingPongSettings'));
+      if (savedSettings) {
+        player1Name = savedSettings.player1Name || "Player 1";
+        player2Name = savedSettings.player2Name || "Player 2";
+        maxScore = savedSettings.maxScore || 10;
+        ballSpeedX = savedSettings.ballSpeed || 5;
+        ballSpeedY = savedSettings.ballSpeed || 5;
+        paddleHeight = savedSettings.paddleSize || 80;
+      }
+      
+      // Update UI with loaded settings
+      player1Input.value = player1Name;
+      player2Input.value = player2Name;
+      player1NameElement.textContent = player1Name;
+      player2NameElement.textContent = player2Name;
+      maxScoreSelect.value = maxScore;
+      ballSpeedSelect.value = Math.abs(ballSpeedX);
+      paddleSizeSelect.value = paddleHeight;
+      
+      // Render initial game state
+      draw();
+      
+      // Load game history
+      renderHistory();
+    }
+    
+    // Event Listeners
+    startBtn.addEventListener('click', function() {
+      if (!gameRunning) {
+        gameRunning = true;
+        loop();
+      }
+    });
+    
+    pauseBtn.addEventListener('click', function() {
+      gameRunning = false;
+      cancelAnimationFrame(animationId);
+    });
+    
+    restartBtn.addEventListener('click', function() {
+      resetGame();
+    });
+    
+    historyBtn.addEventListener('click', function() {
+      openModal('history-modal');
+    });
+    
+    settingsBtn.addEventListener('click', function() {
+      openModal('settings-modal');
+    });
+    
+    updateNamesBtn.addEventListener('click', function() {
+      player1Name = player1Input.value || "Player 1";
+      player2Name = player2Input.value || "Player 2";
+      player1NameElement.textContent = player1Name;
+      player2NameElement.textContent = player2Name;
+      saveSettings();
+    });
+    
+    clearHistoryBtn.addEventListener('click', function() {
+      gameHistory = [];
+      localStorage.setItem('pingPongHistory', JSON.stringify(gameHistory));
+      renderHistory();
+      fullHistoryList.innerHTML = '<p>No game history available</p>';
+    });
+    
+    closeModalButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        closeAllModals();
+      });
+    });
+    
+    document.getElementById('new-game').addEventListener('click', function() {
+      closeAllModals();
+      resetGame();
+    });
+    
+    // Settings change listeners
+    maxScoreSelect.addEventListener('change', function() {
+      maxScore = parseInt(this.value);
+      saveSettings();
+    });
+    
+    ballSpeedSelect.addEventListener('change', function() {
+      const speed = parseInt(this.value);
+      ballSpeedX = Math.abs(ballSpeedX) / Math.abs(ballSpeedX) * speed;
+      ballSpeedY = Math.abs(ballSpeedY) / Math.abs(ballSpeedY) * speed;
+      saveSettings();
+    });
+    
+    paddleSizeSelect.addEventListener('change', function() {
+      paddleHeight = parseInt(this.value);
+      saveSettings();
+    });
+    
+    // Key handlers
+    document.addEventListener('keydown', keyDownHandler);
+    document.addEventListener('keyup', keyUpHandler);
+    
+    function keyDownHandler(e) {
+      if (e.key === 'ArrowUp') {
+        upPressed = true;
+      } else if (e.key === 'ArrowDown') {
+        downPressed = true;
+      } else if (e.key === 'w') {
+        wPressed = true;
+      } else if (e.key === 's') {
+        sPressed = true;
+      }
+    }
+    
+    function keyUpHandler(e) {
+      if (e.key === 'ArrowUp') {
+        upPressed = false;
+      } else if (e.key === 'ArrowDown') {
+        downPressed = false;
+      } else if (e.key === 'w') {
+        wPressed = false;
+      } else if (e.key === 's') {
+        sPressed = false;
+      }
+    }
+    
+    // Game functions
+    function update() {
+      // Move paddles
+      if (upPressed && rightPaddleY > 0) {
+        rightPaddleY -= paddleSpeed;
+      } else if (downPressed && rightPaddleY + paddleHeight < canvas.height) {
+        rightPaddleY += paddleSpeed;
+      }
+      
+      if (wPressed && leftPaddleY > 0) {
+        leftPaddleY -= paddleSpeed;
+      } else if (sPressed && leftPaddleY + paddleHeight < canvas.height) {
+        leftPaddleY += paddleSpeed;
+      }
+      
+      // Move ball
+      ballX += ballSpeedX;
+      ballY += ballSpeedY;
+      
+      // Ball collision with walls
+      if (ballY - ballRadius < 0 || ballY + ballRadius > canvas.height) {
+        ballSpeedY = -ballSpeedY;
+        createBallTrail();
+      }
+      
+      // Ball collision with paddles
+      if (ballX - ballRadius < paddleWidth && 
+          ballY > leftPaddleY && 
+          ballY < leftPaddleY + paddleHeight) {
+        ballSpeedX = -ballSpeedX;
+        createBallTrail();
+      }
+      
+      if (ballX + ballRadius > canvas.width - paddleWidth && 
+          ballY > rightPaddleY && 
+          ballY < rightPaddleY + paddleHeight) {
+        ballSpeedX = -ballSpeedX;
+        createBallTrail();
+      }
+      
+      // Scoring
+      if (ballX < 0) {
+        rightPlayerScore++;
+        player2ScoreElement.textContent = rightPlayerScore;
+        resetBall();
+      } else if (ballX > canvas.width) {
+        leftPlayerScore++;
+        player1ScoreElement.textContent = leftPlayerScore;
+        resetBall();
+      }
+      
+      // Check for winner
+      if (leftPlayerScore === maxScore) {
+        playerWin(player1Name, leftPlayerScore, player2Name, rightPlayerScore);
+      } else if (rightPlayerScore === maxScore) {
+        playerWin(player2Name, rightPlayerScore, player1Name, leftPlayerScore);
+      }
+    }
+    
+    function draw() {
+      // Clear canvas
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      // Draw background
+      ctx.fillStyle = '#0a1929';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
+      // Draw center line (dashed)
+      ctx.beginPath();
+      ctx.setLineDash([10, 15]);
+      ctx.moveTo(canvas.width / 2, 0);
+      ctx.lineTo(canvas.width / 2, canvas.height);
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      ctx.setLineDash([]);
+      
+      // Draw ball with gradient
+      const ballGradient = ctx.createRadialGradient(
+        ballX, ballY, 0,
+        ballX, ballY, ballRadius
+      );
+      ballGradient.addColorStop(0, '#ffffff');
+      ballGradient.addColorStop(1, '#4dabf7');
+      ctx.beginPath();
+      ctx.arc(ballX, ballY, ballRadius, 0, Math.PI * 2);
+      ctx.fillStyle = ballGradient;
+      ctx.fill();
+      ctx.closePath();
+      
+      // Draw paddles with 3D effect
+      // Left paddle
+      const leftPaddleGradient = ctx.createLinearGradient(0, 0, paddleWidth, 0);
+      leftPaddleGradient.addColorStop(0, '#ff7e5f');
+      leftPaddleGradient.addColorStop(1, '#feb47b');
+      ctx.fillStyle = leftPaddleGradient;
+      ctx.fillRect(0, leftPaddleY, paddleWidth, paddleHeight);
+      
+      // Right paddle
+      const rightPaddleGradient = ctx.createLinearGradient(canvas.width - paddleWidth, 0, canvas.width, 0);
+      rightPaddleGradient.addColorStop(0, '#4facfe');
+      rightPaddleGradient.addColorStop(1, '#00f2fe');
+      ctx.fillStyle = rightPaddleGradient;
+      ctx.fillRect(canvas.width - paddleWidth, rightPaddleY, paddleWidth, paddleHeight);
+      
+      // Draw paddle borders
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(0, leftPaddleY, paddleWidth, paddleHeight);
+      ctx.strokeRect(canvas.width - paddleWidth, rightPaddleY, paddleWidth, paddleHeight);
+      
+      // Draw center circle
+      ctx.beginPath();
+      ctx.arc(canvas.width / 2, canvas.height / 2, 50, 0, Math.PI * 2);
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    }
+    
+    function loop() {
+      if (gameRunning) {
+        update();
+        draw();
+        animationId = requestAnimationFrame(loop);
+      }
+    }
+    
+    function resetBall() {
+      ballX = canvas.width / 2;
+      ballY = canvas.height / 2;
+      ballSpeedX = -ballSpeedX;
+      ballSpeedY = Math.random() * 8 - 4;
+    }
+    
+    function resetGame() {
+      leftPlayerScore = 0;
+      rightPlayerScore = 0;
+      player1ScoreElement.textContent = "0";
+      player2ScoreElement.textContent = "0";
+      resetBall();
+      gameRunning = false;
+      cancelAnimationFrame(animationId);
+      draw();
+    }
+    
+    function playerWin(winner, winnerScore, opponent, opponentScore) {
+      gameRunning = false;
+      cancelAnimationFrame(animationId);
+      
+      // Add to game history
+      const now = new Date();
+      const gameResult = {
+        winner: winner,
+        winnerScore: winnerScore,
+        opponent: opponent,
+        opponentScore: opponentScore,
+        date: now.toLocaleDateString(),
+        time: now.toLocaleTimeString()
+      };
+      
+      gameHistory.unshift(gameResult);
+      if (gameHistory.length > 10) gameHistory.pop();
+      
+      localStorage.setItem('pingPongHistory', JSON.stringify(gameHistory));
+      renderHistory();
+      
+      // Show win modal
+      document.getElementById('winner-message').textContent = `${winner} wins the game!`;
+      document.getElementById('modal-player1').textContent = player1Name;
+      document.getElementById('modal-score1').textContent = leftPlayerScore;
+      document.getElementById('modal-player2').textContent = player2Name;
+      document.getElementById('modal-score2').textContent = rightPlayerScore;
+      
+      openModal('win-modal');
+    }
+    
+    function createBallTrail() {
+      for (let i = 0; i < 5; i++) {
+        setTimeout(() => {
+          const trail = document.createElement('div');
+          trail.className = 'ball-trail';
+          trail.style.left = `${ballX}px`;
+          trail.style.top = `${ballY}px`;
+          trail.style.transform = `scale(${0.5 + i * 0.1})`;
+          trail.style.opacity = 1 - i * 0.2;
+          document.body.appendChild(trail);
+          
+          // Animate trail
+          setTimeout(() => {
+            trail.style.opacity = '0';
+            trail.style.transform = `scale(${0.8 + i * 0.1})`;
+            setTimeout(() => {
+              if (trail.parentNode) {
+                trail.parentNode.removeChild(trail);
+              }
+            }, 300);
+          }, 50);
+        }, i * 50);
+      }
+    }
+    
+    // Modal functions
+    function openModal(modalId) {
+      closeAllModals();
+      const modal = document.getElementById(modalId);
+      modal.classList.add('active');
+      
+      if (modalId === 'history-modal') {
+        renderFullHistory();
+      }
+    }
+    
+    function closeAllModals() {
+      document.querySelectorAll('.modal').forEach(modal => {
+        modal.classList.remove('active');
+      });
+    }
+    
+    // History functions
+    function renderHistory() {
+      historyList.innerHTML = '';
+      
+      if (gameHistory.length === 0) {
+        historyList.innerHTML = '<p>No game history available</p>';
+        return;
+      }
+      
+      // Show only the 3 most recent matches in the sidebar
+      const recentHistory = gameHistory.slice(0, 3);
+      
+      recentHistory.forEach(game => {
+        const historyItem = document.createElement('div');
+        historyItem.className = 'history-item';
+        historyItem.innerHTML = `
+          <div class="history-winner">${game.winner} won</div>
+          <div>${game.winnerScore} - ${game.opponentScore} vs ${game.opponent}</div>
+          <small>${game.date} ${game.time}</small>
+        `;
+        historyList.appendChild(historyItem);
+      });
+    }
+    
+    function renderFullHistory() {
+      fullHistoryList.innerHTML = '';
+      
+      if (gameHistory.length === 0) {
+        fullHistoryList.innerHTML = '<p>No game history available</p>';
+        return;
+      }
+      
+      gameHistory.forEach(game => {
+        const historyItem = document.createElement('div');
+        historyItem.className = 'history-item';
+        historyItem.innerHTML = `
+          <div class="history-winner">${game.winner} won</div>
+          <div>${game.winnerScore} - ${game.opponentScore} vs ${game.opponent}</div>
+          <small>${game.date} ${game.time}</small>
+        `;
+        fullHistoryList.appendChild(historyItem);
+      });
+    }
+    
+    // Settings functions
+    function saveSettings() {
+      const settings = {
+        player1Name: player1Name,
+        player2Name: player2Name,
+        maxScore: maxScore,
+        ballSpeed: Math.abs(ballSpeedX),
+        paddleSize: paddleHeight
+      };
+      
+      localStorage.setItem('pingPongSettings', JSON.stringify(settings));
+    }
+    
+    // Initialize the game when page loads
+    window.addEventListener('load', function() {
+      initGame();
+      
+      // Add floating elements for decoration
+      for (let i = 0; i < 15; i++) {
+        const floatElement = document.createElement('div');
+        floatElement.style.position = 'fixed';
+        floatElement.style.width = `${Math.random() * 30 + 10}px`;
+        floatElement.style.height = floatElement.style.width;
+        floatElement.style.background = `rgba(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255}, 0.2)`;
+        floatElement.style.borderRadius = '50%';
+        floatElement.style.left = `${Math.random() * 100}%`;
+        floatElement.style.top = `${Math.random() * 100}%`;
+        floatElement.style.zIndex = '-1';
+        floatElement.style.animation = `float ${Math.random() * 10 + 10}s infinite ease-in-out`;
+        floatElement.style.animationDelay = `${Math.random() * 5}s`;
+        document.body.appendChild(floatElement);
+      }
+    });
+  </script>
+</body>
+</html>
