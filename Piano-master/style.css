@@ -1,0 +1,150 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+html {
+  font-size: 62.5%;
+}
+body {
+  background-color: rgb(54, 54, 54);
+  color: rgb(255, 255, 255);
+  text-align: center;
+  font-size: 1.6rem;
+  user-select: none;
+  padding: 0 5%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  width: 100%;
+  gap: 2vh;
+  font-family: "Times New Roman", Times, serif;
+}
+
+/*START  HEADER  */
+.header {
+  text-align: center;
+  padding-top: 2.4rem;
+  font-size: 1.8rem;
+}
+.header .main-header {
+  letter-spacing: 0.8rem;
+  font-size: 4.2rem;
+}
+.header p {
+  margin-top: 1.8rem;
+}
+.controls {
+  text-align: center;
+  font-style: italic;
+}
+/*END HEADER  */
+/* CONTAINER */
+.container {
+  width: min(100%, 700px);
+  height: 380px;
+  padding: 5rem 2.5rem 2.5rem;
+  background-color: #000;
+  border-radius: 20px 20px 0 0;
+}
+.piano {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  cursor: default;
+}
+
+.keys {
+  width: 10%;
+  height: 100%;
+  position: relative;
+}
+
+.key {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  text-align: center;
+  transition: transform 80ms ease;
+  padding: 1rem;
+}
+
+.key span {
+  opacity: 0;
+  transition: opacity 0.2s ease-in;
+}
+
+.white span {
+  color: rgba(0, 0, 0, 0.7);
+}
+
+.black span {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.piano:hover span {
+  opacity: 1;
+}
+
+.white {
+  width: 100%;
+  height: 100%;
+  background-color: #fff;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.5);
+  position: relative;
+}
+
+.black {
+  position: absolute;
+  width: 70%;
+  height: 170px;
+  background-color: #000;
+  right: -35%;
+  top: 0;
+  z-index: 2;
+  box-shadow: 1px 0 #777, 0 2px 0 #777, 0 3px 0 #666, 0 4px 0 #555, 0 5px 0 #444,
+    0 6px 1px rgba(0, 0, 0, 0.1), 0 0 5px rgba(0, 0, 0, 0.1),
+    0 1px 3px rgba(0, 0, 0, 0.3), 0 3px 5px rgba(0, 0, 0, 0.2),
+    0 5px 10px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.2),
+    0 20px 20px rgba(0, 0, 0, 0.15);
+}
+
+.white:active {
+  box-shadow: -1px 0 15px rgba(0, 0, 0, 0.7) inset;
+}
+
+.black:active {
+  box-shadow: 1px 0 #555, 0 1px 0 #555, 0 1px 0 #444, 0 2px 0 #333;
+}
+
+.playing {
+  transform: scale(0.98);
+  border-color: #0571ff;
+  box-shadow: 0px 0px 16px #046ffa;
+  z-index: 1;
+}
+
+.note {
+  font-size: 5rem;
+  opacity: 0;
+}
+
+@media (max-width: 600px) {
+  .piano span {
+    font-size: 1rem;
+  }
+
+  .key {
+    padding: 1rem 0;
+  }
+
+  .container {
+    padding: 3rem 1.5rem 1.5rem;
+    height: 355px;
+  }
+}
+
+/* END CONTAINER*/
