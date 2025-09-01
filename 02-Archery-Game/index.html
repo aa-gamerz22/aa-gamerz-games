@@ -1,0 +1,1361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Archery Master</title>
+    <script src="TweenMax.min.js"></script>
+    <script src="MorphSVGPlugin.min.js"></script>
+   <link rel="stylesheet" href="css/all.min.css">
+  <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            padding: 20px;
+        }
+        
+        .game-container {
+            width: 100%;
+            max-width: 1000px;
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 20px;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
+            overflow: hidden;
+            position: relative;
+            border: 2px solid #ffcc00;
+            height: 90vh;
+        }
+        
+        .screen {
+            display: none;
+            padding: 30px;
+            height: 100%;
+            overflow-y: auto;
+        }
+        
+        #home-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+        
+        .screen-title {
+            color: #ffcc00;
+            font-size: 48px;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px rgba(255, 204, 0, 0.5);
+        }
+        
+        .screen-subtitle {
+            color: #ddd;
+            font-size: 22px;
+            margin-bottom: 30px;
+            max-width: 600px;
+        }
+        
+        .btn-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            width: 100%;
+            max-width: 300px;
+            margin: 30px 0;
+        }
+        
+        .btn {
+            background: linear-gradient(to bottom, #88ce02, #6aab00);
+            color: #fff;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 0 #4a7800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .btn:hover {
+            background: linear-gradient(to bottom, #9dee00, #7bc500);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 0 #4a7800;
+        }
+        
+        .btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 #4a7800;
+        }
+        
+        .btn.reset {
+            background: linear-gradient(to bottom, #f4531c, #d23b0a);
+            box-shadow: 0 4px 0 #a02e08;
+        }
+        
+        .btn.reset:hover {
+            background: linear-gradient(to bottom, #ff6a3a, #e54d1a);
+            box-shadow: 0 6px 0 #a02e08;
+        }
+        
+        .archery-icon {
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 20px;
+            background: linear-gradient(45deg, #ffcc00, #ff9800);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 20px rgba(255, 204, 0, 0.5);
+            border: 5px solid #f4531c;
+        }
+        
+        .archery-icon::before {
+            content: "";
+            width: 100px;
+            height: 100px;
+            border: 8px solid #1a2a6c;
+            border-radius: 50%;
+            position: absolute;
+        }
+        
+        .archery-icon::after {
+            content: "🏹";
+            font-size: 60px;
+            transform: rotate(-30deg);
+        }
+        
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 15px;
+            margin-bottom: 20px;
+            border: 1px solid #ffcc00;
+        }
+        
+        .stats-container {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .stat-box {
+            background: rgba(30, 30, 50, 0.8);
+            padding: 10px 20px;
+            border-radius: 10px;
+            min-width: 100px;
+            text-align: center;
+            border: 1px solid #88ce02;
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #ffcc00;
+            margin-top: 5px;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: #ddd;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        #game-svg {
+            background: rgba(10, 20, 40, 0.6);
+            border-radius: 15px;
+            overflow: visible;
+            display: block;
+            margin: 0 auto;
+            width: 100%;
+            height: 400px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .instructions {
+            text-align: center;
+            color: #ddd;
+            margin-top: 20px;
+            font-size: 18px;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+        }
+        
+        .power-meter {
+            width: 100%;
+            height: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            margin-top: 15px;
+            overflow: hidden;
+            position: relative;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .power-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(to right, #88ce02, #ffcc00);
+            border-radius: 10px;
+            transition: width 0.1s;
+        }
+        
+        .target-info {
+            background: rgba(0, 0, 0, 0.6);
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #f4531c;
+            color: #ddd;
+            max-width: 500px;
+            margin: 20px auto;
+        }
+        
+        .target-info h3 {
+            color: #ffcc00;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        
+        .target-rings {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 10px;
+        }
+        
+        .target-ring {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .ring-color {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            margin-bottom: 5px;
+        }
+        
+        .ring-points {
+            font-size: 16px;
+            font-weight: bold;
+        }
+        
+        .results-container {
+            background: rgba(30, 30, 50, 0.9);
+            padding: 30px;
+            border-radius: 15px;
+            margin: 30px 0;
+            border: 1px solid #88ce02;
+            text-align: left;
+        }
+        
+        .score-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            color: #ddd;
+            font-size: 18px;
+        }
+        
+        .score-item:last-child {
+            border-bottom: none;
+        }
+        
+        .score-value {
+            color: #ffcc00;
+            font-weight: bold;
+        }
+        
+        .final-score {
+            font-size: 80px;
+            color: #ffcc00;
+            text-shadow: 0 0 10px rgba(255, 204, 0, 0.5);
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        .history-container {
+            background: rgba(30, 30, 50, 0.9);
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            border: 1px solid #88ce02;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .history-item {
+            background: rgba(50, 50, 70, 0.7);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            border-left: 4px solid #88ce02;
+        }
+        
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+        
+        .history-date {
+            color: #ffcc00;
+            font-weight: bold;
+        }
+        
+        .history-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .stat-card {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .stat-card .label {
+            font-size: 12px;
+            color: #aaa;
+            margin-bottom: 5px;
+        }
+        
+        .stat-card .value {
+            font-size: 18px;
+            color: #ffcc00;
+            font-weight: bold;
+        }
+        
+        .no-history {
+            text-align: center;
+            color: #aaa;
+            padding: 20px;
+        }
+        
+        .hit-animation {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 5;
+            opacity: 0;
+            border-radius: 20px;
+        }
+        
+        .hit-animation.active {
+            animation: hitFlash 0.8s;
+        }
+        
+        @keyframes hitFlash {
+            0% { background: rgba(255, 204, 0, 0); }
+            20% { background: rgba(255, 204, 0, 0.4); }
+            100% { background: rgba(255, 204, 0, 0); }
+        }
+        
+        .game-description {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            color: #ddd;
+            line-height: 1.6;
+        }
+        
+        .game-description h3 {
+            color: #ffcc00;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        
+        .settings-container {
+            background: rgba(30, 30, 50, 0.9);
+            padding: 30px;
+            border-radius: 15px;
+            margin: 30px 0;
+            border: 1px solid #88ce02;
+        }
+        
+        .setting-item {
+            margin-bottom: 20px;
+        }
+        
+        .setting-item label {
+            display: block;
+            margin-bottom: 10px;
+            color: #ddd;
+            font-size: 18px;
+        }
+        
+        .setting-item select, .setting-item input {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid #88ce02;
+            color: #fff;
+            font-size: 16px;
+        }
+        
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            border: none;
+            color: #ddd;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .back-btn:hover {
+            background: rgba(100, 100, 100, 0.5);
+        }
+        
+        @media (max-width: 768px) {
+            .game-container {
+                height: 95vh;
+            }
+            
+            .screen-title {
+                font-size: 36px;
+            }
+            
+            .screen-subtitle {
+                font-size: 18px;
+            }
+            
+            .game-header {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .stats-container {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .stat-box {
+                min-width: auto;
+                padding: 8px 15px;
+                flex: 1;
+            }
+            
+            .stat-value {
+                font-size: 20px;
+            }
+            
+            .final-score {
+                font-size: 60px;
+            }
+            
+            #game-svg {
+                height: 300px;
+            }
+            
+            .history-stats {
+                grid-template-columns: 1fr;
+            }
+        }
+        .reset-game-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(to bottom, var(--danger), #a02e08);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 0 #7a2406;
+            transition: all 0.3s;
+            z-index: 10;
+        }
+        
+        .reset-game-btn:hover {
+            background: linear-gradient(to bottom, #ff6a3a, #e54d1a);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 0 #7a2406;
+        }
+        
+        .reset-game-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 #7a2406;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <!-- Home Screen -->
+        <div id="home-screen" class="screen">
+            <div class="archery-icon"></div>
+            <h1 class="screen-title">Archery Master</h1>
+            <p class="screen-subtitle">Test your precision and aim in this challenging archery game. Hit the bullseye to score big!</p>
+            
+            <div class="btn-container">
+                <button id="start-btn" class="btn">Start Game</button>
+                <button id="history-btn" class="btn">Game History</button>
+                <button id="settings-btn" class="btn">Settings</button>
+           <button class="reset-game-btn" id="reset-game-btn" title="Reset Game">
+                <i class="fas fa-redo"></i>
+            </button>
+            </div>
+            
+            <div class="game-description">
+                <h3>How to Play</h3>
+                <p>1. Click and hold to draw the bow</p>
+                <p>2. Drag to aim at the target</p>
+                <p>3. Release to shoot the arrow</p>
+                <p>4. Hit the bullseye for 10 points!</p>
+                <p>5. Regular hits score 5 points</p>
+            </div>
+        </div>
+        
+        <!-- Game Screen -->
+        <div id="game-screen" class="screen">
+            <button class="back-btn">←</button>
+            
+            <div class="game-header">
+                <div class="stats-container">
+                    <div class="stat-box">
+                        <div class="stat-label">Score</div>
+                        <div id="score" class="stat-value">0</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Arrows</div>
+                        <div id="arrows" class="stat-value">10</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Time</div>
+                        <div id="timer" class="stat-value">60</div>
+                    </div>
+                </div>
+                
+                <button id="quit-btn" class="btn reset">Quit</button>
+            </div>
+            
+            <div class="power-meter">
+                <div class="power-fill" id="power-fill"></div>
+            </div>
+            
+            <svg id="game-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 400" overflow="visible">
+                <linearGradient id="ArcGradient" >
+                    <stop offset="0"  stop-color="#fff" stop-opacity=".2"/>
+                    <stop offset="50%" stop-color="#fff" stop-opacity="0"/>
+                </linearGradient>
+                <path id="arc" fill="none" stroke="url(#ArcGradient)" stroke-width="4" d="M100,250c250-400,550-400,800,0"  pointer-events="none"/>
+                <defs>
+                    <g id="arrow">
+                        <line x2="60" fill="none" stroke="#888" stroke-width="2" />
+                        <polygon fill="#888" points="64 0 58 2 56 0 58 -2" />
+                        <polygon fill="#88ce02" points="2 -3 -4 -3 -1 0 -4 3 2 3 5 0" />
+                    </g>
+                </defs>
+                <g id="target">
+                    <path fill="#FFF" d="M924.2,274.2c-21.5,21.5-45.9,19.9-52,3.2c-4.4-12.1,2.4-29.2,14.2-41c11.8-11.8,29-18.6,41-14.2 C944.1,228.3,945.7,252.8,924.2,274.2z" />
+                    <path fill="#F4531C" d="M915.8,265.8c-14.1,14.1-30.8,14.6-36,4.1c-4.1-8.3,0.5-21.3,9.7-30.5s22.2-13.8,30.5-9.7 C930.4,235,929.9,251.7,915.8,265.8z" />
+                    <path fill="#FFF" d="M908.9,258.9c-8,8-17.9,9.2-21.6,3.5c-3.2-4.9-0.5-13.4,5.6-19.5c6.1-6.1,14.6-8.8,19.5-5.6 C918.1,241,916.9,250.9,908.9,258.9z" />
+                    <path fill="#F4531C" d="M903.2,253.2c-2.9,2.9-6.7,3.6-8.3,1.7c-1.5-1.8-0.6-5.4,2-8c2.6-2.6,6.2-3.6,8-2 C906.8,246.5,906.1,250.2,903.2,253.2z" />
+                </g>
+                <g id="bow" fill="none" stroke-linecap="round" vector-effect="non-scaling-stroke" pointer-events="none">
+                    <polyline fill="none" stroke="#ddd" stroke-linecap="round" points="88,200 88,250 88,300"/>
+                    <path fill="none" stroke="#88ce02" stroke-width="3" stroke-linecap="round" d="M88,300 c0-10.1,12-25.1,12-50s-12-39.9-12-50"/>
+                </g>
+                <g class="arrow-angle"><use x="100" y="250" xlink:href="#arrow"/></g>
+                <clipPath id="mask">
+                    <polygon opacity=".5" points="0,0 1500,0 1500,200 970,290 950,240 925,220 875,280 890,295 920,310 0,350" pointer-events="none"/>
+                </clipPath>
+                <g class="arrows" clip-path="url(#mask)"  pointer-events="none">
+                </g>
+                <g class="miss" fill="#aaa" opacity="0" transform="translate(0, 100)">
+                    <path d="M358 194L363 118 386 120 400 153 416 121 440 119 446 203 419 212 416 163 401 180 380 160 381 204"/>
+                    <path d="M450 120L458 200 475 192 474 121"/>
+                    <path d="M537 118L487 118 485 160 515 162 509 177 482 171 482 193 529 199 538 148 501 146 508 133 537 137"/>
+                    <path d="M540 202L543 178 570 186 569 168 544 167 546 122 590 116 586 142 561 140 560 152 586 153 586 205"/>
+                    <path d="M595,215l5-23l31,0l-5,29L595,215z M627,176l13-70l-41-0l-0,70L627,176z"/>
+                </g>
+                <g class="bullseye" fill="#F4531C" opacity="0">
+                    <path d="M322,159l15-21l-27-13l-32,13l15,71l41-14l7-32L322,159z M292,142h20l3,8l-16,8 L292,142z M321,182l-18,9l-4-18l23-2V182z"/>
+                    <path d="M340 131L359 125 362 169 381 167 386 123 405 129 392 183 351 186z"/>
+                    <path d="M413 119L402 188 450 196 454 175 422 175 438 120z"/>
+                    <path d="M432 167L454 169 466 154 451 151 478 115 453 113z"/>
+                    <path d="M524 109L492 112 466 148 487 155 491 172 464 167 463 184 502 191 513 143 487 141 496 125 517 126z"/>
+                    <path d="M537 114L512 189 558 199 566 174 533 175 539 162 553 164 558 150 543 145 547 134 566 148 575 124z"/>
+                    <path d="M577 118L587 158 570 198 587 204 626 118 606 118 598 141 590 112z"/>
+                    <path d="M635 122L599 198 643 207 649 188 624 188 630 170 639 178 645 162 637 158 649 143 662 151 670 134z"/>
+                    <path d="M649,220l4-21l28,4l-6,25L649,220z M681,191l40-79l-35-8L659,184L681,191z"/>
+                </g>
+                <g class="hit" fill="#ffcc00" opacity="0" transform="translate(180, -80) rotate(12) ">
+                    <path d="M383 114L385 195 407 191 406 160 422 155 418 191 436 189 444 112 423 119 422 141 407 146 400 113"/>
+                    <path d="M449 185L453 113 477 112 464 186"/>
+                    <path d="M486 113L484 130 506 130 481 188 506 187 520 131 540 135 545 119"/>
+                    <path d="M526,195l5-20l22,5l-9,16L526,195z M558,164l32-44l-35-9l-19,51L558,164z"/>
+                </g>
+            </svg>
+            
+            <div class="instructions">
+                Draw back an arrow and launch it! Aim for the target to score points.
+            </div>
+            
+            <div class="target-info">
+                <h3>Target Scoring</h3>
+                <div class="target-rings">
+                    <div class="target-ring">
+                        <div class="ring-color" style="background: #F4531C;"></div>
+                        <div class="ring-points">10 pts</div>
+                    </div>
+                    <div class="target-ring">
+                        <div class="ring-color" style="background: #FFF;"></div>
+                        <div class="ring-points">5 pts</div>
+                    </div>
+                    <div class="target-ring">
+                        <div class="ring-color" style="background: #F4531C;"></div>
+                        <div class="ring-points">10 pts</div>
+                    </div>
+                    <div class="target-ring">
+                        <div class="ring-color" style="background: #FFF;"></div>
+                        <div class="ring-points">5 pts</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="hit-animation" id="hit-animation"></div>
+        </div>
+        
+        <!-- Results Screen -->
+        <div id="results-screen" class="screen">
+            <button class="back-btn">←</button>
+            
+            <h1 class="screen-title">Game Over</h1>
+            
+            <div class="final-score" id="final-score">0</div>
+            
+            <div class="results-container">
+                <div class="score-item">
+                    <span>Bullseyes (10 pts):</span>
+                    <span class="score-value" id="bullseyes">0</span>
+                </div>
+                <div class="score-item">
+                    <span>Hits (5 pts):</span>
+                    <span class="score-value" id="hits">0</span>
+                </div>
+                <div class="score-item">
+                    <span>Misses:</span>
+                    <span class="score-value" id="misses">0</span>
+                </div>
+                <div class="score-item">
+                    <span>Accuracy:</span>
+                    <span class="score-value" id="accuracy">0%</span>
+                </div>
+                <div class="score-item" style="margin-top: 15px; padding-top: 15px; border-top: 2px solid #ffcc00;">
+                    <span style="font-size: 22px;">Total Score:</span>
+                    <span class="score-value" style="font-size: 28px;" id="total-score">0</span>
+                </div>
+            </div>
+            
+            <div class="btn-container">
+                <button id="play-again-btn" class="btn">Play Again</button>
+                <button id="results-menu-btn" class="btn reset">Main Menu</button>
+            </div>
+        </div>
+        
+        <!-- History Screen -->
+        <div id="history-screen" class="screen">
+            <button class="back-btn">←</button>
+            
+            <h1 class="screen-title">Game History</h1>
+            
+            <div class="history-container" id="history-list">
+                <div class="no-history">No game history available. Play a game to see your stats!</div>
+            </div>
+        </div>
+        
+        <!-- Settings Screen -->
+        <div id="settings-screen" class="screen">
+            <button class="back-btn">←</button>
+            
+            <h1 class="screen-title">Game Settings</h1>
+            
+            <div class="settings-container">
+                <div class="setting-item">
+                    <label for="difficulty">Difficulty Level</label>
+                    <select id="difficulty">
+                        <option value="easy">Easy</option>
+                        <option value="medium" selected>Medium</option>
+                        <option value="hard">Hard</option>
+                    </select>
+                </div>
+                
+                <div class="setting-item">
+                    <label for="arrows-count">Number of Arrows</label>
+                    <input type="number" id="arrows-count" min="5" max="20" value="10">
+                </div>
+                
+                <div class="setting-item">
+                    <label for="game-time">Game Time (seconds)</label>
+                    <input type="number" id="game-time" min="30" max="120" value="60">
+                </div>
+                
+                <div class="setting-item">
+                    <label>
+                        <input type="checkbox" id="sound-effects" checked> 
+                        Enable Sound Effects
+                    </label>
+                </div>
+            </div>
+            
+            <div class="btn-container">
+                <button id="save-settings" class="btn">Save Settings</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Game state
+        const gameState = {
+            score: 0,
+            arrows: 10,
+            timeLeft: 60,
+            gameActive: false,
+            bullseyes: 0,
+            hits: 0,
+            misses: 0,
+            difficulty: 'medium',
+            timerInterval: null,
+            currentPower: 0,
+            maxPower: 0,
+            history: [],
+            settings: {
+                arrowsCount: 10,
+                gameTime: 60,
+                soundEffects: true,
+                difficulty: 'medium'
+            }
+        };
+
+        // DOM elements
+        const elements = {
+            homeScreen: document.getElementById('home-screen'),
+            gameScreen: document.getElementById('game-screen'),
+            resultsScreen: document.getElementById('results-screen'),
+            historyScreen: document.getElementById('history-screen'),
+            settingsScreen: document.getElementById('settings-screen'),
+            score: document.getElementById('score'),
+            arrows: document.getElementById('arrows'),
+            timer: document.getElementById('timer'),
+            startBtn: document.getElementById('start-btn'),
+            historyBtn: document.getElementById('history-btn'),
+            settingsBtn: document.getElementById('settings-btn'),
+            quitBtn: document.getElementById('quit-btn'),
+            playAgainBtn: document.getElementById('play-again-btn'),
+            resultsMenuBtn: document.getElementById('results-menu-btn'),
+            saveSettings: document.getElementById('save-settings'),
+            finalScore: document.getElementById('final-score'),
+            bullseyes: document.getElementById('bullseyes'),
+            hits: document.getElementById('hits'),
+            misses: document.getElementById('misses'),
+            totalScore: document.getElementById('total-score'),
+            accuracy: document.getElementById('accuracy'),
+            hitAnimation: document.getElementById('hit-animation'),
+            powerFill: document.getElementById('power-fill'),
+            historyList: document.getElementById('history-list'),
+            backBtns: document.querySelectorAll('.back-btn'),
+            difficulty: document.getElementById('difficulty'),
+            arrowsCount: document.getElementById('arrows-count'),
+            gameTime: document.getElementById('game-time'),
+            soundEffects: document.getElementById('sound-effects')
+        };
+
+        // Initialize game
+        function initGame() {
+            loadSettings();
+            loadHistory();
+            
+            // Set up event listeners
+            setupEventListeners();
+            
+            // Show home screen
+            showScreen('home');
+        }
+        
+        function setupEventListeners() {
+            // Navigation buttons
+            elements.startBtn.addEventListener('click', () => startGame());
+            elements.historyBtn.addEventListener('click', () => showScreen('history'));
+            elements.settingsBtn.addEventListener('click', () => showScreen('settings'));
+            elements.quitBtn.addEventListener('click', () => endGame());
+            elements.playAgainBtn.addEventListener('click', () => startGame());
+            elements.resultsMenuBtn.addEventListener('click', () => showScreen('home'));
+            elements.saveSettings.addEventListener('click', () => saveSettings());
+            
+            // Back buttons
+            elements.backBtns.forEach(btn => {
+                btn.addEventListener('click', () => showScreen('home'));
+            });
+        }
+        
+        function showScreen(screenName) {
+            // Hide all screens
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.style.display = 'none';
+            });
+            
+            // Show the requested screen
+            switch(screenName) {
+                case 'home':
+                    elements.homeScreen.style.display = 'flex';
+                    break;
+                case 'game':
+                    elements.gameScreen.style.display = 'block';
+                    setupGame();
+                    break;
+                case 'results':
+                    elements.resultsScreen.style.display = 'block';
+                    break;
+                case 'history':
+                    elements.historyScreen.style.display = 'block';
+                    renderHistory();
+                    break;
+                case 'settings':
+                    elements.settingsScreen.style.display = 'block';
+                    renderSettings();
+                    break;
+            }
+        }
+        
+        function setupGame() {
+            // Reset game state
+            gameState.score = 0;
+            gameState.arrows = gameState.settings.arrowsCount;
+            gameState.timeLeft = gameState.settings.gameTime;
+            gameState.bullseyes = 0;
+            gameState.hits = 0;
+            gameState.misses = 0;
+            gameState.gameActive = true;
+            gameState.currentPower = 0;
+            gameState.maxPower = 0;
+            
+            // Clear arrows from SVG
+            const arrows = document.querySelector(".arrows");
+            if (arrows) arrows.innerHTML = '';
+            
+            // Reset power meter
+            elements.powerFill.style.width = '0%';
+            
+            // Update display
+            updateDisplay();
+            
+            // Start timer
+            gameState.timerInterval = setInterval(() => {
+                gameState.timeLeft--;
+                updateDisplay();
+                
+                if (gameState.timeLeft <= 0) {
+                    endGame();
+                }
+            }, 1000);
+            
+            // Set up SVG game
+            setupSVG();
+        }
+        
+        function setupSVG() {
+            const svg = document.getElementById("game-svg");
+            const cursor = svg.createSVGPoint();
+            const arrows = svg.querySelector(".arrows");
+            let randomAngle = 0;
+
+            // Center of target
+            const target = {
+                x: 900,
+                y: 249.5
+            };
+
+            // Target intersection line segment
+            const lineSegment = {
+                x1: 875,
+                y1: 280,
+                x2: 925,
+                y2: 220
+            };
+
+            // Bow rotation point
+            const pivot = {
+                x: 100,
+                y: 250
+            };
+            
+            // Set initial aim
+            aim({
+                clientX: 320,
+                clientY: 300
+            });
+
+            // Set up start drag event
+            window.addEventListener("mousedown", draw);
+            window.addEventListener("touchstart", handleTouchStart);
+
+            function draw(e) {
+                if (!gameState.gameActive) return;
+                
+                // Pull back arrow
+                randomAngle = (Math.random() * Math.PI * 0.03) - 0.015;
+                TweenMax.to(".arrow-angle use", 0.3, {
+                    opacity: 1
+                });
+                
+                window.addEventListener("mousemove", aim);
+                window.addEventListener("mouseup", loose);
+                window.addEventListener("touchmove", handleTouchMove);
+                window.addEventListener("touchend", handleTouchEnd);
+                
+                aim(e);
+            }
+
+            function handleTouchStart(e) {
+                if (!gameState.gameActive) return;
+                e.preventDefault();
+                draw(e.touches[0]);
+            }
+
+            function handleTouchMove(e) {
+                e.preventDefault();
+                aim(e.touches[0]);
+            }
+
+            function handleTouchEnd(e) {
+                e.preventDefault();
+                loose();
+            }
+
+            function aim(e) {
+                // Get mouse position in relation to svg position and scale
+                const point = getMouseSVG(e);
+                point.x = Math.min(point.x, pivot.x - 7);
+                point.y = Math.max(point.y, pivot.y + 7);
+                const dx = point.x - pivot.x;
+                const dy = point.y - pivot.y;
+                
+                // Make it more difficult by adding random angle each time
+                let angle = Math.atan2(dy, dx) + randomAngle;
+                
+                // Adjust based on difficulty
+                if (gameState.settings.difficulty === 'easy') {
+                    angle += 0.02;
+                } else if (gameState.settings.difficulty === 'hard') {
+                    angle -= 0.03;
+                }
+                
+                const bowAngle = angle - Math.PI;
+                const distance = Math.min(Math.sqrt((dx * dx) + (dy * dy)), 50);
+                const scale = Math.min(Math.max(distance / 30, 1), 2);
+                
+                // Update power meter
+                gameState.currentPower = distance;
+                gameState.maxPower = Math.max(gameState.maxPower, distance);
+                elements.powerFill.style.width = `${(distance / 50) * 100}%`;
+                
+                TweenMax.to("#bow", 0.3, {
+                    scaleX: scale,
+                    rotation: bowAngle + "rad",
+                    transformOrigin: "right center"
+                });
+                
+                const arrowX = Math.min(pivot.x - ((1 / scale) * distance), 88);
+                TweenMax.to(".arrow-angle", 0.3, {
+                    rotation: bowAngle + "rad",
+                    svgOrigin: "100 250"
+                });
+                
+                TweenMax.to(".arrow-angle use", 0.3, {
+                    x: -distance
+                });
+                
+                TweenMax.to("#bow polyline", 0.3, {
+                    attr: {
+                        points: "88,200 " + Math.min(pivot.x - ((1 / scale) * distance), 88) + ",250 88,300"
+                    }
+                });
+
+                const radius = distance * 9;
+                const offset = {
+                    x: (Math.cos(bowAngle) * radius),
+                    y: (Math.sin(bowAngle) * radius)
+                };
+                const arcWidth = offset.x * 3;
+
+                TweenMax.to("#arc", 0.3, {
+                    attr: {
+                        d: "M100,250c" + offset.x + "," + offset.y + "," + (arcWidth - offset.x) + "," + (offset.y + 50) + "," + arcWidth + ",50"
+                    },
+                    autoAlpha: distance/60
+                });
+            }
+
+            function loose() {
+                if (!gameState.gameActive) return;
+                
+                // Release arrow
+                window.removeEventListener("mousemove", aim);
+                window.removeEventListener("mouseup", loose);
+                window.removeEventListener("touchmove", handleTouchMove);
+                window.removeEventListener("touchend", handleTouchEnd);
+
+                TweenMax.to("#bow", 0.4, {
+                    scaleX: 1,
+                    transformOrigin: "right center",
+                    ease: "elastic.out"
+                });
+                
+                TweenMax.to("#bow polyline", 0.4, {
+                    attr: {
+                        points: "88,200 88,250 88,300"
+                    },
+                    ease: "elastic.out"
+                });
+                
+                // Duplicate arrow
+                const newArrow = document.createElementNS("http://www.w3.org/2000/svg", "use");
+                newArrow.setAttributeNS('http://www.w3.org/1999/xlink', 'href', "#arrow");
+                arrows.appendChild(newArrow);
+
+                // Animate arrow along path
+                const path = MorphSVGPlugin.pathDataToBezier("#arc");
+                TweenMax.to([newArrow], 0.5, {
+                    force3D: true,
+                    bezier: {
+                        type: "cubic",
+                        values: path,
+                        autoRotate: ["x", "y", "rotation"]
+                    },
+                    onUpdate: hitTest,
+                    onUpdateParams: ["{self}"],
+                    onComplete: onMiss,
+                    ease: "none"
+                });
+                
+                TweenMax.to("#arc", 0.3, {
+                    opacity: 0
+                });
+                
+                // Hide previous arrow
+                TweenMax.set(".arrow-angle use", {
+                    opacity: 0
+                });
+                
+                // Reduce arrows
+                gameState.arrows--;
+                updateDisplay();
+                
+                // Check if game should end
+                if (gameState.arrows <= 0) {
+                    endGame();
+                }
+            }
+
+            function hitTest(tween) {
+                // Check for collisions with arrow and target
+                const arrow = tween.target[0];
+                const transform = arrow._gsTransform;
+                const radians = transform.rotation * Math.PI / 180;
+                const arrowSegment = {
+                    x1: transform.x,
+                    y1: transform.y,
+                    x2: (Math.cos(radians) * 60) + transform.x,
+                    y2: (Math.sin(radians) * 60) + transform.y
+                }
+
+                const intersection = getIntersection(arrowSegment, lineSegment);
+                if (intersection && intersection.segment1 && intersection.segment2) {
+                    tween.pause();
+                    const dx = intersection.x - target.x;
+                    const dy = intersection.y - target.y;
+                    const distance = Math.sqrt((dx * dx) + (dy * dy));
+                    let selector = ".hit";
+                    let points = 5;
+                    
+                    if (distance < 7) {
+                        selector = ".bullseye";
+                        points = 10;
+                        gameState.bullseyes++;
+                    } else {
+                        gameState.hits++;
+                    }
+                    
+                    // Add to score
+                    gameState.score += points;
+                    updateDisplay();
+                    
+                    // Show hit animation
+                    elements.hitAnimation.classList.add('active');
+                    setTimeout(() => {
+                        elements.hitAnimation.classList.remove('active');
+                    }, 800);
+                    
+                    showMessage(selector);
+                }
+            }
+
+            function onMiss() {
+                // Damn!
+                gameState.misses++;
+                updateDisplay();
+                showMessage(".miss");
+            }
+
+            function showMessage(selector) {
+                // Handle all text animations by providing selector
+                TweenMax.killTweensOf(selector);
+                TweenMax.killChildTweensOf(selector);
+                TweenMax.set(selector, {
+                    autoAlpha: 1
+                });
+                
+                TweenMax.staggerFromTo(selector + " path", .5, {
+                    rotation: -5,
+                    scale: 0,
+                    transformOrigin: "center"
+                }, {
+                    scale: 1,
+                    ease: "back.out"
+                }, .05);
+                
+                TweenMax.staggerTo(selector + " path", .3, {
+                    delay: 2,
+                    rotation: 20,
+                    scale: 0,
+                    ease: "back.in"
+                }, .03);
+            }
+
+            function getMouseSVG(e) {
+                // Normalize mouse position within svg coordinates
+                cursor.x = e.clientX;
+                cursor.y = e.clientY;
+                return cursor.matrixTransform(svg.getScreenCTM().inverse());
+            }
+
+            function getIntersection(segment1, segment2) {
+                // Find intersection point of two line segments and whether or not the point is on either line segment
+                const dx1 = segment1.x2 - segment1.x1;
+                const dy1 = segment1.y2 - segment1.y1;
+                const dx2 = segment2.x2 - segment2.x1;
+                const dy2 = segment2.y2 - segment2.y1;
+                const cx = segment1.x1 - segment2.x1;
+                const cy = segment1.y1 - segment2.y1;
+                const denominator = dy2 * dx1 - dx2 * dy1;
+                
+                if (Math.abs(denominator) < 0.0001) {
+                    return null;
+                }
+                
+                const ua = (dx2 * cy - dy2 * cx) / denominator;
+                const ub = (dx1 * cy - dy1 * cx) / denominator;
+                
+                return {
+                    x: segment1.x1 + ua * dx1,
+                    y: segment1.y1 + ua * dy1,
+                    segment1: ua >= 0 && ua <= 1,
+                    segment2: ub >= 0 && ub <= 1
+                };
+            }
+        }
+        
+        function startGame() {
+            showScreen('game');
+        }
+        
+        function endGame() {
+            gameState.gameActive = false;
+            
+            // Stop timer
+            if (gameState.timerInterval) {
+                clearInterval(gameState.timerInterval);
+                gameState.timerInterval = null;
+            }
+            
+            // Calculate accuracy
+            const totalShots = gameState.bullseyes + gameState.hits + gameState.misses;
+            const accuracy = totalShots > 0 ? 
+                Math.round(((gameState.bullseyes + gameState.hits) / totalShots) * 100) : 0;
+            
+            // Update results screen
+            elements.finalScore.textContent = gameState.score;
+            elements.bullseyes.textContent = gameState.bullseyes;
+            elements.hits.textContent = gameState.hits;
+            elements.misses.textContent = gameState.misses;
+            elements.totalScore.textContent = gameState.score;
+            elements.accuracy.textContent = `${accuracy}%`;
+            
+            // Save game to history
+            saveGameToHistory(accuracy);
+            
+            // Show results screen
+            showScreen('results');
+        }
+        
+        function updateDisplay() {
+            elements.score.textContent = gameState.score;
+            elements.arrows.textContent = gameState.arrows;
+            elements.timer.textContent = gameState.timeLeft;
+        }
+        
+        function saveGameToHistory(accuracy) {
+            const gameData = {
+                date: new Date().toLocaleString(),
+                score: gameState.score,
+                bullseyes: gameState.bullseyes,
+                hits: gameState.hits,
+                misses: gameState.misses,
+                accuracy: accuracy,
+                difficulty: gameState.settings.difficulty,
+                arrows: gameState.settings.arrowsCount
+            };
+            
+            gameState.history.push(gameData);
+            saveHistory();
+        }
+        
+        function renderHistory() {
+            if (gameState.history.length === 0) {
+                elements.historyList.innerHTML = '<div class="no-history">No game history available. Play a game to see your stats!</div>';
+                return;
+            }
+            
+            let historyHTML = '';
+            
+            gameState.history.forEach((game, index) => {
+                historyHTML += `
+                    <div class="history-item">
+                        <div class="history-header">
+                            <div class="history-date">Game #${index + 1}</div>
+                            <div class="history-date">${game.date}</div>
+                        </div>
+                        <div class="history-stats">
+                            <div class="stat-card">
+                                <div class="label">Score</div>
+                                <div class="value">${game.score}</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="label">Accuracy</div>
+                                <div class="value">${game.accuracy}%</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="label">Difficulty</div>
+                                <div class="value">${game.difficulty}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            elements.historyList.innerHTML = historyHTML;
+        }
+        
+        function renderSettings() {
+            elements.difficulty.value = gameState.settings.difficulty;
+            elements.arrowsCount.value = gameState.settings.arrowsCount;
+            elements.gameTime.value = gameState.settings.gameTime;
+            elements.soundEffects.checked = gameState.settings.soundEffects;
+        }
+        
+        function saveSettings() {
+            gameState.settings.difficulty = elements.difficulty.value;
+            gameState.settings.arrowsCount = parseInt(elements.arrowsCount.value);
+            gameState.settings.gameTime = parseInt(elements.gameTime.value);
+            gameState.settings.soundEffects = elements.soundEffects.checked;
+            
+            localStorage.setItem('archerySettings', JSON.stringify(gameState.settings));
+            alert('Settings saved successfully!');
+            showScreen('home');
+        }
+        
+        function loadSettings() {
+            const savedSettings = localStorage.getItem('archerySettings');
+            if (savedSettings) {
+                gameState.settings = JSON.parse(savedSettings);
+            }
+        }
+        
+        function saveHistory() {
+            localStorage.setItem('archeryHistory', JSON.stringify(gameState.history));
+        }
+        
+        function loadHistory() {
+            const savedHistory = localStorage.getItem('archeryHistory');
+            if (savedHistory) {
+                gameState.history = JSON.parse(savedHistory);
+            }
+        }
+
+        // Initialize the game when page loads
+        window.addEventListener('load', initGame);
+   
+        // Reset all game data
+        function resetAllGameData() {
+            if (confirm('Are you sure you want to reset all game data? This will delete your progress, history, and settings.')) {
+                // Clear all saved data
+                localStorage.removeItem('archeryHistory');
+                localStorage.removeItem('archerySettings');
+                localStorage.removeItem('archeryProgress');
+                
+                // Reset game state
+                gameState.level = 1;
+                gameState.unlockedLevels = [1];
+                gameState.history = [];
+                gameState.settings = {
+                    arrowsCount: 10,
+                    gameTime: 60,
+                    soundEffects: true,
+                    difficulty: 'medium',
+                    theme: 'default',
+                    arrowTrail: 'medium',
+                    motionEffects: true,
+                    autoLevelProgress: 'yes'
+                };
+                
+                // Update UI
+                renderLevelSelection();
+                applyTheme();
+                
+                alert('Game has been reset successfully!');
+            }
+        }
+
+   </script>
+</body>
+</html>
