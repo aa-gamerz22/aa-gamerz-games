@@ -54,8 +54,8 @@
 ## 🖼️ Gallery (Sneak Peek)
 
 <p align="center">
-  <img src="https://i.ibb.co/fQymBpr/minecraft.jpg" width="45%" style="border-radius:15px;margin:10px;" />
-  <img src="https://i.ibb.co/cFZBtSg/granny.jpg" width="45%" style="border-radius:15px;margin:10px;" />
+  <img src="1gb.jpg" width="45%" style="border-radius:15px;margin:10px;" />
+  <img src="2gb.jpg" width="45%" style="border-radius:15px;margin:10px;" />
 </p>
 
 ---
