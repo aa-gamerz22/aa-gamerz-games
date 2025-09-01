@@ -1,0 +1,176 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&disp');
+
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins',sans-serif;
+}
+
+body {
+    display: flex;
+    height: 100vh;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+    background: linear-gradient(210deg, #25a5be, #ee9bf2);
+}
+
+.mainFrame {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: linear-gradient(180deg, #ffffff, #d3f6f6);
+    width: 400px;
+    height: 650px;
+    margin: auto;
+    border: 1px solid purple;
+    padding: 20px;
+    text-align: center;
+}
+
+.mainFrame .headingFrame {
+    position: relative;
+    top: 4%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 380px;
+    padding-bottom: 5px;
+    margin: auto;
+    text-align: center;
+    opacity: initial;
+}
+
+.mainFrame .headingFrame::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    height: 3px;
+    width: 300px;
+    margin-top: 10px;
+    background: linear-gradient(210deg, #25a5be, #ee9bf2);
+}
+
+.mainFrame .options {
+    padding-top: 10%;
+    text-align: center;
+}
+
+.options .user {
+    font-size: 22px;
+    display: inline-block;
+    width: 45%;
+    height: 200px;
+    padding: 10px;
+    margin-right: 10px;
+    vertical-align: top;
+    background-color: rgb(249, 209, 240);
+}
+
+.options .computer {
+    font-size: 22px;
+    display: inline-block;
+    width: 45%;
+    height: 200px;
+    padding: 10px;
+    margin-left: 10px;
+    vertical-align: top;
+    background-color: rgb(147, 230, 234);
+}
+
+.options::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    height: 2px;
+    width: 300px;
+    padding-bottom: 2px;
+    margin-bottom: 10px;
+    background: linear-gradient(210deg, #25a5be, #ee9bf2);
+}
+
+.options .userImage {
+    position: relative;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    margin-top: 70px;
+    text-align: center;
+}
+
+.options .computerImage {
+    position: relative;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    margin-top: 70px;
+    text-align: center;
+}
+
+.mainFrame .result {
+    position: relative;
+    font-size: 22px;
+    top: 5%;
+    width: 345px;
+    height: 110px;
+    margin-left: 10px;
+    margin: auto;
+    background-color: rgb(173, 217, 241);
+    text-align: center;
+}
+
+.mainFrame .result .resultLabel {
+    padding-top: 20px;
+}
+
+.mainFrame .choice {
+    position: relative;
+    font-size: 22px;
+    top: 10%;
+    width: 345px;
+    height: 100px;
+    margin-left: 20px;
+    margin: auto;
+    padding: 10px;
+    background-color: rgb(247, 194, 239);
+    text-align: center;
+}
+
+.choice .but {
+    font-size: 13px;
+    display: inline-block;
+    background-color: bisque;
+    width: 27%;
+    height: 25px;
+    margin: 7px;
+    margin-top: 15px;
+    vertical-align: top;
+    background: linear-gradient(180deg, #ffffff, #d2d2d1);
+}
+
+.mainFrame .resetDiv {
+    position: relative;
+    top: 10%;
+    width: 200px;
+    height: 50px;
+    margin: auto;
+    padding: 5px;
+    text-align: center;
+}
+
+.resetDiv .resetButton {
+    font-size: 13px;
+    width: 60%;
+    height: 25px;
+    margin: 7px;
+    margin-top: 15px;
+    vertical-align: top;
+    background: linear-gradient(180deg, #ffffff, #f8bcbc);
+}

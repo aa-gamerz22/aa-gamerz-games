@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>Rock Paper Scissors</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <link rel='stylesheet' type='text/css' media='screen' href='styling.css'>
+</head>
+<body>
+    <div class="mainFrame">
+
+        <div class="headingFrame">
+            <h2 style="color: purple; font-size: 28px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">ROCK PAPER SCISSORS</h2>
+        </div>
+
+        <div class="options">
+
+            <div class="user">
+                <div>
+                    YOU
+                    <div class="userImage" style="background: linear-gradient(180deg, #f3f6f6, #f9fbdd); width: 100px;">
+                        <img id="userImage" style="margin-top: 5px;" src="./Resources/Glasses.png" alt="Glasses" width="80" height="80">
+                        <h6 id="user">YOU</h6>
+                    </div>
+                </div>
+            </div>
+
+            <div class="computer">
+                <div>
+                    COMPUTER
+                    <div class="computerImage" style="background: linear-gradient(180deg, #f3f6f6, #f9fbdd); width: 100px;">
+                        <img id="computerImage" style="margin-top: 5px;" src="./Resources/Sleeping.png" alt="Sleeping" width="80" height="80">
+                        <h6 id="computer">COMPUTER</h6>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="result">
+            <h5 class="resultLabel" id="result">RESULT</h5>
+            <span class="userCounterLabel" style="font-size: 38px;" id="userCounter">0</span><span style="font-size: 36px;"> : </span><span class="computerCounterLabel" style="font-size: 38px;" id="computerCounter">0</span>
+        </div>
+
+        <div class="choice">
+            <h5>Choose an option:</h5>
+            <button className="button" class="but" id="rock">ROCK</button>
+            <button className="button" class="but" id="paper">PAPER</button>
+            <button className="button" class="but" id="scissors">SCISSORS</button>
+        </div>
+
+        <div class="resetDiv">
+            <button class="resetButton" id="reset">RESET SCORE</button>
+        </div>
+
+    </div>
+    <script src='main.js'></script>
+</body>
+</html>
