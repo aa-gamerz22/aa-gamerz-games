@@ -1,0 +1,2830 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ultimate Game Hub</title>
+    <link rel="stylesheet" href="css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #6c5ce7;
+            --secondary: #a29bfe;
+            --accent: #00cec9;
+            --dark: #2d3436;
+            --light: #dfe6e9;
+            --success: #00b894;
+            --danger: #ff7675;
+            --warning: #fdcb6e;
+            --info: #74b9ff;
+            --neon-blue: #00d8ff;
+            --neon-pink: #ff00ff;
+            --neon-green: #39ff14;
+            --neon-yellow: #f9cb28;
+            --neon-orange: #ff7a00;
+            --bg-gradient: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+            --card-gradient: linear-gradient(135deg, #2c3e50, #4a6491);
+            --header-bg: rgba(255, 255, 255, 0.1);
+            --text-color: #fff;
+        }
+
+        body {
+            background: var(--bg-gradient);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            color: var(--text-color);
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+            transition: background 0.5s ease;
+        }
+
+        /* Theme Classes */
+        body.theme-dark-purple {
+            --bg-gradient: linear-gradient(135deg, #2c061f, #374045);
+            --card-gradient: linear-gradient(135deg, #4a1942, #6a5d7b);
+            --neon-blue: #e94560;
+            --neon-pink: #f05945;
+        }
+        
+        body.theme-blue-pink {
+            --bg-gradient: linear-gradient(135deg, #1d2b64, #f8cdda);
+            --card-gradient: linear-gradient(135deg, #4a569d, #dc2424);
+            --neon-blue: #7f7fd5;
+            --neon-pink: #e94057;
+        }
+        
+        body.theme-green-blue {
+            --bg-gradient: linear-gradient(135deg, #0f9b0f, #3a6186);
+            --card-gradient: linear-gradient(135deg, #1d976c, #93f9b9);
+            --neon-blue: #56ccf2;
+            --neon-pink: #2f80ed;
+        }
+        
+        body.theme-orange-yellow {
+            --bg-gradient: linear-gradient(135deg, #e65c00, #f9d423);
+            --card-gradient: linear-gradient(135deg, #f46b45, #eea849);
+            --neon-blue: #ff416c;
+            --neon-pink: #ff4b2b;
+        }
+        
+        body.theme-red-black {
+            --bg-gradient: linear-gradient(135deg, #8e0e00, #1f1c18);
+            --card-gradient: linear-gradient(135deg, #8e0e00, #1f1c18);
+            --neon-blue: #ff512f;
+            --neon-pink: #dd2476;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            border-radius: 20px;
+            background: var(--header-bg);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+
+        .settings-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            color: var(--text-color);
+            font-size: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .settings-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(30deg);
+        }
+
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, var(--neon-blue), var(--neon-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .tagline {
+            font-size: 1.3rem;
+            color: var(--neon-blue);
+            margin-bottom: 10px;
+        }
+
+        /* Navigation */
+        .game-nav {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .game-btn {
+            background: linear-gradient(45deg, var(--neon-blue), var(--neon-pink));
+            border: none;
+            border-radius: 15px;
+            color: white;
+            padding: 16px 30px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 250px;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .game-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: 0.5s;
+            z-index: -1;
+        }
+
+        .game-btn:hover::before {
+            left: 100%;
+        }
+
+        .game-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Mini Games Section */
+        .section-title {
+            text-align: center;
+            font-size: 2.2rem;
+            margin: 40px 0 30px;
+            position: relative;
+            padding-bottom: 15px;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--neon-blue), var(--neon-pink));
+            border-radius: 2px;
+        }
+
+        .mini-games {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .game-card {
+            background: var(--card-gradient);
+            border-radius: 20px;
+            padding: 25px;
+            transition: all 0.4s ease;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .game-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .game-title {
+            font-size: 1.6rem;
+            margin-bottom: 20px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .game-title i {
+            color: var(--neon-pink);
+        }
+
+        .game-container {
+            width: 100%;
+            height: 200px;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 20px;
+            border-radius: 15px;
+            background: rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .play-btn {
+            background: linear-gradient(45deg, var(--neon-orange), var(--neon-yellow));
+            border: none;
+            border-radius: 12px;
+            color: white;
+            padding: 14px 20px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            text-align: center;
+            margin-top: auto;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .play-btn:hover {
+            background: linear-gradient(45deg, var(--neon-yellow), var(--neon-orange));
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Game Specific Previews */
+        .snake-preview {
+            width: 180px;
+            height: 180px;
+            position: relative;
+            background: #111;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .snake-part {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: var(--neon-green);
+            border-radius: 4px;
+        }
+
+        .snake-head {
+            background: var(--neon-blue);
+            z-index: 2;
+        }
+
+        .snake-food {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: var(--danger);
+            border-radius: 50%;
+        }
+
+        .memory-preview {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            width: 100%;
+            padding: 10px;
+        }
+
+        .memory-card-preview {
+            height: 50px;
+            background: var(--info);
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .memory-card-preview.flipped {
+            background: var(--warning);
+            transform: rotateY(180deg);
+        }
+
+        .tic-tac-toe-preview {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            width: 200px;
+        }
+
+        .ttt-cell {
+            height: 60px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2rem;
+            font-weight: bold;
+        }
+
+        .ttt-cell.x { color: var(--neon-blue); }
+        .ttt-cell.o { color: var(--neon-orange); }
+
+        .puzzle-preview {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 6px;
+            width: 200px;
+        }
+
+        .puzzle-tile-preview {
+            height: 45px;
+            background: var(--neon-yellow);
+            border-radius: 6px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--dark);
+        }
+
+        .puzzle-tile-preview.empty {
+            background: transparent;
+        }
+
+        .brick-preview {
+            width: 200px;
+            height: 150px;
+            background: #111;
+            border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .brick {
+            position: absolute;
+            width: 40px;
+            height: 15px;
+            background: var(--danger);
+            border-radius: 3px;
+        }
+
+        .ball {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--neon-blue);
+        }
+
+        .paddle {
+            position: absolute;
+            width: 60px;
+            height: 15px;
+            background: var(--neon-green);
+            border-radius: 8px;
+        }
+
+        .flappy-preview {
+            width: 200px;
+            height: 150px;
+            background: linear-gradient(to bottom, #87CEEB, #E0F7FA);
+            border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .bird {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background: var(--neon-yellow);
+            border-radius: 50%;
+        }
+
+        .pipe {
+            position: absolute;
+            width: 40px;
+            background: var(--success);
+        }
+
+        /* Game Screens */
+        .game-screen {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .game-content {
+            background: var(--card-gradient);
+            border-radius: 20px;
+            padding: 30px;
+            width: 95%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 0 40px rgba(0, 206, 201, 0.5);
+            border: 2px solid var(--neon-blue);
+            position: relative;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: var(--danger);
+            border: none;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            color: white;
+            font-size: 1.8rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .close-btn:hover {
+            transform: rotate(90deg) scale(1.1);
+            background: #ff5252;
+        }
+
+        .game-screen.active {
+            display: flex;
+        }
+
+        .screen-title {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 25px;
+            color: var(--neon-blue);
+            text-shadow: 0 0 15px rgba(0, 216, 255, 0.5);
+        }
+
+        .game-area {
+            width: 100%;
+            min-height: 400px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 20px 0;
+            padding: 20px;
+            position: relative;
+        }
+
+        .game-stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            font-size: 1.3rem;
+        }
+
+        .stat {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--neon-green);
+            margin-top: 5px;
+        }
+
+        .game-controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .control-btn {
+            padding: 12px 30px;
+            border-radius: 10px;
+            border: none;
+            background: linear-gradient(45deg, var(--neon-blue), var(--neon-pink));
+            color: white;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .control-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .win-screen {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            border-radius: 15px;
+            z-index: 5;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .win-screen.active {
+            display: flex;
+        }
+
+        .win-title {
+            font-size: 3rem;
+            color: var(--neon-yellow);
+            margin-bottom: 20px;
+            text-shadow: 0 0 20px rgba(253, 203, 110, 0.8);
+        }
+
+        /* Mobile Controls */
+        .mobile-controls {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .mobile-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            padding: 15px;
+            font-size: 1.2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .mobile-btn:active {
+            background: rgba(255, 255, 255, 0.4);
+            transform: scale(0.95);
+        }
+
+        /* Settings Panel */
+        .settings-panel {
+            position: fixed;
+            top: 0;
+            right: -400px;
+            width: 350px;
+            height: 100%;
+            background: var(--card-gradient);
+            z-index: 2000;
+            padding: 30px 20px;
+            transition: right 0.4s ease;
+            box-shadow: -5px 0 25px rgba(0, 0, 0, 0.3);
+            overflow-y: auto;
+        }
+
+        .settings-panel.active {
+            right: 0;
+        }
+
+        .settings-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--neon-blue);
+        }
+
+        .settings-title {
+            font-size: 1.8rem;
+            color: var(--neon-blue);
+        }
+
+        .close-settings {
+            background: var(--danger);
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .theme-options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .theme-btn {
+            height: 100px;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .theme-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .theme-btn::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .theme-btn:hover::after {
+            opacity: 1;
+        }
+
+        .theme-btn.active::before {
+            content: '✓';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 30px;
+            height: 30px;
+            background: var(--success);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;
+            font-size: 1.2rem;
+        }
+
+        /* Game Boards */
+        .game-board {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        
+        .game-cell {
+            aspect-ratio: 1/1;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .game-cell:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .game-cell.x {
+            color: var(--neon-blue);
+        }
+        
+        .game-cell.o {
+            color: var(--neon-orange);
+        }
+        
+        .memory-board {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        
+        .memory-card {
+            aspect-ratio: 3/4;
+            background: var(--info);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            cursor: pointer;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+            position: relative;
+        }
+        
+        .memory-card .front, .memory-card .back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+        }
+        
+        .memory-card .front {
+            background: var(--info);
+        }
+        
+        .memory-card .back {
+            background: var(--warning);
+            transform: rotateY(180deg);
+        }
+        
+        .memory-card.flipped {
+            transform: rotateY(180deg);
+        }
+        
+        .puzzle-board {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 5px;
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        
+        .puzzle-tile {
+            aspect-ratio: 1/1;
+            background: var(--neon-yellow);
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--dark);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .puzzle-tile.empty {
+            background: transparent;
+            cursor: default;
+        }
+        
+        .puzzle-tile:hover:not(.empty) {
+            background: var(--neon-orange);
+            color: white;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .game-nav {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .game-btn {
+                width: 100%;
+                max-width: 350px;
+            }
+            
+            .mini-games {
+                grid-template-columns: 1fr;
+            }
+            
+            .section-title {
+                font-size: 1.8rem;
+            }
+            
+            .game-content {
+                padding: 20px;
+            }
+            
+            .screen-title {
+                font-size: 2rem;
+            }
+            
+            .game-area {
+                min-height: 300px;
+            }
+            
+            .settings-panel {
+                width: 100%;
+                right: -100%;
+            }
+            
+            .memory-board {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        /* Animations */
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            padding: 20px;
+            color: var(--neon-blue);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <button class="settings-btn" id="settingsBtn">
+                <i class="fas fa-cog"></i>
+            </button>
+            <h1><i class="fas fa-gamepad"></i> Ultimate Game Hub</h1>
+            <p class="tagline">Play all your favorite games in one place!</p>
+        </header>
+        
+        <!-- Main Game Navigation -->
+         <h2 class="section-title">Special Games Collection</h2>
+        <div class="game-nav">
+            <div class="game-card">
+                <h3 class="game-title"><i class="fas fa-running"></i> Ludo Game</h3>
+                <div class="game-container">
+                    <img src="miniludo.png" alt="ludo game png" height="400" width="280">
+                </div>
+            <button class="game-btn pulse" onclick="location.href='ludoo.html'">
+                <i class="fas fa-dice"></i> Play Ludo
+            </button>
+            </div>
+            <div class="game-card">
+                <h3 class="game-title"><i class="fas fa-mattress-pillow"></i> Bomb Game</h3>
+                <div class="game-container">
+                    <img src="boomb.png" alt="bomb png" height="400" width="280">
+                </div>
+            <button class="game-btn pulse" onclick="location.href='bomb.html'">
+                <i class="fas fa-bomb"></i> Play Bomb Simulator
+            </button>
+            </div>
+            <div class="game-card">
+                <h3 class="game-title"><i class="fas fa-brain"></i> Neon Quiz Game</h3>
+                <div class="game-container">
+                    <img src="quiz.png" alt="neon quiz png" height="400" width="280">
+                </div>
+            <button class="game-btn pulse" onclick="location.href='Quiz_Neon_Game.html'">
+                <i class="fas fa-question-circle"></i> Play Neon Quiz
+            </button>
+            </div>
+            <div class="game-card">
+                <h3 class="game-title"><i class="fas fa-brain"></i> ICE Slide Game</h3>
+                <div class="game-container">
+                    <img src="ice.png" alt="ice silde png" height="400" width="280">
+                </div>
+            <button class="game-btn pulse" onclick="location.href='dist/index.html'">
+                <i class="fas fa-sleigh"></i> Play ICE Slide
+            </button>
+            </div>
+           
+            <div class="game-card">
+                <h3 class="game-title"><i class="fas fa-car-tunnel"></i> Car Racing Game</h3>
+                <div class="game-container">
+                    <img src="car_racing.png" alt=" car racing png" height="400" width="280">
+                </div>
+             <button class="game-btn pulse" onclick="location.href='car game.html'">
+                <i class="fas fa-car-on"></i> PLay Car Racing
+            </button>
+            </div>
+             <div class="game-card">
+                <h3 class="game-title"><i class="fas fa-brain"></i> Maze Game</h3>
+                <div class="game-container">
+                    <img src="maze.png" alt="Maze png" height="400" width="280">
+                </div>
+            <button class="game-btn pulse" onclick="location.href='maze.html'">
+                <i class="fas fa-subway"></i> Play Maze
+            </button>
+            </div>
+             <div class="game-card">
+                <h3 class="game-title"><i class="fas fa-running"></i> FootBall Game</h3>
+                <div class="game-container">
+                    <img src="football.png" alt="FootBall png" height="400" width="280">
+                </div>
+            <button class="game-btn pulse" onclick="location.href='football-game-master/index.html'">
+                <i class="fas fa-volleyball-ball"></i> Play FootBall
+            </button>
+            </div>
+            <div class="game-card">
+                <h3 class="game-title"><i class="fas fa-dragon"></i> Snake And Ladders Game</h3>
+                <div class="game-container">
+                    <img src="Snake And Ladders.png" alt="Snake And Ladders png" height="400" width="280">
+                </div>
+            <button class="game-btn pulse" onclick="location.href='snakes-and-ladders-game-main/index.html'">
+                <i class="fas fa-boxes"></i> Play Snake And Ladders
+            </button>
+            </div>
+             <div class="game-card">
+                <h3 class="game-title"><i class="fas fa-chess-board"></i> Chess Game</h3>
+                <div class="game-container">
+                    <img src="Chess.png" alt="Chess png" height="400" width="280">
+                </div>
+            <button class="game-btn pulse" onclick="location.href='my first game/dist/index.html'">
+                <i class="fas fa-chess"></i> Play Chess
+            </button>
+            </div>
+        </div>
+        
+        <!-- Mini Games Section -->
+        <h2 class="section-title">Mini Games Collection</h2>
+        <div class="mini-games">
+            <!-- Snake Game -->
+            <div class="game-card">
+                <h3 class="game-title"><i class="fas fa-worm"></i> Snake Game</h3>
+                <div class="game-container">
+                    <div class="snake-preview">
+                        <div class="snake-part snake-head" style="top: 80px; left: 80px;"></div>
+                        <div class="snake-part" style="top: 80px; left: 60px;"></div>
+                        <div class="snake-part" style="top: 80px; left: 40px;"></div>
+                        <div class="snake-food" style="top: 130px; left: 140px;"></div>
+                    </div>
+                </div>
+                <button class="play-btn" onclick="openMiniGame('snake')">
+                    <i class="fas fa-play"></i> Play Snake
+                </button>
+            </div>
+            
+            <!-- Memory Card Game -->
+            <div class="game-card">
+                <h3 class="game-title"><i class="fas fa-brain"></i> Memory Cards</h3>
+                <div class="game-container">
+                    <div class="memory-preview">
+                        <div class="memory-card-preview">🍎</div>
+                        <div class="memory-card-preview">⭐</div>
+                        <div class="memory-card-preview">🍌</div>
+                        <div class="memory-card-preview">⭐</div>
+                        <div class="memory-card-preview">⭐</div>
+                        <div class="memory-card-preview">🍊</div>
+                        <div class="memory-card-preview">⭐</div>
+                        <div class="memory-card-preview">🍓</div>
+                    </div>
+                </div>
+                <button class="play-btn" onclick="openMiniGame('memory')">
+                    <i class="fas fa-play"></i> Play Memory
+                </button>
+            </div>
+            
+            <!-- Tic Tac Toe -->
+            <div class="game-card">
+                <h3 class="game-title"><i class="fas fa-times-circle"></i> Tic Tac Toe</h3>
+                <div class="game-container">
+                    <div class="tic-tac-toe-preview">
+                        <div class="ttt-cell x">X</div>
+                        <div class="ttt-cell o">O</div>
+                        <div class="ttt-cell x">X</div>
+                        <div class="ttt-cell"></div>
+                        <div class="ttt-cell o">O</div>
+                        <div class="ttt-cell"></div>
+                        <div class="ttt-cell"></div>
+                        <div class="ttt-cell x">X</div>
+                        <div class="ttt-cell o">O</div>
+                    </div>
+                </div>
+                <button class="play-btn" onclick="openMiniGame('tictactoe')">
+                    <i class="fas fa-play"></i> Play Tic Tac Toe
+                </button>
+            </div>
+            
+            <!-- Number Puzzle -->
+            <div class="game-card">
+                <h3 class="game-title"><i class="fas fa-puzzle-piece"></i> Number Puzzle</h3>
+                <div class="game-container">
+                    <div class="puzzle-preview">
+                        <div class="puzzle-tile-preview">1</div>
+                        <div class="puzzle-tile-preview">2</div>
+                        <div class="puzzle-tile-preview">3</div>
+                        <div class="puzzle-tile-preview">4</div>
+                        <div class="puzzle-tile-preview">5</div>
+                        <div class="puzzle-tile-preview">6</div>
+                        <div class="puzzle-tile-preview">7</div>
+                        <div class="puzzle-tile-preview">8</div>
+                        <div class="puzzle-tile-preview">9</div>
+                        <div class="puzzle-tile-preview">10</div>
+                        <div class="puzzle-tile-preview">11</div>
+                        <div class="puzzle-tile-preview">12</div>
+                        <div class="puzzle-tile-preview">13</div>
+                        <div class="puzzle-tile-preview">14</div>
+                        <div class="puzzle-tile-preview">15</div>
+                        <div class="puzzle-tile-preview empty"></div>
+                    </div>
+                </div>
+                <button class="play-btn" onclick="openMiniGame('puzzle')">
+                    <i class="fas fa-play"></i> Play Puzzle
+                </button>
+            </div>
+            
+            <!-- Brick Breaker -->
+            <div class="game-card">
+                <h3 class="game-title"><i class="fas fa-table-tennis"></i> Brick Breaker</h3>
+                <div class="game-container">
+                    <div class="brick-preview">
+                        <div class="brick" style="top: 30px; left: 30px;"></div>
+                        <div class="brick" style="top: 30px; left: 80px;"></div>
+                        <div class="brick" style="top: 30px; left: 130px;"></div>
+                        <div class="ball" style="top: 80px; left: 100px;"></div>
+                        <div class="paddle" style="bottom: 20px; left: 70px;"></div>
+                    </div>
+                </div>
+                <button class="play-btn" onclick="openMiniGame('brickbreaker')">
+                    <i class="fas fa-play"></i> Play Brick Breaker
+                </button>
+            </div>
+            
+            <!-- Flappy Bird -->
+            <div class="game-card">
+                <h3 class="game-title"><i class="fas fa-dove"></i> Flappy Bird</h3>
+                <div class="game-container">
+                    <div class="flappy-preview">
+                        <div class="bird" style="top: 80px; left: 50px;"></div>
+                        <div class="pipe" style="top: 0; right: 60px; height: 100px;"></div>
+                        <div class="pipe" style="bottom: 0; right: 100px; height: 80px;"></div>
+                    </div>
+                </div>
+                <button class="play-btn" onclick="openMiniGame('flappybird')">
+                    <i class="fas fa-play"></i> Play Flappy Bird
+                </button>
+            </div>
+        </div>
+    </div>
+    
+     <!-- Other Game Navigation -->
+         <h2 class="section-title">Other Entertaments</h2>
+        <div class="game-nav">
+             <div class="game-card">
+                <h3 class="game-title"><i class="fas fa-brain"></i> Dimension Game</h3>
+                <div class="game-container">
+                    <img src="dimension.png" alt="Dimension png" height="400" width="280">
+                </div>
+                        <button class="game-btn pulse" onclick="location.href='dimensions.html'">
+                <i class="fas fa-wand-magic-sparkles"></i> Play Dimensional Simulator
+            </button>
+            </div>
+           
+             <div class="game-card">
+                <h3 class="game-title"><i class="fas fa-eye"></i>Optical Illusion Simulator</h3>
+                <div class="game-container">
+                    <img src="optical_illusion.png" alt="optical_illusion png" height="400" width="280">
+                </div>
+                        <button class="game-btn pulse" onclick="location.href='optical-magic.html'">
+                <i class="fas fa-bullseye"></i> Play Optical Illusion Simulator
+            </button>
+            </div>
+            <div class="game-card">
+                <h3 class="game-title"><i class="fab fa-speaker-deck"></i>Typing Speed Tester</h3>
+                <div class="game-container">
+                    <img src="Typing Speed Tester.png" alt="Dimension png" height="400" width="280">
+                </div>
+                        <button class="game-btn pulse" onclick="location.href='Typing Speed/test.html'">
+                <i class="far fa-sticky-note"></i> Play Speed Tester
+            </button>
+            </div>
+               <div class="game-card">
+                <h3 class="game-title"><i class="fab fa-itunes-note"></i>Piano Simulator</h3>
+                <div class="game-container">
+                    <img src="Piano.png" alt="Piano png" height="400" width="280">
+
+                </div>
+                        <button class="game-btn pulse" onclick="location.href='Piano-master/index.html'">
+                <i class="fas fa-headphones-alt"></i>Play Piano
+            </button>
+         </div>
+          <div class="game-card">
+                <h3 class="game-title"><i class="fab fa-itunes"></i>Piano Tiles Game</h3>
+                <div class="game-container">
+                    <img src="Piano Tiles.png" alt="Piano Tiles png" height="400" width="280">
+
+                </div>
+                        <button class="game-btn pulse" onclick="location.href='Piano-Tiles-master/index.html'">
+                <i class="fab fa-deezer"></i>Play Piano Tiles
+            </button>
+         </div> 
+           <div class="game-card">
+                <h3 class="game-title"><i class="fab fa-buromobelexperte"></i>Pixle Art Simulator</h3>
+                <div class="game-container">
+                    <img src="Pixle Art.png" alt="Pixle Art png" height="400" width="280">
+
+                </div>
+                        <button class="game-btn pulse" onclick="location.href='HCJ pixel/main.html'">
+                <i class="fab fa-buromobelexperte"></i>Play Pixle Art
+            </button>
+         </div>
+          
+        </div> 
+            
+        <!-- Advance Mini Game Navigation -->
+         <h2 class="section-title">Advance Mini Games</h2>
+        <div class="game-nav">
+             <div class="game-card">
+                <h3 class="game-title"><i class="fas fa-bullseye"></i> Archery Game</h3>
+                <div class="game-container">
+                    <img src="Archery.png" alt="Archery png" height="400" width="280">
+                </div>
+                        <button class="game-btn pulse" onclick="location.href='02-Archery-Game/index.html'">
+                <i class="fab fa-first-order-alt"></i> Play Archery
+            </button>
+            </div>
+           
+             <div class="game-card">
+                <h3 class="game-title"><i class="far fa-lemon"></i> Candy Crush Game</h3>
+                <div class="game-container">
+                    <img src="Candy Crush.png" alt=" Candy Crush png" height="400" width="280">
+                </div>
+            <button class="game-btn pulse" onclick="location.href='01-Candy-Crush-Game/index.html'">
+                <i class="fas fa-cookie"></i> Play Candy Crush
+            </button>
+            </div>
+
+            <div class="game-card">
+                <h3 class="game-title"><i class="fas fa-baseball-ball"></i>Dream Ping Pong</h3>
+                <div class="game-container">
+                    <img src="Ping-Pong.png" alt="Ping-Pong png" height="400" width="280">
+                </div>
+                        <button class="game-btn pulse" onclick="location.href='05-Minesweeper-Game/Ping-Pong-Game.html'">
+                <i class="fas fa-futbol"></i> Play Ping Pong
+            </button>
+            </div>
+            <div class="game-card">
+                <h3 class="game-title"><i class="fas fa-meteor"></i>Tilting Maze Game</h3>
+                <div class="game-container">
+                    <img src="Tilting Maze Game.png" alt="Tilting Maze Game png" height="400" width="280">
+                </div>
+                        <button class="game-btn pulse" onclick="location.href='09-Tilting-Maze-Game/index.html'">
+                <i class="fab fa-battle-net"></i> Play Tilting Maze
+            </button>
+            </div>
+        <div class="game-card">
+                <h3 class="game-title"><i class="fas fa-bomb"></i>Minesweeper Game</h3>
+                <div class="game-container">
+                    <img src="Minesweeper Game.png" alt="Minesweeper Game png" height="400" width="280">
+
+                </div>
+                        <button class="game-btn pulse" onclick="location.href='05-Minesweeper-Game/Minesweeper.html'">
+                <i class="fas fa-exclamation-circle"></i> Play Minesweeper
+            </button>
+         </div>
+          <div class="game-card">
+                <h3 class="game-title"><i class="fas fa-calculator"></i>Number Guessing Game</h3>
+                <div class="game-container">
+                    <img src="Type Number Guessing Game.png" alt="Type Number Guessing Game png" height="400" width="280">
+                </div>
+                        <button class="game-btn pulse" onclick="location.href='12-Type-Number-Guessing-Game/index.html'">
+                <i class="fab fa-think-peaks"></i> Play Number Guessing Game
+            </button>
+         </div>
+       <div class="game-card">
+                <h3 class="game-title"><i class="fas fa-birthday-cake"></i>Tower Blocks Game</h3>
+                <div class="game-container">
+                    <img src="Tower Blocks Game.png" alt="Tower Blocks Game png" height="400" width="280">
+
+                </div>
+                        <button class="game-btn pulse" onclick="location.href='06-Tower-Blocks/index.html'">
+                <i class="fab fa-creative-commons-remix"></i>Play Tower Blocks
+            </button>
+         </div>
+        <div class="game-card">
+                <h3 class="game-title"><i class="fab fa-wordpress"></i>Hangman Game</h3>
+                <div class="game-container">
+                    <img src="Hangman Game.png" alt="Hangman Game png" height="400" width="280">
+
+                </div>
+                        <button class="game-btn pulse" onclick="location.href='18-Hangman-Game/index.html'">
+                <i class="fas fa-skull-crossbones"></i>Play Hangman
+            </button>
+         </div>
+         <div class="game-card">
+                <h3 class="game-title"><i class="fas fa-road"></i>Crossy Road Game</h3>
+                <div class="game-container">
+                    <img src="Crossy Road.png" alt="Crossy Road png" height="400" width="280">
+
+                </div>
+                        <button class="game-btn pulse" onclick="location.href='20-Crossy-Road-Game/index.html'">
+                <i class="fas fa-traffic-light"></i>Play Crossy Road
+            </button>
+         </div>
+          <div class="game-card">
+                <h3 class="game-title"><i class="fas fa-holly-berry"></i>Connect Four Game</h3>
+                <div class="game-container">
+                    <img src="Connect Four.png" alt="Connect Four png" height="400" width="280">
+
+                </div>
+                        <button class="game-btn pulse" onclick="location.href='15-Connect-Four-Game/index.html'">
+                <i class="fab fa-buromobelexperte"></i>Play Connect Four
+            </button>
+         </div>
+         <div class="game-card">
+                <h3 class="game-title"><i class="fab fa-dropbox"></i>Tetris Game</h3>
+                <div class="game-container">
+                    <img src="Tetris Game.png" alt="Tetris Game png" height="400" width="280">
+
+                </div>
+                        <button class="game-btn pulse" onclick="location.href='08-Tetris-Game/index.html'">
+                <i class="fas fa-border-all"></i>Play Tetris
+            </button>
+         </div>
+       <div class="game-card">
+                <h3 class="game-title"><i class="fas fa-hand-paper"></i>Rock Paper Scissor</h3>
+                <div class="game-container">
+                    <img src="Rock Paper Scissor.png" alt="Rock Paper Scissor png" height="400" width="280">
+
+                </div>
+                        <button class="game-btn pulse" onclick="location.href='11-Rock-Paper-Scissors/index.html'">
+                <i class="fas fa-hand-rock"></i>Play Rock Paper Scissor
+            </button>
+         </div>
+            <div class="game-card">
+                <h3 class="game-title"><i class="fas fa-calculator"></i>2048 Game</h3>
+                <div class="game-container">
+                    <img src="2048 Game.png" alt="2048 Game png" height="400" width="280">
+
+                </div>
+                        <button class="game-btn pulse" onclick="location.href='21-2048-Game/index.html'">
+                <i class="fas fa-calculator"></i>Play 2048 Game
+            </button>
+         </div>
+         <div class="game-card">
+                <h3 class="game-title"><i class="fas fa-rainbow"></i>Simon Says Game</h3>
+                <div class="game-container">
+                    <img src="Simon Says Game.png" alt="Simon Says Game png" height="400" width="280">
+
+                </div>
+                        <button class="game-btn pulse" onclick="location.href='30-Simon-Says-Game/index.html'">
+                <i class="fab fa-cloudsmith"></i>Play Simon Says
+            </button>
+         </div>
+       <div class="game-card">
+                <h3 class="game-title"><i class="fab fa-creative-commons-by"></i>Stick Man Stick</h3>
+                <div class="game-container">
+                    <img src="Stick Man Stick.png" alt="Stick Man Stick png" height="400" width="280">
+
+                </div>
+                        <button class="game-btn pulse" onclick="location.href='Stick_Man-main/Code/main.html'">
+                <i class="far fa-chart-bar"></i>Play Stick Man Stick
+            </button>
+         </div>
+             <div class="game-card">
+                <h3 class="game-title"><i class="fab fa-galactic-senate"></i>Tank War Game</h3>
+                <div class="game-container">
+                    <img src="Tank War Game.png" alt="Tank War Game png" height="400" width="280">
+
+                </div>
+                        <button class="game-btn pulse" onclick="location.href='tank-war-main/index.html'">
+                <i class="fas fa-bacteria"></i>Play Tank War
+            </button>
+         </div>
+         <div class="game-card">
+                <h3 class="game-title"><i class="fas fa-walking"></i>Prison Escape Game</h3>
+                <div class="game-container">
+                    <img src="Prison Escape Game.png" alt="Prison Escape Game png" height="400" width="280">
+
+                </div>
+                        <button class="game-btn pulse" onclick="location.href='prison-escape-master/index.html'">
+                <i class="fas fa-hotel"></i>Play Prison Escape
+            </button>
+         </div>
+          <div class="game-card">
+                <h3 class="game-title"><i class="far fa-caret-square-up"></i>Jumping Game</h3>
+                <div class="game-container">
+                    <img src="Jumping Game.png" alt="Jumping Game png" height="400" width="280">
+
+                </div>
+                        <button class="game-btn pulse" onclick="location.href='jumping-game/dist/index.html'">
+                <i class="fas fa-hand-point-up"></i>Play Jumping Up
+            </button>
+         </div>
+         <div class="game-card">
+                <h3 class="game-title"><i class="fas fa-car-side"></i>Star Race Game</h3>
+                <div class="game-container">
+                    <img src="Star Race Game.png" alt="Star Race Game png" height="400" width="280">
+
+                </div>
+                        <button class="game-btn pulse" onclick="location.href='star-race-master/index.html'">
+                <i class="fas fa-car-burst"></i>Play Star Race
+            </button>
+         </div> 
+          <div class="game-card">
+                <h3 class="game-title"><i class="fab fa-connectdevelop"></i>Catch Chicken Game</h3>
+                <div class="game-container">
+                    <img src="Catch Chicken Game.png" alt="Catch Chicken Game png" height="400" width="280">
+
+                </div>
+                        <button class="game-btn pulse" onclick="location.href='jquery-chicken-master/index.html'">
+                <i class="fas fa-shopping-basket"></i>Play Catch Chicken
+            </button>
+         </div>
+           <div class="game-card">
+                <h3 class="game-title"><i class="fas fa-skull"></i>Fight Game</h3>
+                <div class="game-container">
+                    <img src="Fight Game.png" alt="Fight Game png" height="400" width="280">
+
+                </div>
+                        <button class="game-btn pulse" onclick="location.href='Fight-Game-master/index.html'">
+                <i class="fas fa-skull-crossbones"></i>Play Fight master
+            </button>
+         </div>
+         <div class="game-card">
+                <h3 class="game-title"><i class="fas fa-dragon"></i>Dragon Runner Game</h3>
+                <div class="game-container">
+                    <img src="Dragon Runner.png" alt="Dragon Runner png" height="400" width="280">
+
+                </div>
+                        <button class="game-btn pulse" onclick="location.href='2D-MD-Visual-Game-Project--main/index.html'">
+                <i class="fas fa-walking"></i>Play Dragon Runner
+            </button>
+         </div>
+          <div class="game-card">
+                <h3 class="game-title"><i class="fab fa-creative-commons-remix"></i>Gold Miner Game</h3>
+                <div class="game-container">
+                    <img src="Gold Miner.png" alt="Gold Miner png" height="400" width="280">
+
+                </div>
+                        <button class="game-btn pulse" onclick="location.href='gold-miner-panda-main/index.html'">
+                <i class="fas fa-diamond"></i>Play Gold Miner
+            </button>
+         </div>
+          <div class="game-card">
+                <h3 class="game-title"><i class="fas fa-space-shuttle"></i>Space Master Game</h3>
+                <div class="game-container">
+                    <img src="Space Master.png" alt="Space Master png" height="400" width="280">
+
+                </div>
+                        <button class="game-btn pulse" onclick="location.href='js13k-2021-master/release/game/index.html'">
+                <i class="fas fa-user-astronaut"></i>Play Space Master
+            </button>
+         </div>
+          <div class="game-card">
+                <h3 class="game-title"><i class="fas fa-clipboard-check"></i>Pankabunches Game</h3>
+                <div class="game-container">
+                    <img src="Pankabunches.png" alt="Pankabunches png" height="400" width="280">
+
+                </div>
+                        <button class="game-btn pulse" onclick="location.href='packabunchas-main/index.html'">
+                <i class="fas fa-rocket"></i>Play Pankabunches 
+            </button>
+         </div>
+          <div class="game-card">
+                <h3 class="game-title"><i class="fab fa-creative-commons-share"></i>Pixal Art Game</h3>
+                <div class="game-container">
+                    <img src="Pixal Art Challange.png" alt="Pixal Art Challange png" height="400" width="280">
+
+                </div>
+                        <button class="game-btn pulse" onclick="location.href='Pixel Game/optical illusion.html'">
+                <i class="fab fa-figma"></i>Play Pixal Art Challange
+            </button>
+         </div>
+          <!-- <div class="game-card">
+                <h3 class="game-title"><i class=""></i></h3>
+                <div class="game-container">
+                    <img src=".png" alt=" png" height="400" width="280">
+
+                </div>
+                        <button class="game-btn pulse" onclick="location.href=''">
+                <i class=""></i>Play 
+            </button>
+         </div> -->
+           <!-- <div class="game-card">
+                <h3 class="game-title"><i class=""></i></h3>
+                <div class="game-container">
+                    <img src=".png" alt=" png" height="400" width="280">
+
+                </div>
+                        <button class="game-btn pulse" onclick="location.href=''">
+                <i class=""></i>Play 
+            </button>
+         </div> -->
+          <!-- <div class="game-card">
+                <h3 class="game-title"><i class=""></i></h3>
+                <div class="game-container">
+                    <img src=".png" alt=" png" height="400" width="280">
+
+                </div>
+                        <button class="game-btn pulse" onclick="location.href=''">
+                <i class=""></i>Play 
+            </button>
+         </div> -->
+        </div>
+    <!-- Settings Panel -->
+    <div class="settings-panel" id="settingsPanel">
+        <div class="settings-header">
+            <h2 class="settings-title">Settings</h2>
+            <button class="close-settings" id="closeSettings">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <h3 style="margin-bottom: 15px; color: var(--neon-blue);">Select Theme:</h3>
+        <div class="theme-options">
+            <button class="theme-btn active" style="background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);" onclick="changeTheme('default')"></button>
+            <button class="theme-btn" style="background: linear-gradient(135deg, #2c061f, #374045);" onclick="changeTheme('dark-purple')"></button>
+            <button class="theme-btn" style="background: linear-gradient(135deg, #1d2b64, #f8cdda);" onclick="changeTheme('blue-pink')"></button>
+            <button class="theme-btn" style="background: linear-gradient(135deg, #0f9b0f, #3a6186);" onclick="changeTheme('green-blue')"></button>
+            <button class="theme-btn" style="background: linear-gradient(135deg, #e65c00, #f9d423);" onclick="changeTheme('orange-yellow')"></button>
+            <button class="theme-btn" style="background: linear-gradient(135deg, #8e0e00, #1f1c18);" onclick="changeTheme('red-black')"></button>
+        </div>
+        
+        <h3 style="margin: 25px 0 15px; color: var(--neon-blue);">Game Settings:</h3>
+        <div style="background: rgba(0, 0, 0, 0.2); padding: 15px; border-radius: 10px;">
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 5px;">Volume: <span id="volumeValue">80</span>%</label>
+                <input type="range" min="0" max="100" value="80" id="volumeSlider" style="width: 100%;">
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 5px;">Difficulty: <span id="difficultyValue">Medium</span></label>
+                <select id="difficultySelect" style="width: 100%; padding: 8px; border-radius: 5px; background: rgba(0, 0, 0, 0.3); color: white; border: 1px solid var(--neon-blue);">
+                    <option value="easy">Easy</option>
+                    <option value="medium" selected>Medium</option>
+                    <option value="hard">Hard</option>
+                </select><br><br><br>
+                <button class="play-btn" onclick="location.href='fas fa-icons.html'">
+                <i class="fas fa-box-open"></i> Select Icons
+            </button>
+            </div>
+            <div>
+                <label style="display: flex; align-items: center; gap: 10px;">
+                    <input type="checkbox" id="soundToggle" checked>
+                    Enable Sound Effects
+                </label>
+            </div>
+        </div>
+        
+        <div style="margin-top: 30px; text-align: center;">
+            <button class="control-btn" style="width: 100%;" onclick="resetSettings()">
+                <i class="fas fa-redo"></i> Reset to Defaults
+            </button>
+        </div>
+    </div>
+    
+    <!-- Mini Game Screens -->
+    <!-- Snake Game Screen -->
+    <div class="game-screen" id="snake-screen">
+        <div class="game-content">
+            <button class="close-btn" onclick="closeMiniGame('snake')">×</button>
+            <h2 class="screen-title"><i class="fas fa-worm"></i> Snake Game</h2>
+            
+            <div class="game-stats">
+                <div class="stat">
+                    <span>Score</span>
+                    <div class="stat-value" id="snake-score">0</div>
+                </div>
+                <div class="stat">
+                    <span>Length</span>
+                    <div class="stat-value" id="snake-length">5</div>
+                </div>
+                <div class="stat">
+                    <span>Speed</span>
+                    <div class="stat-value" id="snake-speed">Medium</div>
+                </div>
+            </div>
+            
+            <div class="game-area">
+                <canvas id="snake-canvas" width="400" height="400" style="background: #111; border-radius: 10px;"></canvas>
+                <div class="win-screen" id="snake-win">
+                    <div class="win-title">Game Over!</div>
+                    <div style="font-size: 1.5rem; margin-bottom: 30px; color: white;">Your score: <span id="final-snake-score">0</span></div>
+                    <button class="control-btn" onclick="resetSnake()"><i class="fas fa-redo"></i> Play Again</button>
+                </div>
+            </div>
+            
+            <div class="game-controls">
+                <button class="control-btn" onclick="changeSnakeSpeed()"><i class="fas fa-tachometer-alt"></i> Change Speed</button>
+                <button class="control-btn" onclick="pauseSnake()"><i class="fas fa-pause"></i> Pause Game</button>
+            </div>
+            
+            <div class="mobile-controls">
+                <div></div>
+                <button class="mobile-btn" onclick="changeSnakeDirection('up')">↑</button>
+                <div></div>
+                <button class="mobile-btn" onclick="changeSnakeDirection('left')">←</button>
+                <button class="mobile-btn" onclick="pauseSnake()">⏯️</button>
+                <button class="mobile-btn" onclick="changeSnakeDirection('right')">→</button>
+                <div></div>
+                <button class="mobile-btn" onclick="changeSnakeDirection('down')">↓</button>
+                <div></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Tic Tac Toe Screen -->
+    <div class="game-screen" id="tictactoe-screen">
+        <div class="game-content">
+            <button class="close-btn" onclick="closeMiniGame('tictactoe')">×</button>
+            <h2 class="screen-title"><i class="fas fa-times-circle"></i> Tic Tac Toe</h2>
+            
+            <div class="game-stats">
+                <div class="stat">
+                    <span>Player</span>
+                    <div class="stat-value" id="ttt-player">X</div>
+                </div>
+                <div class="stat">
+                    <span>Wins</span>
+                    <div class="stat-value" id="ttt-wins">0</div>
+                </div>
+                <div class="stat">
+                    <span>Draws</span>
+                    <div class="stat-value" id="ttt-draws">0</div>
+                </div>
+            </div>
+            
+            <div class="game-area">
+                <div class="game-board" id="ttt-board">
+                    <!-- Cells will be generated by JS -->
+                </div>
+                <div class="win-screen" id="ttt-win">
+                    <div class="win-title" id="ttt-result">Player X Wins!</div>
+                    <button class="control-btn" onclick="resetTicTacToe()"><i class="fas fa-redo"></i> Play Again</button>
+                </div>
+            </div>
+            
+            <div class="game-controls">
+                <button class="control-btn" onclick="resetTicTacToe()"><i class="fas fa-redo"></i> Reset Game</button>
+                <button class="control-btn" onclick="toggleTicTacToeMode()"><i class="fas fa-robot"></i> <span id="ttt-mode">Single Player</span></button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Memory Card Screen -->
+    <div class="game-screen" id="memory-screen">
+        <div class="game-content">
+            <button class="close-btn" onclick="closeMiniGame('memory')">×</button>
+            <h2 class="screen-title"><i class="fas fa-brain"></i> Memory Card Game</h2>
+            
+            <div class="game-stats">
+                <div class="stat">
+                    <span>Moves</span>
+                    <div class="stat-value" id="memory-moves">0</div>
+                </div>
+                <div class="stat">
+                    <span>Pairs</span>
+                    <div class="stat-value" id="memory-pairs">0</div>
+                </div>
+                <div class="stat">
+                    <span>Time</span>
+                    <div class="stat-value" id="memory-time">0s</div>
+                </div>
+            </div>
+            
+            <div class="game-area">
+                <div class="memory-board" id="memory-board">
+                    <!-- Cards will be generated by JS -->
+                </div>
+                <div class="win-screen" id="memory-win">
+                    <div class="win-title">You Win!</div>
+                    <div style="font-size: 1.5rem; margin-bottom: 30px; color: white;">Time: <span id="final-memory-time">0s</span></div>
+                    <button class="control-btn" onclick="resetMemory()"><i class="fas fa-redo"></i> Play Again</button>
+                </div>
+            </div>
+            
+            <div class="game-controls">
+                <button class="control-btn" onclick="resetMemory()"><i class="fas fa-redo"></i> Reset Game</button>
+                <button class="control-btn" onclick="changeMemorySize()"><i class="fas fa-expand"></i> Change Size</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Number Puzzle Screen -->
+    <div class="game-screen" id="puzzle-screen">
+        <div class="game-content">
+            <button class="close-btn" onclick="closeMiniGame('puzzle')">×</button>
+            <h2 class="screen-title"><i class="fas fa-puzzle-piece"></i> Number Puzzle</h2>
+            
+            <div class="game-stats">
+                <div class="stat">
+                    <span>Moves</span>
+                    <div class="stat-value" id="puzzle-moves">0</div>
+                </div>
+                <div class="stat">
+                    <span>Time</span>
+                    <div class="stat-value" id="puzzle-time">0s</div>
+                </div>
+                <div class="stat">
+                    <span>Size</span>
+                    <div class="stat-value" id="puzzle-size">4x4</div>
+                </div>
+            </div>
+            
+            <div class="game-area">
+                <div class="puzzle-board" id="puzzle-board">
+                    <!-- Tiles will be generated by JS -->
+                </div>
+                <div class="win-screen" id="puzzle-win">
+                    <div class="win-title">Puzzle Solved!</div>
+                    <div style="font-size: 1.5rem; margin-bottom: 30px; color: white;">Time: <span id="final-puzzle-time">0s</span></div>
+                    <button class="control-btn" onclick="resetPuzzle()"><i class="fas fa-redo"></i> Play Again</button>
+                </div>
+            </div>
+            
+            <div class="game-controls">
+                <button class="control-btn" onclick="resetPuzzle()"><i class="fas fa-redo"></i> Reset Game</button>
+                <button class="control-btn" onclick="changePuzzleSize()"><i class="fas fa-expand"></i> Change Size</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Brick Breaker Screen -->
+    <div class="game-screen" id="brickbreaker-screen">
+        <div class="game-content">
+            <button class="close-btn" onclick="closeMiniGame('brickbreaker')">×</button>
+            <h2 class="screen-title"><i class="fas fa-table-tennis"></i> Brick Breaker</h2>
+            
+            <div class="game-stats">
+                <div class="stat">
+                    <span>Score</span>
+                    <div class="stat-value" id="brick-score">0</div>
+                </div>
+                <div class="stat">
+                    <span>Level</span>
+                    <div class="stat-value" id="brick-level">1</div>
+                </div>
+                <div class="stat">
+                    <span>Lives</span>
+                    <div class="stat-value" id="brick-lives">3</div>
+                </div>
+            </div>
+            
+            <div class="game-area">
+                <canvas id="brick-canvas" width="500" height="400" style="background: #111; border-radius: 10px;"></canvas>
+                <div class="win-screen" id="brick-win">
+                    <div class="win-title">Game Over!</div>
+                    <div style="font-size: 1.5rem; margin-bottom: 30px; color: white;">Your score: <span id="final-brick-score">0</span></div>
+                    <button class="control-btn" onclick="resetBrick()"><i class="fas fa-redo"></i> Play Again</button>
+                </div>
+            </div>
+            
+            <div class="game-controls">
+                <button class="control-btn" onclick="startBrick()"><i class="fas fa-play"></i> Start Game</button>
+                <button class="control-btn" onclick="resetBrick()"><i class="fas fa-redo"></i> Reset Game</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Flappy Bird Screen -->
+    <div class="game-screen" id="flappybird-screen">
+        <div class="game-content">
+            <button class="close-btn" onclick="closeMiniGame('flappybird')">×</button>
+            <h2 class="screen-title"><i class="fas fa-dove"></i> Flappy Bird</h2>
+            
+            <div class="game-stats">
+                <div class="stat">
+                    <span>Score</span>
+                    <div class="stat-value" id="flappy-score">0</div>
+                </div>
+                <div class="stat">
+                    <span>Best</span>
+                    <div class="stat-value" id="flappy-best">0</div>
+                </div>
+                <div class="stat">
+                    <span>Speed</span>
+                    <div class="stat-value" id="flappy-speed">Normal</div>
+                </div>
+            </div>
+            
+            <div class="game-area">
+                <canvas id="flappy-canvas" width="400" height="500" style="background: #87CEEB; border-radius: 10px;"></canvas>
+                <div class="win-screen" id="flappy-win">
+                    <div class="win-title">Game Over!</div>
+                    <div style="font-size: 1.5rem; margin-bottom: 30px; color: white;">Your score: <span id="final-flappy-score">0</span></div>
+                    <button class="control-btn" onclick="resetFlappy()"><i class="fas fa-redo"></i> Play Again</button>
+                </div>
+            </div>
+            
+            <div class="game-controls">
+                <button class="control-btn" onclick="startFlappy()"><i class="fas fa-play"></i> Start Game</button>
+                <button class="control-btn" onclick="resetFlappy()"><i class="fas fa-redo"></i> Reset Game</button>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <p>Created with ❤️ by AA Gamerz | Ultimate Game Hub v6.0</p>
+        <p>All games optimized for both desktop and mobile devices</p>
+    </footer>
+
+    <script>
+        // Settings Panel
+        const settingsBtn = document.getElementById('settingsBtn');
+        const closeSettings = document.getElementById('closeSettings');
+        const settingsPanel = document.getElementById('settingsPanel');
+        const volumeSlider = document.getElementById('volumeSlider');
+        const volumeValue = document.getElementById('volumeValue');
+        const difficultySelect = document.getElementById('difficultySelect');
+        const difficultyValue = document.getElementById('difficultyValue');
+        const soundToggle = document.getElementById('soundToggle');
+        
+        settingsBtn.addEventListener('click', () => {
+            settingsPanel.classList.add('active');
+        });
+        
+        closeSettings.addEventListener('click', () => {
+            settingsPanel.classList.remove('active');
+        });
+        
+        // Volume control
+        volumeSlider.addEventListener('input', () => {
+            volumeValue.textContent = volumeSlider.value;
+            // In a real app, you would set the game volume here
+        });
+        
+        // Difficulty control
+        difficultySelect.addEventListener('change', () => {
+            difficultyValue.textContent = difficultySelect.options[difficultySelect.selectedIndex].text;
+            // In a real app, you would adjust game difficulty here
+        });
+        
+        // Theme Switching
+        function changeTheme(theme) {
+            // Remove existing theme classes
+            document.body.classList.remove('theme-default', 'theme-dark-purple', 'theme-blue-pink', 
+                                          'theme-green-blue', 'theme-orange-yellow', 'theme-red-black');
+            
+            // Add new theme class
+            if (theme !== 'default') {
+                document.body.classList.add(`theme-${theme}`);
+            }
+            
+            // Update active button
+            document.querySelectorAll('.theme-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+        }
+        
+        function resetSettings() {
+            // Reset to default theme
+            document.body.classList.remove('theme-dark-purple', 'theme-blue-pink', 
+                                          'theme-green-blue', 'theme-orange-yellow', 
+                                          'theme-red-black');
+            document.querySelectorAll('.theme-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector('.theme-btn').classList.add('active');
+            
+            // Reset other settings
+            volumeSlider.value = 80;
+            volumeValue.textContent = '80';
+            difficultySelect.value = 'medium';
+            difficultyValue.textContent = 'Medium';
+            soundToggle.checked = true;
+        }
+        
+        // Mini Game Navigation
+        function openMiniGame(game) {
+            document.getElementById(`${game}-screen`).classList.add('active');
+            
+            // Initialize the game when opened
+            if (game === 'snake') {
+                initSnakeGame();
+            } else if (game === 'brickbreaker') {
+                initBrick();
+            } else if (game === 'flappybird') {
+                initFlappy();
+            } else if (game === 'tictactoe') {
+                initTicTacToe();
+            } else if (game === 'memory') {
+                initMemory();
+            } else if (game === 'puzzle') {
+                initPuzzle();
+            }
+        }
+        
+        function closeMiniGame(game) {
+            document.getElementById(`${game}-screen`).classList.remove('active');
+        }
+        
+        // Snake Game Implementation
+        let snakeGame;
+        let snakeDirection = 'right';
+        let snakePaused = false;
+        let snakeSpeed = 150;
+        
+        function initSnakeGame() {
+            const canvas = document.getElementById('snake-canvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Reset game state
+            snakeGame = {
+                canvas: canvas,
+                ctx: ctx,
+                snake: [
+                    {x: 200, y: 200},
+                    {x: 190, y: 200},
+                    {x: 180, y: 200},
+                    {x: 170, y: 200},
+                    {x: 160, y: 200}
+                ],
+                food: {x: 0, y: 0},
+                dx: 10,
+                dy: 0,
+                score: 0,
+                gameLoop: null
+            };
+            
+            snakeDirection = 'right';
+            snakePaused = false;
+            
+            // Generate first food
+            generateFood();
+            
+            // Start game loop
+            if (snakeGame.gameLoop) clearInterval(snakeGame.gameLoop);
+            snakeGame.gameLoop = setInterval(gameLoop, snakeSpeed);
+            
+            // Draw initial state
+            drawSnake();
+            drawFood();
+            
+            // Add keyboard controls
+            document.removeEventListener('keydown', changeDirection);
+            document.addEventListener('keydown', changeDirection);
+            
+            // Reset win screen
+            document.getElementById('snake-win').classList.remove('active');
+            document.getElementById('snake-score').textContent = '0';
+            document.getElementById('snake-length').textContent = '5';
+        }
+        
+        function gameLoop() {
+            if (snakePaused) return;
+            
+            const { snake, canvas, ctx, dx, dy } = snakeGame;
+            const head = {x: snake[0].x + dx, y: snake[0].y + dy};
+            
+            // Check collision with walls
+            if (head.x < 0 || head.x >= canvas.width || head.y < 0 || head.y >= canvas.height) {
+                endSnakeGame();
+                return;
+            }
+            
+            // Check collision with self
+            for (let i = 0; i < snake.length; i++) {
+                if (head.x === snake[i].x && head.y === snake[i].y) {
+                    endSnakeGame();
+                    return;
+                }
+            }
+            
+            // Move snake
+            snake.unshift(head);
+            
+            // Check if food eaten
+            if (head.x === snakeGame.food.x && head.y === snakeGame.food.y) {
+                snakeGame.score += 10;
+                document.getElementById('snake-score').textContent = snakeGame.score;
+                document.getElementById('snake-length').textContent = snake.length;
+                generateFood();
+            } else {
+                snake.pop();
+            }
+            
+            // Clear canvas and redraw
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawSnake();
+            drawFood();
+        }
+        
+        function drawSnake() {
+            const { ctx, snake } = snakeGame;
+            
+            // Draw snake
+            snake.forEach((part, index) => {
+                ctx.fillStyle = index === 0 ? '#00d8ff' : '#00ff88';
+                ctx.fillRect(part.x, part.y, 10, 10);
+                
+                ctx.strokeStyle = '#000';
+                ctx.strokeRect(part.x, part.y, 10, 10);
+            });
+        }
+        
+        function drawFood() {
+            const { ctx, food } = snakeGame;
+            
+            ctx.fillStyle = '#ff4d4d';
+            ctx.beginPath();
+            ctx.arc(food.x + 5, food.y + 5, 5, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        
+        function generateFood() {
+            const { canvas } = snakeGame;
+            const foodX = Math.floor(Math.random() * (canvas.width / 10)) * 10;
+            const foodY = Math.floor(Math.random() * (canvas.height / 10)) * 10;
+            
+            snakeGame.food = {x: foodX, y: foodY};
+        }
+        
+        function changeDirection(event) {
+            const key = event.keyCode;
+            
+            // Prevent the snake from reversing
+            if (key === 37 && snakeDirection !== 'right') { // Left
+                snakeGame.dx = -10;
+                snakeGame.dy = 0;
+                snakeDirection = 'left';
+            } else if (key === 38 && snakeDirection !== 'down') { // Up
+                snakeGame.dx = 0;
+                snakeGame.dy = -10;
+                snakeDirection = 'up';
+            } else if (key === 39 && snakeDirection !== 'left') { // Right
+                snakeGame.dx = 10;
+                snakeGame.dy = 0;
+                snakeDirection = 'right';
+            } else if (key === 40 && snakeDirection !== 'up') { // Down
+                snakeGame.dx = 0;
+                snakeGame.dy = 10;
+                snakeDirection = 'down';
+            }
+        }
+        
+        function changeSnakeDirection(dir) {
+            if (dir === 'left' && snakeDirection !== 'right') {
+                snakeGame.dx = -10;
+                snakeGame.dy = 0;
+                snakeDirection = 'left';
+            } else if (dir === 'up' && snakeDirection !== 'down') {
+                snakeGame.dx = 0;
+                snakeGame.dy = -10;
+                snakeDirection = 'up';
+            } else if (dir === 'right' && snakeDirection !== 'left') {
+                snakeGame.dx = 10;
+                snakeGame.dy = 0;
+                snakeDirection = 'right';
+            } else if (dir === 'down' && snakeDirection !== 'up') {
+                snakeGame.dx = 0;
+                snakeGame.dy = 10;
+                snakeDirection = 'down';
+            }
+        }
+        
+        function endSnakeGame() {
+            clearInterval(snakeGame.gameLoop);
+            document.getElementById('final-snake-score').textContent = snakeGame.score;
+            document.getElementById('snake-win').classList.add('active');
+        }
+        
+        function resetSnake() {
+            initSnakeGame();
+        }
+        
+        function changeSnakeSpeed() {
+            const speeds = [200, 150, 100];
+            const labels = ['Slow', 'Medium', 'Fast'];
+            const currentIndex = speeds.indexOf(snakeSpeed);
+            const nextIndex = (currentIndex + 1) % speeds.length;
+            
+            snakeSpeed = speeds[nextIndex];
+            document.getElementById('snake-speed').textContent = labels[nextIndex];
+            
+            clearInterval(snakeGame.gameLoop);
+            snakeGame.gameLoop = setInterval(gameLoop, snakeSpeed);
+        }
+        
+        function pauseSnake() {
+            snakePaused = !snakePaused;
+            const pauseBtn = document.querySelector('#snake-screen .control-btn:nth-child(2)');
+            pauseBtn.innerHTML = snakePaused ? '<i class="fas fa-play"></i> Resume Game' : '<i class="fas fa-pause"></i> Pause Game';
+        }
+        
+        // Brick Breaker Game Implementation
+        let brickGame;
+        let brickPaused = true;
+        
+        function initBrick() {
+            const canvas = document.getElementById('brick-canvas');
+            const ctx = canvas.getContext('2d');
+            
+            brickGame = {
+                canvas: canvas,
+                ctx: ctx,
+                paddleWidth: 75,
+                paddleHeight: 15,
+                paddleX: (canvas.width - 75) / 2,
+                ballRadius: 10,
+                x: canvas.width / 2,
+                y: canvas.height - 30,
+                dx: 2,
+                dy: -2,
+                score: 0,
+                lives: 3,
+                gameLoop: null,
+                rightPressed: false,
+                leftPressed: false,
+                bricks: []
+            };
+            
+            brickPaused = true;
+            
+            // Create bricks
+            brickGame.bricks = [];
+            const brickRowCount = 5;
+            const brickColumnCount = 8;
+            const brickWidth = 50;
+            const brickHeight = 17;
+            const brickPadding = 10;
+            const brickOffsetTop = 30;
+            const brickOffsetLeft = 30;
+            
+            for (let c = 0; c < brickColumnCount; c++) {
+                brickGame.bricks[c] = [];
+                for (let r = 0; r < brickRowCount; r++) {
+                    brickGame.bricks[c][r] = { x: 0, y: 0, status: 1 };
+                }
+            }
+            
+            // Draw initial state
+            drawBrickGame();
+            
+            // Add event listeners
+            document.addEventListener("keydown", keyDownHandler, false);
+            document.addEventListener("keyup", keyUpHandler, false);
+            document.addEventListener("mousemove", mouseMoveHandler, false);
+            
+            // Reset win screen
+            document.getElementById('brick-win').classList.remove('active');
+            document.getElementById('brick-score').textContent = '0';
+            document.getElementById('brick-level').textContent = '1';
+            document.getElementById('brick-lives').textContent = '3';
+        }
+        
+        function keyDownHandler(e) {
+            if(e.key == "Right" || e.key == "ArrowRight") {
+                brickGame.rightPressed = true;
+            }
+            else if(e.key == "Left" || e.key == "ArrowLeft") {
+                brickGame.leftPressed = true;
+            }
+        }
+        
+        function keyUpHandler(e) {
+            if(e.key == "Right" || e.key == "ArrowRight") {
+                brickGame.rightPressed = false;
+            }
+            else if(e.key == "Left" || e.key == "ArrowLeft") {
+                brickGame.leftPressed = false;
+            }
+        }
+        
+        function mouseMoveHandler(e) {
+            const relativeX = e.clientX - brickGame.canvas.offsetLeft;
+            if(relativeX > 0 && relativeX < brickGame.canvas.width) {
+                brickGame.paddleX = relativeX - brickGame.paddleWidth/2;
+            }
+        }
+        
+        function drawBrickGame() {
+            const { ctx, canvas, paddleWidth, paddleHeight, paddleX, ballRadius, x, y, bricks } = brickGame;
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw bricks
+            const brickRowCount = 5;
+            const brickColumnCount = 8;
+            const brickWidth = 45;
+            const brickHeight = 17;
+            const brickPadding = 10;
+            const brickOffsetTop = 30;
+            const brickOffsetLeft = 30;
+            
+            for (let c = 0; c < brickColumnCount; c++) {
+                for (let r = 0; r < brickRowCount; r++) {
+                    if (bricks[c][r].status === 1) {
+                        const brickX = (c * (brickWidth + brickPadding)) + brickOffsetLeft;
+                        const brickY = (r * (brickHeight + brickPadding)) + brickOffsetTop;
+                        bricks[c][r].x = brickX;
+                        bricks[c][r].y = brickY;
+                        ctx.beginPath();
+                        ctx.rect(brickX, brickY, brickWidth, brickHeight);
+                        ctx.fillStyle = "#0ebde991";
+                        ctx.fill();
+                        ctx.closePath();
+                    }
+                }
+            }
+            
+            // Draw paddle
+            ctx.beginPath();
+            ctx.rect(paddleX, canvas.height - paddleHeight, paddleWidth, paddleHeight);
+            ctx.fillStyle = "#81754ec4";
+            ctx.fill();
+            ctx.closePath();
+            
+            // Draw ball
+            ctx.beginPath();
+            ctx.arc(x, y, ballRadius, 0, Math.PI*2);
+            ctx.fillStyle = "green";
+            ctx.fill();
+            ctx.closePath();
+            
+            // Draw score
+            ctx.font = "16px Arial";
+            ctx.fillStyle = "#e4d614";
+            ctx.fillText("Score: " + brickGame.score, 8, 20);
+        }
+        
+        function startBrick() {
+            if (brickPaused) {
+                brickPaused = false;
+                if (brickGame.gameLoop) clearInterval(brickGame.gameLoop);
+                brickGame.gameLoop = setInterval(updateBrick, 10);
+            }
+        }
+        
+        function updateBrick() {
+            const { ctx, canvas, paddleWidth, paddleHeight, paddleX, ballRadius, x, y, dx, dy, bricks } = brickGame;
+            
+            if(brickGame.rightPressed && brickGame.paddleX < canvas.width - brickGame.paddleWidth) {
+                brickGame.paddleX += 7;
+            }
+            else if(brickGame.leftPressed && brickGame.paddleX > 0) {
+                brickGame.paddleX -= 7;
+            }
+            
+            brickGame.x += brickGame.dx;
+            brickGame.y += brickGame.dy;
+            
+            // Wall collision (right/left)
+            if(brickGame.x + brickGame.dx > canvas.width - brickGame.ballRadius || brickGame.x + brickGame.dx < brickGame.ballRadius) {
+                brickGame.dx = -brickGame.dx;
+            }
+            
+            // Wall collision (top)
+            if(brickGame.y + brickGame.dy < brickGame.ballRadius) {
+                brickGame.dy = -brickGame.dy;
+            } 
+            // Paddle collision
+            else if(brickGame.y + brickGame.dy > canvas.height - brickGame.ballRadius - brickGame.paddleHeight) {
+                if(brickGame.x > brickGame.paddleX && brickGame.x < brickGame.paddleX + brickGame.paddleWidth) {
+                    brickGame.dy = -brickGame.dy;
+                }
+                // Bottom wall - lose life
+                else {
+                    brickGame.lives--;
+                    document.getElementById('brick-lives').textContent = brickGame.lives;
+                    if(!brickGame.lives) {
+                        endBrickGame();
+                    } else {
+                        brickGame.x = canvas.width/2;
+                        brickGame.y = canvas.height-30;
+                        brickGame.dx = 3;
+                        brickGame.dy = -3;
+                        brickGame.paddleX = (canvas.width - brickGame.paddleWidth)/2;
+                    }
+                }
+            }
+            
+            // Brick collision
+            const brickRowCount = 5;
+            const brickColumnCount = 8;
+            for (let c = 0; c < brickColumnCount; c++) {
+                for (let r = 0; r < brickRowCount; r++) {
+                    const b = bricks[c][r];
+                    if (b.status === 1) {
+                        if (
+                            brickGame.x > b.x && 
+                            brickGame.x < b.x + 75 && 
+                            brickGame.y > b.y && 
+                            brickGame.y < b.y + 20
+                        ) {
+                            brickGame.dy = -brickGame.dy;
+                            b.status = 0;
+                            brickGame.score++;
+                            document.getElementById('brick-score').textContent = brickGame.score;
+                            
+                            // Check if all bricks are broken
+                            let allBroken = true;
+                            for (let c = 0; c < brickColumnCount; c++) {
+                                for (let r = 0; r < brickRowCount; r++) {
+                                    if (bricks[c][r].status === 1) {
+                                        allBroken = false;
+                                        break;
+                                    }
+                                }
+                            }
+                            
+                            if (allBroken) {
+                                brickGame.level++;
+                                document.getElementById('brick-level').textContent = brickGame.level;
+                                initBrick();
+                            }
+                        }
+                    }
+                }
+            }
+            
+            drawBrickGame();
+        }
+        
+        function endBrickGame() {
+            clearInterval(brickGame.gameLoop);
+            document.getElementById('final-brick-score').textContent = brickGame.score;
+            document.getElementById('brick-win').classList.add('active');
+        }
+        
+        function resetBrick() {
+            initBrick();
+        }
+        
+        // Flappy Bird Game Implementation
+        let flappyGame;
+        let flappyPaused = true;
+        
+        function initFlappy() {
+            const canvas = document.getElementById('flappy-canvas');
+            const ctx = canvas.getContext('2d');
+            
+            flappyGame = {
+                canvas: canvas,
+                ctx: ctx,
+                birdX: 50,
+                birdY: 150,
+                birdRadius: 15,
+                gravity: 0.3,
+                velocity: 0,
+                jump: -6,
+                pipes: [],
+                pipeWidth: 50,
+                pipeGap: 150,
+                frameCount: 0,
+                score: 0,
+                bestScore: 0,
+                gameLoop: null
+            };
+            
+            flappyPaused = true;
+            
+            // Draw initial state
+            drawFlappyGame();
+            
+            // Add event listeners
+            document.addEventListener("keydown", flappyJump);
+            canvas.addEventListener("click", flappyJump);
+            
+            // Reset win screen
+            document.getElementById('flappy-win').classList.remove('active');
+            document.getElementById('flappy-score').textContent = '0';
+        }
+        
+        function flappyJump() {
+            if (flappyPaused) {
+                startFlappy();
+            }
+            flappyGame.velocity = flappyGame.jump;
+        }
+        
+        function drawFlappyGame() {
+            const { ctx, canvas, birdX, birdY, birdRadius } = flappyGame;
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw background
+            ctx.fillStyle = "#87CEEB";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw clouds
+            ctx.fillStyle = "white";
+            ctx.beginPath();
+            ctx.arc(100, 80, 30, 0, Math.PI * 2);
+            ctx.arc(130, 70, 40, 0, Math.PI * 2);
+            ctx.arc(160, 80, 30, 0, Math.PI * 2);
+            ctx.fill();
+            
+            ctx.beginPath();
+            ctx.arc(300, 100, 30, 0, Math.PI * 2);
+            ctx.arc(330, 90, 40, 0, Math.PI * 2);
+            ctx.arc(360, 100, 30, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Draw ground
+            ctx.fillStyle = "#8B4513";
+            ctx.fillRect(0, canvas.height - 50, canvas.width, 50);
+            ctx.fillStyle = "#7CFC00";
+            ctx.fillRect(0, canvas.height - 50, canvas.width, 10);
+            
+            // Draw bird
+            ctx.fillStyle = "#FFD700";
+            ctx.beginPath();
+            ctx.arc(birdX, birdY, birdRadius, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Draw bird eye
+            ctx.fillStyle = "black";
+            ctx.beginPath();
+            ctx.arc(birdX + 5, birdY - 3, 3, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Draw bird beak
+            ctx.fillStyle = "#FF6600";
+            ctx.beginPath();
+            ctx.moveTo(birdX + 10, birdY);
+            ctx.lineTo(birdX + 20, birdY);
+            ctx.lineTo(birdX + 10, birdY + 5);
+            ctx.fill();
+            
+            // Draw pipes
+            ctx.fillStyle = "#228B22";
+            flappyGame.pipes.forEach(pipe => {
+                ctx.fillRect(pipe.x, 0, flappyGame.pipeWidth, pipe.topHeight);
+                ctx.fillRect(pipe.x, pipe.topHeight + flappyGame.pipeGap, flappyGame.pipeWidth, canvas.height);
+            });
+            
+            // Draw score
+            ctx.font = "24px Arial";
+            ctx.fillStyle = "#FFF";
+            ctx.fillText("Score: " + flappyGame.score, 10, 30);
+        }
+        
+        function startFlappy() {
+            if (flappyPaused) {
+                flappyPaused = false;
+                if (flappyGame.gameLoop) clearInterval(flappyGame.gameLoop);
+                flappyGame.gameLoop = setInterval(updateFlappy, 20);
+            }
+        }
+        
+        function updateFlappy() {
+            const { ctx, canvas, birdY, birdRadius, gravity, velocity } = flappyGame;
+            
+            // Apply gravity
+            flappyGame.velocity += gravity;
+            flappyGame.birdY += velocity;
+            
+            // Generate pipes
+            flappyGame.frameCount++;
+            if (flappyGame.frameCount % 100 === 0) {
+                const topHeight = Math.floor(Math.random() * (canvas.height - flappyGame.pipeGap - 50)) + 20;
+                flappyGame.pipes.push({
+                    x: canvas.width,
+                    topHeight: topHeight
+                });
+            }
+            
+            // Move pipes
+            flappyGame.pipes.forEach(pipe => {
+                pipe.x -= 2;
+                
+                // Check collision
+                if (
+                    flappyGame.birdX + flappyGame.birdRadius > pipe.x && 
+                    flappyGame.birdX - flappyGame.birdRadius < pipe.x + flappyGame.pipeWidth && 
+                    (flappyGame.birdY - flappyGame.birdRadius < pipe.topHeight || 
+                     flappyGame.birdY + flappyGame.birdRadius > pipe.topHeight + flappyGame.pipeGap)
+                ) {
+                    endFlappyGame();
+                }
+                
+                // Score point when passing pipe
+                if (pipe.x + flappyGame.pipeWidth === flappyGame.birdX) {
+                    flappyGame.score++;
+                    document.getElementById('flappy-score').textContent = flappyGame.score;
+                }
+            });
+            
+            // Remove off-screen pipes
+            flappyGame.pipes = flappyGame.pipes.filter(pipe => pipe.x + flappyGame.pipeWidth > 0);
+            
+            // Check ground collision
+            if (flappyGame.birdY + flappyGame.birdRadius > canvas.height - 50) {
+                endFlappyGame();
+            }
+            
+            drawFlappyGame();
+        }
+        
+        function endFlappyGame() {
+            clearInterval(flappyGame.gameLoop);
+            document.getElementById('final-flappy-score').textContent = flappyGame.score;
+            if (flappyGame.score > flappyGame.bestScore) {
+                flappyGame.bestScore = flappyGame.score;
+                document.getElementById('flappy-best').textContent = flappyGame.bestScore;
+            }
+            document.getElementById('flappy-win').classList.add('active');
+        }
+        
+        function resetFlappy() {
+            initFlappy();
+        }
+        
+        // Tic Tac Toe Implementation
+        let tttGame;
+        
+        function initTicTacToe() {
+            tttGame = {
+                board: ['', '', '', '', '', '', '', '', ''],
+                currentPlayer: 'X',
+                gameOver: false,
+                wins: 0,
+                draws: 0,
+                vsComputer: false
+            };
+            
+            document.getElementById('ttt-win').classList.remove('active');
+            document.getElementById('ttt-player').textContent = 'X';
+            document.getElementById('ttt-wins').textContent = tttGame.wins;
+            document.getElementById('ttt-draws').textContent = tttGame.draws;
+            
+            renderTicTacToe();
+        }
+        
+        function renderTicTacToe() {
+            const boardElement = document.getElementById('ttt-board');
+            boardElement.innerHTML = '';
+            
+            tttGame.board.forEach((cell, index) => {
+                const cellElement = document.createElement('div');
+                cellElement.className = `game-cell ${cell === 'X' ? 'x' : cell === 'O' ? 'o' : ''}`;
+                cellElement.textContent = cell;
+                cellElement.addEventListener('click', () => makeTicTacToeMove(index));
+                boardElement.appendChild(cellElement);
+            });
+        }
+        
+        function makeTicTacToeMove(index) {
+            if (tttGame.board[index] !== '' || tttGame.gameOver) return;
+            
+            tttGame.board[index] = tttGame.currentPlayer;
+            renderTicTacToe();
+            
+            if (checkTicTacToeWin()) {
+                if (tttGame.currentPlayer === 'X') tttGame.wins++;
+                document.getElementById('ttt-result').textContent = `Player ${tttGame.currentPlayer} Wins!`;
+                document.getElementById('ttt-wins').textContent = tttGame.wins;
+                document.getElementById('ttt-win').classList.add('active');
+                tttGame.gameOver = true;
+                return;
+            }
+            
+            if (checkTicTacToeDraw()) {
+                tttGame.draws++;
+                document.getElementById('ttt-result').textContent = "It's a Draw!";
+                document.getElementById('ttt-draws').textContent = tttGame.draws;
+                document.getElementById('ttt-win').classList.add('active');
+                tttGame.gameOver = true;
+                return;
+            }
+            
+            // Switch player
+            tttGame.currentPlayer = tttGame.currentPlayer === 'X' ? 'O' : 'X';
+            document.getElementById('ttt-player').textContent = tttGame.currentPlayer;
+            
+            // Computer move
+            if (tttGame.vsComputer && tttGame.currentPlayer === 'O' && !tttGame.gameOver) {
+                setTimeout(() => {
+                    const emptyCells = tttGame.board.map((cell, idx) => cell === '' ? idx : null).filter(val => val !== null);
+                    const randomIndex = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+                    makeTicTacToeMove(randomIndex);
+                }, 500);
+            }
+        }
+        
+        function checkTicTacToeWin() {
+            const winPatterns = [
+                [0, 1, 2], [3, 4, 5], [6, 7, 8], // rows
+                [0, 3, 6], [1, 4, 7], [2, 5, 8], // columns
+                [0, 4, 8], [2, 4, 6]             // diagonals
+            ];
+            
+            return winPatterns.some(pattern => {
+                const [a, b, c] = pattern;
+                return tttGame.board[a] !== '' && 
+                       tttGame.board[a] === tttGame.board[b] && 
+                       tttGame.board[a] === tttGame.board[c];
+            });
+        }
+        
+        function checkTicTacToeDraw() {
+            return tttGame.board.every(cell => cell !== '');
+        }
+        
+        function resetTicTacToe() {
+            tttGame.board = ['', '', '', '', '', '', '', '', ''];
+            tttGame.currentPlayer = 'X';
+            tttGame.gameOver = false;
+            document.getElementById('ttt-player').textContent = 'X';
+            document.getElementById('ttt-win').classList.remove('active');
+            renderTicTacToe();
+        }
+        
+        function toggleTicTacToeMode() {
+            tttGame.vsComputer = !tttGame.vsComputer;
+            document.getElementById('ttt-mode').textContent = tttGame.vsComputer ? 'Vs Computer' : 'Single Player';
+            resetTicTacToe();
+        }
+        
+        // Memory Card Game Implementation
+        let memoryGame;
+        let memoryTimer;
+        
+        function initMemory() {
+            memoryGame = {
+                cards: ['🍎', '🍌', '🍒', '🍇', '🍊', '🍓', '🍉', '🥭', '👑', '🔮'],
+                flippedCards: [],
+                matchedPairs: 0,
+                moves: 0,
+                timer: 0,
+                boardSize: 4
+            };
+            
+            // Duplicate the cards to create pairs
+            memoryGame.cards = [...memoryGame.cards, ...memoryGame.cards];
+            
+            // Shuffle the cards
+            for (let i = memoryGame.cards.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [memoryGame.cards[i], memoryGame.cards[j]] = [memoryGame.cards[j], memoryGame.cards[i]];
+            }
+            
+            document.getElementById('memory-win').classList.remove('active');
+            document.getElementById('memory-moves').textContent = '0';
+            document.getElementById('memory-pairs').textContent = '0';
+            document.getElementById('memory-time').textContent = '0s';
+            
+            clearInterval(memoryTimer);
+            memoryGame.timer = 0;
+            
+            renderMemory();
+        }
+        
+        function renderMemory() {
+            const boardElement = document.getElementById('memory-board');
+            boardElement.innerHTML = '';
+            
+            memoryGame.cards.forEach((card, index) => {
+                const cardElement = document.createElement('div');
+                cardElement.className = 'memory-card';
+                cardElement.dataset.index = index;
+                
+                const frontElement = document.createElement('div');
+                frontElement.className = 'front';
+                frontElement.textContent = '❓';
+                
+                const backElement = document.createElement('div');
+                backElement.className = 'back';
+                backElement.textContent = card;
+                
+                cardElement.appendChild(frontElement);
+                cardElement.appendChild(backElement);
+                
+                cardElement.addEventListener('click', () => flipCard(index));
+                boardElement.appendChild(cardElement);
+            });
+        }
+        
+        function flipCard(index) {
+            const card = document.querySelector(`.memory-card[data-index="${index}"]`);
+            if (!card || card.classList.contains('flipped') || memoryGame.flippedCards.length >= 2) return;
+            
+            card.classList.add('flipped');
+            memoryGame.flippedCards.push(index);
+            
+            if (memoryGame.flippedCards.length === 2) {
+                memoryGame.moves++;
+                document.getElementById('memory-moves').textContent = memoryGame.moves;
+                
+                const [index1, index2] = memoryGame.flippedCards;
+                const card1 = memoryGame.cards[index1];
+                const card2 = memoryGame.cards[index2];
+                
+                if (card1 === card2) {
+                    // Match found
+                    memoryGame.matchedPairs++;
+                    document.getElementById('memory-pairs').textContent = memoryGame.matchedPairs;
+                    memoryGame.flippedCards = [];
+                    
+                    // Check win
+                    if (memoryGame.matchedPairs === memoryGame.cards.length / 2) {
+                        clearInterval(memoryTimer);
+                        document.getElementById('final-memory-time').textContent = `${memoryGame.timer}s`;
+                        document.getElementById('memory-win').classList.add('active');
+                    }
+                } else {
+                    // No match, flip back after delay
+                    setTimeout(() => {
+                        document.querySelector(`.memory-card[data-index="${index1}"]`).classList.remove('flipped');
+                        document.querySelector(`.memory-card[data-index="${index2}"]`).classList.remove('flipped');
+                        memoryGame.flippedCards = [];
+                    }, 1000);
+                }
+            }
+            
+            // Start timer on first move
+            if (memoryGame.moves === 1 && !memoryTimer) {
+                memoryTimer = setInterval(() => {
+                    memoryGame.timer++;
+                    document.getElementById('memory-time').textContent = `${memoryGame.timer}s`;
+                }, 1000);
+            }
+        }
+        
+        function resetMemory() {
+            initMemory();
+        }
+        
+        function changeMemorySize() {
+            // Toggle between 4x4 and 6x6
+            memoryGame.boardSize = memoryGame.boardSize === 4 ? 6 : 4;
+            memoryGame.cards = memoryGame.cards.slice(0, (memoryGame.boardSize * memoryGame.boardSize) / 2);
+            initMemory();
+        }
+        
+        // Number Puzzle Implementation
+        let puzzleGame;
+        let puzzleTimer;
+        
+        function initPuzzle() {
+            puzzleGame = {
+                tiles: Array.from({ length: 15 }, (_, i) => i + 1),
+                emptyIndex: 15,
+                moves: 0,
+                timer: 0,
+                size: 4
+            };
+            
+            // Shuffle the tiles
+            for (let i = puzzleGame.tiles.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [puzzleGame.tiles[i], puzzleGame.tiles[j]] = [puzzleGame.tiles[j], puzzleGame.tiles[i]];
+            }
+            
+            puzzleGame.tiles.push(0); // Add empty tile at the end
+            puzzleGame.emptyIndex = puzzleGame.tiles.length - 1;
+            
+            document.getElementById('puzzle-win').classList.remove('active');
+            document.getElementById('puzzle-moves').textContent = '0';
+            document.getElementById('puzzle-time').textContent = '0s';
+            
+            clearInterval(puzzleTimer);
+            puzzleGame.timer = 0;
+            
+            renderPuzzle();
+        }
+        
+        function renderPuzzle() {
+            const boardElement = document.getElementById('puzzle-board');
+            boardElement.innerHTML = '';
+            
+            puzzleGame.tiles.forEach((tile, index) => {
+                const tileElement = document.createElement('div');
+                tileElement.className = tile === 0 ? 'puzzle-tile empty' : 'puzzle-tile';
+                tileElement.textContent = tile === 0 ? '' : tile;
+                tileElement.addEventListener('click', () => movePuzzleTile(index));
+                boardElement.appendChild(tileElement);
+            });
+        }
+        
+        function movePuzzleTile(index) {
+            const emptyIndex = puzzleGame.emptyIndex;
+            const size = puzzleGame.size;
+            
+            // Check if tile can be moved (must be adjacent to empty space)
+            const row = Math.floor(index / size);
+            const col = index % size;
+            const emptyRow = Math.floor(emptyIndex / size);
+            const emptyCol = emptyIndex % size;
+            
+            const isAdjacent = 
+                (Math.abs(row - emptyRow) === 1 && col === emptyCol) ||
+                (Math.abs(col - emptyCol) === 1 && row === emptyRow);
+            
+            if (isAdjacent) {
+                // Move tile
+                [puzzleGame.tiles[emptyIndex], puzzleGame.tiles[index]] = [puzzleGame.tiles[index], puzzleGame.tiles[emptyIndex]];
+                puzzleGame.emptyIndex = index;
+                puzzleGame.moves++;
+                document.getElementById('puzzle-moves').textContent = puzzleGame.moves;
+                
+                renderPuzzle();
+                
+                // Start timer on first move
+                if (puzzleGame.moves === 1 && !puzzleTimer) {
+                    puzzleTimer = setInterval(() => {
+                        puzzleGame.timer++;
+                        document.getElementById('puzzle-time').textContent = `${puzzleGame.timer}s`;
+                    }, 1000);
+                }
+                
+                // Check win
+                if (isPuzzleSolved()) {
+                    clearInterval(puzzleTimer);
+                    document.getElementById('final-puzzle-time').textContent = `${puzzleGame.timer}s`;
+                    document.getElementById('puzzle-win').classList.add('active');
+                }
+            }
+        }
+        
+        function isPuzzleSolved() {
+            for (let i = 0; i < puzzleGame.tiles.length - 1; i++) {
+                if (puzzleGame.tiles[i] !== i + 1) {
+                    return false;
+                }
+            }
+            return puzzleGame.tiles[puzzleGame.tiles.length - 1] === 0;
+        }
+        
+        function resetPuzzle() {
+            initPuzzle();
+        }
+        
+        function changePuzzleSize() {
+            // Toggle between 3x3 and 4x4
+            puzzleGame.size = puzzleGame.size === 4 ? 3 : 4;
+            puzzleGame.tiles = Array.from({ length: puzzleGame.size * puzzleGame.size - 1 }, (_, i) => i + 1);
+            initPuzzle();
+            document.getElementById('puzzle-size').textContent = `${puzzleGame.size}x${puzzleGame.size}`;
+        }
+        
+        // Initialize all mini games when page loads
+        window.onload = function() {
+            initSnakeGame();
+            initBrick();
+            initFlappy();
+            initTicTacToe();
+            initMemory();
+            initPuzzle();
+        };
+    </script>
+</body>
+</html>
