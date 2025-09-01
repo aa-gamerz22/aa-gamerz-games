@@ -1,0 +1,1508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Simon Game</title>
+    <link rel="stylesheet" href="css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            overflow: hidden;
+            position: relative;
+        }
+
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+            background-size: 30px 30px;
+            z-index: -1;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            height: 90vh;
+            background: rgba(15, 15, 35, 0.9);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header Styles */
+        .header {
+            background: linear-gradient(to right, #0f0c29, #302b63, #24243e);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #4a00e0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-icon {
+            font-size: 2.5rem;
+            color: #8e2de2;
+            text-shadow: 0 0 10px rgba(142, 45, 226, 0.7);
+        }
+
+        .logo-text {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(to right, #8e2de2, #4a00e0);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Screen Container */
+        .screen-container {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Screen Styles */
+        .screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            padding: 30px;
+            display: none;
+            flex-direction: column;
+            transition: transform 0.5s ease-in-out;
+            overflow-y: auto;
+        }
+
+        .screen.active {
+            display: flex;
+        }
+
+        /* Home Screen */
+        #home-screen {
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><circle cx="50" cy="50" r="2" fill="rgba(142,45,226,0.2)"/></svg>');
+            justify-content: center;
+            align-items: center;
+        }
+
+        .home-content {
+            text-align: center;
+            max-width: 800px;
+            padding: 30px;
+            background: rgba(25, 25, 50, 0.7);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+
+        .reset-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(255, 0, 0, 0.3);
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .reset-btn:hover {
+            background: rgba(255, 0, 0, 0.5);
+            transform: rotate(180deg);
+        }
+
+        .reset-btn i {
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        .game-title {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            background: linear-gradient(to right, #fc466b, #3f5efb);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .game-tagline {
+            font-size: 1.2rem;
+            color: #a0a0e0;
+            margin-bottom: 40px;
+        }
+
+        .button-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 18px 30px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-primary {
+            background: linear-gradient(to right, #8e2de2, #4a00e0);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: #e0e0ff;
+            backdrop-filter: blur(10px);
+        }
+
+        .btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn i {
+            font-size: 1.5rem;
+        }
+
+        /* Level Selection Screen */
+        #level-screen {
+            background: rgba(10, 10, 25, 0.95);
+            padding: 20px;
+        }
+
+        .level-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .levels-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 15px;
+            flex: 1;
+            overflow-y: auto;
+            padding: 5px;
+        }
+
+        .level-card {
+            aspect-ratio: 1;
+            background: rgba(30, 30, 60, 0.7);
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .level-card.unlocked {
+            background: linear-gradient(135deg, #3a1c71, #d76d77, #ffaf7b);
+        }
+
+        .level-card.locked {
+            background: rgba(50, 50, 80, 0.5);
+            cursor: not-allowed;
+        }
+
+        .level-card.unlocked:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .level-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: white;
+            z-index: 2;
+        }
+
+        .difficulty-label {
+            font-size: 0.8rem;
+            padding: 3px 8px;
+            border-radius: 10px;
+            margin-top: 5px;
+            z-index: 2;
+        }
+
+        .locked-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1;
+            flex-direction: column;
+        }
+
+        .locked-overlay i {
+            font-size: 2rem;
+            color: #8e2de2;
+            margin-bottom: 5px;
+        }
+
+        .locked-text {
+            font-size: 0.7rem;
+            color: #e0e0ff;
+        }
+
+        /* Game Screen */
+        #game-screen {
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="rgba(15,15,35,0.9)"/><circle cx="20" cy="20" r="3" fill="rgba(142,45,226,0.2)"/><circle cx="80" cy="60" r="3" fill="rgba(142,45,226,0.2)"/><circle cx="50" cy="80" r="3" fill="rgba(142,45,226,0.2)"/></svg>');
+            flex-direction: column;
+        }
+
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            margin-bottom: 20px;
+        }
+
+        .game-info {
+            display: flex;
+            gap: 20px;
+            background: rgba(30, 30, 60, 0.7);
+            padding: 10px 20px;
+            border-radius: 50px;
+        }
+
+        .info-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .info-label {
+            font-size: 0.9rem;
+            color: #a0a0e0;
+        }
+
+        .info-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #8e2de2;
+        }
+
+        .difficulty-display {
+            background: rgba(142, 45, 226, 0.3);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .simon-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .simon-circle {
+            width: 350px;
+            height: 350px;
+            position: relative;
+            border-radius: 50%;
+            overflow: hidden;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.6);
+            transform: rotate(45deg);
+        }
+
+        .quadrant {
+            position: absolute;
+            width: 50%;
+            height: 50%;
+            cursor: pointer;
+            transition: opacity 0.3s;
+        }
+
+        .quadrant:active {
+            opacity: 1 !important;
+        }
+
+        .quadrant-top-left {
+            top: 0;
+            left: 0;
+            background: linear-gradient(135deg, var(--color1-top), var(--color1-bottom));
+            border-top-left-radius: 100%;
+        }
+
+        .quadrant-top-right {
+            top: 0;
+            right: 0;
+            background: linear-gradient(225deg, var(--color2-top), var(--color2-bottom));
+            border-top-right-radius: 100%;
+        }
+
+        .quadrant-bottom-left {
+            bottom: 0;
+            left: 0;
+            background: linear-gradient(45deg, var(--color3-top), var(--color3-bottom));
+            border-bottom-left-radius: 100%;
+        }
+
+        .quadrant-bottom-right {
+            bottom: 0;
+            right: 0;
+            background: linear-gradient(315deg, var(--color4-top), var(--color4-bottom));
+            border-bottom-right-radius: 100%;
+        }
+
+        .center-circle {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 120px;
+            height: 120px;
+            background: rgba(25, 25, 50, 0.9);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
+            z-index: 10;
+            cursor: pointer;
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        /* Result Screen */
+        #result-screen {
+            justify-content: center;
+            align-items: center;
+            background: rgba(10, 10, 25, 0.95);
+        }
+
+        .result-card {
+            background: linear-gradient(135deg, #0f0c29, #302b63);
+            width: 90%;
+            max-width: 500px;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+        }
+
+        .result-title {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: #8e2de2;
+        }
+
+        .result-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .stat {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #4a00e0;
+        }
+
+        .stat-label {
+            color: #a0a0e0;
+            margin-top: 5px;
+        }
+
+        /* Game Over Screen */
+        #gameover-screen {
+            justify-content: center;
+            align-items: center;
+            background: rgba(10, 10, 25, 0.95);
+        }
+
+        .gameover-card {
+            background: linear-gradient(135deg, #0f0c29, #302b63);
+            width: 90%;
+            max-width: 500px;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+        }
+
+        .gameover-title {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: #ff416c;
+        }
+
+        /* Settings Screen */
+        #settings-screen {
+            background: rgba(15, 15, 35, 0.95);
+        }
+
+        .settings-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .settings-title {
+            font-size: 2rem;
+            margin-bottom: 30px;
+            color: #8e2de2;
+            text-align: center;
+        }
+
+        .settings-group {
+            background: rgba(30, 30, 60, 0.7);
+            padding: 25px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+        }
+
+        .group-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: #4a00e0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .theme-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 15px;
+        }
+
+        .theme-option {
+            height: 150px;
+            border-radius: 15px;
+            cursor: pointer;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s;
+        }
+
+        .theme-option:hover {
+            transform: scale(1.05);
+        }
+
+        .theme-option.active {
+            box-shadow: 0 0 0 3px #8e2de2, 0 0 20px rgba(142, 45, 226, 0.7);
+        }
+
+        .theme-preview {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .theme-preview-top {
+            flex: 3;
+        }
+
+        .theme-preview-bottom {
+            flex: 1;
+            background: rgba(25, 25, 50, 0.8);
+        }
+
+        .theme-name {
+            position: absolute;
+            bottom: 10px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        /* History Screen */
+        #history-screen {
+            background: rgba(15, 15, 35, 0.95);
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .history-content {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .history-list {
+            list-style: none;
+        }
+
+        .history-item {
+            background: rgba(30, 30, 60, 0.7);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .history-date {
+            color: #a0a0e0;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                height: 100vh;
+                border-radius: 0;
+            }
+            
+            .button-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .simon-circle {
+                width: 300px;
+                height: 300px;
+            }
+            
+            .game-title {
+                font-size: 3rem;
+            }
+            
+            .result-stats {
+                grid-template-columns: 1fr;
+            }
+            
+            .theme-selector {
+                justify-content: center;
+            }
+            
+            .levels-container {
+                grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            }
+        }
+
+        /* Animations */
+        @keyframes pulse {
+            0% { opacity: 0.7; }
+            50% { opacity: 1; }
+            100% { opacity: 0.7; }
+        }
+
+        .pulse {
+            animation: pulse 1.5s infinite;
+        }
+
+        .active-quadrant {
+            opacity: 1 !important;
+            filter: brightness(1.5);
+        }
+
+        .wrong-answer {
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-10px); }
+            40%, 80% { transform: translateX(10px); }
+        }
+
+        .difficulty-beginner { background: #11998e; }
+        .difficulty-easy { background: #38ef7d; }
+        .difficulty-medium { background: #ffd200; color: #000; }
+        .difficulty-hard { background: #ff7e5f; }
+        .difficulty-very-hard { background: #ff416c; }
+        .difficulty-extreme { background: #8e2de2; }
+        .difficulty-master { background: #4a00e0; }
+        .difficulty-grandmaster { background: #000; color: #fff; }
+        .difficulty-champion { background: linear-gradient(45deg, #ffd700, #c0c0c0); color: #000; }
+        .difficulty-legend { background: linear-gradient(45deg, #ff0000, #0000ff); color: #fff; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-brain"></i>
+                </div>
+                <div class="logo-text">Simon Master</div>
+            </div>
+            <div class="game-info">
+                <div class="info-box">
+                    <div class="info-label">LEVEL</div>
+                    <div class="info-value" id="current-level-display">1</div>
+                </div>
+                <div class="info-box">
+                    <div class="info-label">SCORE</div>
+                    <div class="info-value" id="score-display">0</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="screen-container">
+            <!-- Home Screen -->
+            <div id="home-screen" class="screen active">
+                <div class="home-content">
+                    <button class="reset-btn" onclick="resetGameData()">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                    <h1 class="game-title">SIMON MASTER</h1>
+                    <p class="game-tagline">Challenge your memory with 50 levels of increasing difficulty!</p>
+                    
+                    <div class="button-grid">
+                        <button class="btn btn-primary" onclick="showScreen('level-screen')">
+                            <i class="fas fa-play"></i> START GAME
+                        </button>
+                        <button class="btn btn-secondary" onclick="showScreen('settings-screen')">
+                            <i class="fas fa-cog"></i> SETTINGS
+                        </button>
+                        <button class="btn btn-secondary" onclick="showScreen('history-screen')">
+                            <i class="fas fa-history"></i> HISTORY
+                        </button>
+                        <button class="btn btn-secondary" onclick="showScreen('help-screen')">
+                            <i class="fas fa-question-circle"></i> HELP
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Level Selection Screen -->
+            <div id="level-screen" class="screen">
+                <div class="level-header">
+                    <h2><i class="fas fa-layer-group"></i> SELECT LEVEL</h2>
+                    <button class="btn btn-secondary" onclick="showScreen('home-screen')">
+                        <i class="fas fa-arrow-left"></i> BACK
+                    </button>
+                </div>
+                
+                <div class="levels-container" id="levels-container">
+                    <!-- Levels will be generated dynamically -->
+                </div>
+            </div>
+            
+            <!-- Game Screen -->
+            <div id="game-screen" class="screen">
+                <div class="game-header">
+                    <div>
+                        <h2>Level: <span id="current-level">1</span>/50</h2>
+                        <div class="difficulty-display" id="difficulty-display">Beginner</div>
+                    </div>
+                    <button class="btn btn-secondary" onclick="showScreen('level-screen')">
+                        <i class="fas fa-home"></i> LEVELS
+                    </button>
+                </div>
+                
+                <div class="simon-container">
+                    <div class="simon-circle">
+                        <div class="quadrant quadrant-top-left" id="quadrant-0"></div>
+                        <div class="quadrant quadrant-top-right" id="quadrant-1"></div>
+                        <div class="quadrant quadrant-bottom-left" id="quadrant-2"></div>
+                        <div class="quadrant quadrant-bottom-right" id="quadrant-3"></div>
+                        <div class="center-circle" id="start-btn">
+                            <i class="fas fa-play"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Result Screen -->
+            <div id="result-screen" class="screen">
+                <div class="result-card">
+                    <h2 class="result-title">LEVEL COMPLETED!</h2>
+                    <div class="result-icon">
+                        <i class="fas fa-trophy" style="font-size: 5rem; color: #ffd700; margin: 20px 0;"></i>
+                    </div>
+                    
+                    <div class="result-stats">
+                        <div class="stat">
+                            <div class="stat-value" id="level-number">1</div>
+                            <div class="stat-label">Level</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-value" id="result-score">0</div>
+                            <div class="stat-label">Score</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-value" id="sequence-length">3</div>
+                            <div class="stat-label">Sequence</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-value" id="difficulty-name">Beginner</div>
+                            <div class="stat-label">Difficulty</div>
+                        </div>
+                    </div>
+                    
+                    <div class="button-grid" style="grid-template-columns: 1fr 1fr; margin-top: 30px;">
+                        <button class="btn btn-secondary" onclick="showScreen('level-screen')">
+                            <i class="fas fa-home"></i> LEVELS
+                        </button>
+                        <button class="btn btn-primary" onclick="nextLevel()">
+                            <i class="fas fa-redo"></i> NEXT LEVEL
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Game Over Screen -->
+            <div id="gameover-screen" class="screen">
+                <div class="gameover-card">
+                    <h2 class="gameover-title">GAME OVER!</h2>
+                    <div class="result-icon">
+                        <i class="fas fa-times-circle" style="font-size: 5rem; color: #ff416c; margin: 20px 0;"></i>
+                    </div>
+                    
+                    <div class="result-stats">
+                        <div class="stat">
+                            <div class="stat-value" id="gameover-level">1</div>
+                            <div class="stat-label">Level Reached</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-value" id="gameover-score">0</div>
+                            <div class="stat-label">Score</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-value" id="gameover-sequence">3</div>
+                            <div class="stat-label">Sequence Length</div>
+                        </div>
+                    </div>
+                    
+                    <div class="button-grid" style="grid-template-columns: 1fr 1fr; margin-top: 30px;">
+                        <button class="btn btn-secondary" onclick="showScreen('level-screen')">
+                            <i class="fas fa-home"></i> LEVELS
+                        </button>
+                        <button class="btn btn-primary" onclick="restartLevel()">
+                            <i class="fas fa-redo"></i> TRY AGAIN
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Settings Screen -->
+            <div id="settings-screen" class="screen">
+                <div class="settings-content">
+                    <h2 class="settings-title"><i class="fas fa-cog"></i> GAME SETTINGS</h2>
+                    
+                    <div class="settings-group">
+                        <h3 class="group-title"><i class="fas fa-palette"></i> THEMES (10 Styles)</h3>
+                        <div class="theme-selector">
+                            <div class="theme-option active" data-theme="neon" onclick="selectTheme('neon')">
+                                <div class="theme-preview">
+                                    <div class="theme-preview-top" style="background: linear-gradient(135deg, #ff416c, #ff4b2b);"></div>
+                                    <div class="theme-preview-bottom"></div>
+                                </div>
+                                <div class="theme-name">Neon Glow</div>
+                            </div>
+                            <div class="theme-option" data-theme="emerald" onclick="selectTheme('emerald')">
+                                <div class="theme-preview">
+                                    <div class="theme-preview-top" style="background: linear-gradient(135deg, #11998e, #38ef7d);"></div>
+                                    <div class="theme-preview-bottom"></div>
+                                </div>
+                                <div class="theme-name">Emerald</div>
+                            </div>
+                            <div class="theme-option" data-theme="ocean" onclick="selectTheme('ocean')">
+                                <div class="theme-preview">
+                                    <div class="theme-preview-top" style="background: linear-gradient(135deg, #3494e6, #ec6ead);"></div>
+                                    <div class="theme-preview-bottom"></div>
+                                </div>
+                                <div class="theme-name">Ocean Breeze</div>
+                            </div>
+                            <div class="theme-option" data-theme="sunset" onclick="selectTheme('sunset')">
+                                <div class="theme-preview">
+                                    <div class="theme-preview-top" style="background: linear-gradient(135deg, #f7971e, #ffd200);"></div>
+                                    <div class="theme-preview-bottom"></div>
+                                </div>
+                                <div class="theme-name">Sunset</div>
+                            </div>
+                            <div class="theme-option" data-theme="royal" onclick="selectTheme('royal')">
+                                <div class="theme-preview">
+                                    <div class="theme-preview-top" style="background: linear-gradient(135deg, #5c258d, #4389a2);"></div>
+                                    <div class="theme-preview-bottom"></div>
+                                </div>
+                                <div class="theme-name">Royal</div>
+                            </div>
+                            <div class="theme-option" data-theme="forest" onclick="selectTheme('forest')">
+                                <div class="theme-preview">
+                                    <div class="theme-preview-top" style="background: linear-gradient(135deg, #56ab2f, #a8e063);"></div>
+                                    <div class="theme-preview-bottom"></div>
+                                </div>
+                                <div class="theme-name">Forest</div>
+                            </div>
+                            <div class="theme-option" data-theme="violet" onclick="selectTheme('violet')">
+                                <div class="theme-preview">
+                                    <div class="theme-preview-top" style="background: linear-gradient(135deg, #834d9b, #d04ed6);"></div>
+                                    <div class="theme-preview-bottom"></div>
+                                </div>
+                                <div class="theme-name">Violet</div>
+                            </div>
+                            <div class="theme-option" data-theme="gold" onclick="selectTheme('gold')">
+                                <div class="theme-preview">
+                                    <div class="theme-preview-top" style="background: linear-gradient(135deg, #f7971e, #ffd200);"></div>
+                                    <div class="theme-preview-bottom"></div>
+                                </div>
+                                <div class="theme-name">Gold Rush</div>
+                            </div>
+                            <div class="theme-option" data-theme="ice" onclick="selectTheme('ice')">
+                                <div class="theme-preview">
+                                    <div class="theme-preview-top" style="background: linear-gradient(135deg, #005c97, #363795);"></div>
+                                    <div class="theme-preview-bottom"></div>
+                                </div>
+                                <div class="theme-name">Ice Cold</div>
+                            </div>
+                            <div class="theme-option" data-theme="crimson" onclick="selectTheme('crimson')">
+                                <div class="theme-preview">
+                                    <div class="theme-preview-top" style="background: linear-gradient(135deg, #de6262, #ffb88c);"></div>
+                                    <div class="theme-preview-bottom"></div>
+                                </div>
+                                <div class="theme-name">Crimson</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="settings-group">
+                        <h3 class="group-title"><i class="fas fa-sliders-h"></i> GAME OPTIONS</h3>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                            <div>
+                                <label style="display: block; margin-bottom: 10px;">Sound Volume</label>
+                                <input type="range" min="0" max="100" value="80" style="width: 100%;">
+                            </div>
+                            <div>
+                                <label style="display: block; margin-bottom: 10px;">Vibration</label>
+                                <select style="width: 100%; padding: 10px; background: rgba(255,255,255,0.1); border: none; border-radius: 10px; color: white;">
+                                    <option>On</option>
+                                    <option selected>Off</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; justify-content: center; margin-top: 30px;">
+                        <button class="btn btn-primary" onclick="saveSettings()">
+                            <i class="fas fa-save"></i> SAVE SETTINGS
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- History Screen -->
+            <div id="history-screen" class="screen">
+                <div class="history-header">
+                    <h2><i class="fas fa-history"></i> GAME HISTORY</h2>
+                    <div>
+                        <button class="btn btn-secondary" onclick="showScreen('home-screen')">
+                            <i class="fas fa-arrow-left"></i> BACK
+                        </button>
+                        <button class="btn btn-secondary" onclick="resetHistory()" style="margin-left: 10px;">
+                            <i class="fas fa-trash"></i> RESET
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="history-content">
+                    <ul class="history-list" id="history-list">
+                        <!-- History items will be generated dynamically -->
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Help Screen -->
+            <div id="help-screen" class="screen">
+                <div class="settings-content">
+                    <h2 class="settings-title"><i class="fas fa-question-circle"></i> GAME HELP</h2>
+                    
+                    <div class="settings-group">
+                        <h3 class="group-title"><i class="fas fa-gamepad"></i> HOW TO PLAY</h3>
+                        <div style="line-height: 1.8; color: #e0e0ff;">
+                            <p>1. Watch the sequence of colors that Simon shows.</p>
+                            <p>2. Repeat the sequence by pressing the colors in the same order.</p>
+                            <p>3. The sequence gets longer with each successful round.</p>
+                            <p>4. If you make a mistake, the game ends.</p>
+                            <p>5. Complete levels to unlock more challenging levels.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="settings-group">
+                        <h3 class="group-title"><i class="fas fa-trophy"></i> DIFFICULTY LEVELS</h3>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px;">
+                            <div class="difficulty-beginner" style="padding: 10px; border-radius: 10px;">1-5: Beginner</div>
+                            <div class="difficulty-easy" style="padding: 10px; border-radius: 10px;">6-10: Easy</div>
+                            <div class="difficulty-medium" style="padding: 10px; border-radius: 10px;">11-15: Medium</div>
+                            <div class="difficulty-hard" style="padding: 10px; border-radius: 10px;">16-20: Hard</div>
+                            <div class="difficulty-very-hard" style="padding: 10px; border-radius: 10px;">21-25: Very Hard</div>
+                            <div class="difficulty-extreme" style="padding: 10px; border-radius: 10px;">26-30: Extreme</div>
+                            <div class="difficulty-master" style="padding: 10px; border-radius: 10px;">31-35: Master</div>
+                            <div class="difficulty-grandmaster" style="padding: 10px; border-radius: 10px;">36-40: Grandmaster</div>
+                            <div class="difficulty-champion" style="padding: 10px; border-radius: 10px;">41-45: Champion</div>
+                            <div class="difficulty-legend" style="padding: 10px; border-radius: 10px;">46-50: Legend</div>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; justify-content: center; margin-top: 30px;">
+                        <button class="btn btn-primary" onclick="showScreen('home-screen')">
+                            <i class="fas fa-arrow-left"></i> BACK TO HOME
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Game state
+        let gameState = {
+            currentLevel: 1,
+            maxLevel: 50,
+            unlockedLevels: 1,
+            score: 0,
+            sequence: [],
+            playerSequence: [],
+            gameStarted: false,
+            currentTheme: 'neon',
+            gameHistory: [],
+            difficultyLevels: {
+                1: "Beginner",
+                6: "Easy",
+                11: "Medium",
+                16: "Hard",
+                21: "Very Hard",
+                26: "Extreme",
+                31: "Master",
+                36: "Grandmaster",
+                41: "Champion",
+                46: "Legend"
+            }
+        };
+
+        // Theme configurations
+        const themes = {
+            neon: {
+                color1Top: '#ff416c',
+                color1Bottom: '#ff4b2b',
+                color2Top: '#11998e',
+                color2Bottom: '#38ef7d',
+                color3Top: '#3494e6',
+                color3Bottom: '#ec6ead',
+                color4Top: '#f7971e',
+                color4Bottom: '#ffd200'
+            },
+            emerald: {
+                color1Top: '#56ab2f',
+                color1Bottom: '#a8e063',
+                color2Top: '#005c97',
+                color2Bottom: '#363795',
+                color3Top: '#614385',
+                color3Bottom: '#516395',
+                color4Top: '#ff512f',
+                color4Bottom: '#f09819'
+            },
+            ocean: {
+                color1Top: '#3494e6',
+                color1Bottom: '#ec6ead',
+                color2Top: '#5c258d',
+                color2Bottom: '#4389a2',
+                color3Top: '#1d976c',
+                color3Bottom: '#93f9b9',
+                color4Top: '#ff7e5f',
+                color4Bottom: '#feb47b'
+            },
+            sunset: {
+                color1Top: '#f7971e',
+                color1Bottom: '#ffd200',
+                color2Top: '#834d9b',
+                color2Bottom: '#d04ed6',
+                color3Top: '#2c3e50',
+                color3Bottom: '#4ca1af',
+                color4Top: '#de6262',
+                color4Bottom: '#ffb88c'
+            },
+            royal: {
+                color1Top: '#5c258d',
+                color1Bottom: '#4389a2',
+                color2Top: '#1d2b64',
+                color2Bottom: '#f8cdda',
+                color3Top: '#ff7e5f',
+                color3Bottom: '#feb47b',
+                color4Top: '#614385',
+                color4Bottom: '#516395'
+            },
+            forest: {
+                color1Top: '#56ab2f',
+                color1Bottom: '#a8e063',
+                color2Top: '#005c97',
+                color2Bottom: '#363795',
+                color3Top: '#134e5e',
+                color3Bottom: '#71b280',
+                color4Top: '#949c5c',
+                color4Bottom: '#d6d78f'
+            },
+            violet: {
+                color1Top: '#834d9b',
+                color1Bottom: '#d04ed6',
+                color2Top: '#3a1c71',
+                color2Bottom: '#d76d77',
+                color3Top: '#5c258d',
+                color3Bottom: '#4389a2',
+                color4Top: '#ff6b6b',
+                color4Bottom: '#ffa8a8'
+            },
+            gold: {
+                color1Top: '#f7971e',
+                color1Bottom: '#ffd200',
+                color2Top: '#b06ab3',
+                color2Bottom: '#4568dc',
+                color3Top: '#ffd700',
+                color3Bottom: '#ffb700',
+                color4Top: '#c7903c',
+                color4Bottom: '#dbaa4a'
+            },
+            ice: {
+                color1Top: '#005c97',
+                color1Bottom: '#363795',
+                color2Top: '#3494e6',
+                color2Bottom: '#ec6ead',
+                color3Top: '#56ccf2',
+                color3Bottom: '#2f80ed',
+                color4Top: '#00d2ff',
+                color4Bottom: '#3a7bd5'
+            },
+            crimson: {
+                color1Top: '#de6262',
+                color1Bottom: '#ffb88c',
+                color2Top: '#ff416c',
+                color2Bottom: '#ff4b2b',
+                color3Top: '#ff6b6b',
+                color3Bottom: '#ffa8a8',
+                color4Top: '#d31027',
+                color4Bottom: '#ea384d'
+            }
+        };
+
+        // Initialize the game
+        function initGame() {
+            // Load saved state if available
+            const savedState = localStorage.getItem('simonGameState');
+            if (savedState) {
+                gameState = JSON.parse(savedState);
+            }
+            
+            // Apply the saved theme
+            applyTheme(gameState.currentTheme);
+            
+            // Generate level selection
+            generateLevelCards();
+            
+            // Generate history
+            generateHistory();
+            
+            // Set active theme in settings
+            document.querySelectorAll('.theme-option').forEach(option => {
+                if (option.dataset.theme === gameState.currentTheme) {
+                    option.classList.add('active');
+                } else {
+                    option.classList.remove('active');
+                }
+            });
+        }
+
+        // Screen navigation
+        function showScreen(screenId) {
+            // Hide all screens
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            
+            // Show the requested screen
+            document.getElementById(screenId).classList.add('active');
+            
+            // Special handling for game screen
+            if(screenId === 'game-screen') {
+                startNewGame();
+            }
+            
+            // Generate history when showing history screen
+            if(screenId === 'history-screen') {
+                generateHistory();
+            }
+        }
+        
+        // Generate level cards
+        function generateLevelCards() {
+            const container = document.getElementById('levels-container');
+            container.innerHTML = '';
+            
+            for (let i = 1; i <= gameState.maxLevel; i++) {
+                const difficulty = getDifficulty(i);
+                const levelCard = document.createElement('div');
+                levelCard.className = `level-card ${i <= gameState.unlockedLevels ? 'unlocked' : 'locked'}`;
+                levelCard.innerHTML = `
+                    <div class="level-number">${i}</div>
+                    <div class="difficulty-label ${'difficulty-' + difficulty.replace(/\s+/g, '-').toLowerCase()}">${difficulty}</div>
+                    ${i > gameState.unlockedLevels ? `
+                    <div class="locked-overlay">
+                        <i class="fas fa-lock"></i>
+                        <div class="locked-text">Locked</div>
+                    </div>
+                    ` : ''}
+                `;
+                
+                if (i <= gameState.unlockedLevels) {
+                    levelCard.addEventListener('click', () => {
+                        gameState.currentLevel = i;
+                        document.getElementById('current-level').textContent = i;
+                        document.getElementById('current-level-display').textContent = i;
+                        document.getElementById('difficulty-display').textContent = difficulty;
+                        showScreen('game-screen');
+                    });
+                }
+                
+                container.appendChild(levelCard);
+            }
+        }
+        
+        // Get difficulty name for level
+        function getDifficulty(level) {
+            for (let startLevel in gameState.difficultyLevels) {
+                if (level >= parseInt(startLevel)) {
+                    return gameState.difficultyLevels[startLevel];
+                }
+            }
+            return "Beginner";
+        }
+        
+        // Generate history
+        function generateHistory() {
+            const historyList = document.getElementById('history-list');
+            historyList.innerHTML = '';
+            
+            if (gameState.gameHistory.length === 0) {
+                historyList.innerHTML = '<p style="text-align: center; color: #a0a0e0; padding: 20px;">No game history yet. Play some levels to see your progress!</p>';
+                return;
+            }
+            
+            gameState.gameHistory.forEach(record => {
+                const historyItem = document.createElement('li');
+                historyItem.className = 'history-item';
+                historyItem.innerHTML = `
+                    <div>
+                        <div class="history-date">${record.date}</div>
+                        <div>Level ${record.level} - ${getDifficulty(record.level)}</div>
+                    </div>
+                    <div style="font-weight: bold; color: #8e2de2;">Score: ${record.score}</div>
+                `;
+                historyList.appendChild(historyItem);
+            });
+        }
+        
+        // Reset history
+        function resetHistory() {
+            gameState.gameHistory = [];
+            localStorage.setItem('simonGameState', JSON.stringify(gameState));
+            generateHistory();
+        }
+        
+        // Reset all game data
+        function resetGameData() {
+            if (confirm("Are you sure you want to reset all game data? This will delete all progress, settings, and history.")) {
+                // Reset game state
+                gameState = {
+                    currentLevel: 1,
+                    maxLevel: 50,
+                    unlockedLevels: 1,
+                    score: 0,
+                    sequence: [],
+                    playerSequence: [],
+                    gameStarted: false,
+                    currentTheme: 'neon',
+                    gameHistory: [],
+                    difficultyLevels: {
+                        1: "Beginner",
+                        6: "Easy",
+                        11: "Medium",
+                        16: "Hard",
+                        21: "Very Hard",
+                        26: "Extreme",
+                        31: "Master",
+                        36: "Grandmaster",
+                        41: "Champion",
+                        46: "Legend"
+                    }
+                };
+                
+                // Clear localStorage
+                localStorage.removeItem('simonGameState');
+                
+                // Apply default theme
+                applyTheme('neon');
+                
+                // Update UI
+                generateLevelCards();
+                generateHistory();
+                
+                // Update theme selection
+                document.querySelectorAll('.theme-option').forEach(option => {
+                    if (option.dataset.theme === 'neon') {
+                        option.classList.add('active');
+                    } else {
+                        option.classList.remove('active');
+                    }
+                });
+                
+                alert("All game data has been reset successfully!");
+            }
+        }
+        
+        // Select theme
+        function selectTheme(themeName) {
+            gameState.currentTheme = themeName;
+            applyTheme(themeName);
+            
+            // Update active theme in settings
+            document.querySelectorAll('.theme-option').forEach(option => {
+                if (option.dataset.theme === themeName) {
+                    option.classList.add('active');
+                } else {
+                    option.classList.remove('active');
+                }
+            });
+        }
+        
+        // Apply theme
+        function applyTheme(themeName) {
+            const theme = themes[themeName];
+            document.documentElement.style.setProperty('--color1-top', theme.color1Top);
+            document.documentElement.style.setProperty('--color1-bottom', theme.color1Bottom);
+            document.documentElement.style.setProperty('--color2-top', theme.color2Top);
+            document.documentElement.style.setProperty('--color2-bottom', theme.color2Bottom);
+            document.documentElement.style.setProperty('--color3-top', theme.color3Top);
+            document.documentElement.style.setProperty('--color3-bottom', theme.color3Bottom);
+            document.documentElement.style.setProperty('--color4-top', theme.color4Top);
+            document.documentElement.style.setProperty('--color4-bottom', theme.color4Bottom);
+        }
+        
+        // Save settings
+        function saveSettings() {
+            localStorage.setItem('simonGameState', JSON.stringify(gameState));
+            showScreen('home-screen');
+        }
+        
+        // Game logic
+        function startNewGame() {
+            gameState.sequence = [];
+            gameState.playerSequence = [];
+            gameState.gameStarted = false;
+            
+            document.getElementById('score-display').textContent = gameState.score;
+            
+            // Add the center button event listener
+            const startBtn = document.getElementById('start-btn');
+            startBtn.innerHTML = '<i class="fas fa-play"></i>';
+            startBtn.onclick = startLevel;
+        }
+        
+        function startLevel() {
+            if(!gameState.gameStarted) {
+                gameState.gameStarted = true;
+                document.getElementById('start-btn').innerHTML = '<i class="fas fa-sync-alt"></i>';
+            }
+            
+            // Clear previous sequence
+            gameState.sequence = [];
+            
+            // Determine sequence length based on level
+            const baseLength = 3;
+            const additionalLength = Math.floor((gameState.currentLevel - 1) / 5);
+            const sequenceLength = baseLength + additionalLength;
+            
+            // Add new colors to the sequence
+            for (let i = 0; i < sequenceLength; i++) {
+                const nextColor = Math.floor(Math.random() * 4);
+                gameState.sequence.push(nextColor);
+            }
+            
+            // Show the sequence to the player
+            playSequence();
+        }
+        
+        function playSequence() {
+            let i = 0;
+            // Speed increases with level
+            const speed = Math.max(200, 1000 - (gameState.currentLevel * 15));
+            
+            const interval = setInterval(() => {
+                lightUp(gameState.sequence[i]);
+                i++;
+                if(i >= gameState.sequence.length) {
+                    clearInterval(interval);
+                    gameState.playerSequence = [];
+                }
+            }, speed);
+        }
+        
+        function lightUp(colorIndex) {
+            const quadrant = document.getElementById(`quadrant-${colorIndex}`);
+            quadrant.classList.add('active-quadrant');
+            
+            setTimeout(() => {
+                quadrant.classList.remove('active-quadrant');
+            }, 300);
+        }
+        
+        // Add event listeners to quadrants
+        for(let i = 0; i < 4; i++) {
+            document.getElementById(`quadrant-${i}`).addEventListener('click', () => {
+                if(!gameState.gameStarted) return;
+                
+                lightUp(i);
+                gameState.playerSequence.push(i);
+                
+                // Check if the player's sequence matches
+                if(gameState.playerSequence[gameState.playerSequence.length - 1] !== 
+                   gameState.sequence[gameState.playerSequence.length - 1]) {
+                    // Wrong answer - game over
+                    document.body.classList.add('wrong-answer');
+                    setTimeout(() => {
+                        document.body.classList.remove('wrong-answer');
+                        showGameOver();
+                    }, 500);
+                    return;
+                }
+                
+                // Check if the player completed the sequence
+                if(gameState.playerSequence.length === gameState.sequence.length) {
+                    // Level completed
+                    gameState.score += gameState.sequence.length * 10;
+                    
+                    // Add to history
+                    const now = new Date();
+                    const dateStr = now.toLocaleDateString('en-US', { 
+                        year: 'numeric', 
+                        month: 'short', 
+                        day: 'numeric' 
+                    });
+                    
+                    gameState.gameHistory.unshift({
+                        date: dateStr,
+                        level: gameState.currentLevel,
+                        score: gameState.score
+                    });
+                    
+                    // Keep only last 20 records
+                    if (gameState.gameHistory.length > 20) {
+                        gameState.gameHistory.pop();
+                    }
+                    
+                    // Save state
+                    localStorage.setItem('simonGameState', JSON.stringify(gameState));
+                    
+                    // Show result screen
+                    document.getElementById('level-number').textContent = gameState.currentLevel;
+                    document.getElementById('result-score').textContent = gameState.score;
+                    document.getElementById('sequence-length').textContent = gameState.sequence.length;
+                    document.getElementById('difficulty-name').textContent = getDifficulty(gameState.currentLevel);
+                    showScreen('result-screen');
+                }
+            });
+        }
+        
+        function showGameOver() {
+            document.getElementById('gameover-level').textContent = gameState.currentLevel;
+            document.getElementById('gameover-score').textContent = gameState.score;
+            document.getElementById('gameover-sequence').textContent = gameState.sequence.length;
+            showScreen('gameover-screen');
+        }
+        
+        function restartLevel() {
+            showScreen('game-screen');
+        }
+        
+        function nextLevel() {
+            // Unlock next level if applicable
+            if (gameState.currentLevel === gameState.unlockedLevels && 
+                gameState.unlockedLevels < gameState.maxLevel) {
+                gameState.unlockedLevels++;
+            }
+            
+            // Go to next level if available
+            if (gameState.currentLevel < gameState.maxLevel) {
+                gameState.currentLevel++;
+                document.getElementById('current-level').textContent = gameState.currentLevel;
+                document.getElementById('current-level-display').textContent = gameState.currentLevel;
+                document.getElementById('difficulty-display').textContent = getDifficulty(gameState.currentLevel);
+                showScreen('game-screen');
+            } else {
+                showScreen('level-screen');
+            }
+            
+            // Save state
+            localStorage.setItem('simonGameState', JSON.stringify(gameState));
+            generateLevelCards();
+        }
+        
+        // Initialize the game when page loads
+        window.onload = initGame;
+    </script>
+</body>
+</html>
