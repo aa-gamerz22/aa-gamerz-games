@@ -1,0 +1,1881 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ice Maze Adventure</title>
+    <link rel="stylesheet" href="css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+<!-- Offline Fonts -->
+<link rel="stylesheet" href="fonts/orbitron/fonts.css">
+<link rel="stylesheet" href="fonts/press-start-2p/font.css">
+<link rel="stylesheet" href="fonts/bangers/fonts.css">
+<link rel="stylesheet" href="fonts/montserrat/fonts.css">
+<link rel="stylesheet" href="fonts/roboto-slab/fonts.css">
+<link rel="stylesheet" href="fonts/lobster/font.css">
+<link rel="stylesheet" href="fonts/pacifico/fonts.css">
+<link rel="stylesheet" href="fonts/righteous/fonts.css">
+<link rel="stylesheet" href="fonts/chewy/font.css">
+<link rel="stylesheet" href="fonts/fredoka-one/fonts.css">
+<link rel="stylesheet" href="fonts/luckiest-guy/fonts.css">
+<link rel="stylesheet" href="fonts/rubik-glitch/fonts.css">
+<link rel="stylesheet" href="fonts/rubik-wet-paint/fonts.css">
+<link rel="stylesheet" href="fonts/rubik-moonrocks/fonts.css">
+<link rel="stylesheet" href="fonts/rubik-microbe/fonts.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary: #6a11cb;
+            --secondary: #2575fc;
+            --accent: #ff6b6b;
+            --dark: #1a1a2e;
+            --light: #f8f9fa;
+            --success: #4ade80;
+            --danger: #f87171;
+            --warning: #fbbf24;
+            --info: #60a5fa;
+            --ice-blue: #70d6ff;
+            --ice-light: #e6f7ff;
+            --ice-dark: #3d85c6;
+            --wall-color: #5d4037;
+            --theme-bg: linear-gradient(135deg, #1a1a2e, #16213e);
+            --theme-card: rgba(30, 30, 50, 0.7);
+            --theme-text: #f8f9fa;
+            --theme-accent: #ff6b6b;
+            --player-color: #facc15;
+            --font-main: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            --font-accent: 'Orbitron', sans-serif;
+        }
+        
+        body {
+            background: var(--theme-bg);
+            color: var(--theme-text);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+            font-family: var(--font-main);
+            transition: background 0.5s ease;
+        }
+        
+        .background-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.1;
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+            transition: all 0.5s ease;
+        }
+        
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Screen Management */
+        .screen {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 20px;
+            min-height: 90vh;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .screen.active {
+            display: flex;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Navigation */
+        .nav-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(10px);
+            z-index: 100;
+            transition: all 0.3s;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
+        }
+        
+        .reset-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(10px);
+            z-index: 100;
+            transition: all 0.3s;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .reset-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
+        }
+        
+        .settings-btn {
+            position: fixed;
+            top: 20px;
+            right: 80px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(10px);
+            z-index: 100;
+            transition: all 0.3s;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .settings-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
+        }
+        
+        /* Home Screen */
+        .home-screen {
+            text-align: center;
+            padding-top: 80px;
+        }
+        
+        .logo {
+            font-size: 5rem;
+            margin-bottom: 20px;
+            background: linear-gradient(to right, var(--theme-accent), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .game-title {
+            font-size: 3.5rem;
+            margin-bottom: 10px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            font-family: var(--font-accent);
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+        }
+        
+        .game-subtitle {
+            font-size: 1.5rem;
+            margin-bottom: 40px;
+            color: #a0aec0;
+            max-width: 600px;
+            line-height: 1.6;
+        }
+        
+        .btn {
+            padding: 15px 40px;
+            border: none;
+            border-radius: 50px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: white;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+            margin: 10px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+        }
+        
+        .btn:active {
+            transform: translateY(2px);
+        }
+        
+        .btn-play {
+            font-size: 1.5rem;
+            padding: 18px 50px;
+            margin-top: 20px;
+        }
+        
+        /* Device Selection */
+        .device-container {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .device-card {
+            background: var(--theme-card);
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            min-width: 250px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            transition: all 0.3s;
+            cursor: pointer;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+        }
+        
+        .device-card:hover {
+            transform: translateY(-10px);
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4);
+        }
+        
+        .device-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+        
+        .device-name {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .device-desc {
+            font-size: 1rem;
+            color: #cbd5e0;
+        }
+        
+        /* Level Selection */
+        .level-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 25px;
+            width: 100%;
+            max-width: 1200px;
+            margin-top: 30px;
+        }
+        
+        .level-card {
+            background: var(--theme-card);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            transition: all 0.3s;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+        }
+        
+        .level-card:hover {
+            transform: translateY(-10px);
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4);
+        }
+        
+        .level-card.locked {
+            filter: grayscale(0.8);
+            cursor: not-allowed;
+        }
+        
+        .level-icon {
+            font-size: 3.5rem;
+            margin-bottom: 15px;
+            color: var(--theme-accent);
+        }
+        
+        .level-number {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: var(--theme-accent);
+        }
+        
+        .level-name {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        
+        .level-desc {
+            font-size: 1rem;
+            color: #cbd5e0;
+            margin-bottom: 20px;
+        }
+        
+        .level-status {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        
+        .locked-status {
+            background: #4a5568;
+            color: #a0aec0;
+        }
+        
+        .unlocked-status {
+            background: var(--success);
+            color: white;
+        }
+        
+        .completed-status {
+            background: var(--info);
+            color: white;
+        }
+        
+        .master-status {
+            background: linear-gradient(to right, #ff00cc, #333399);
+            color: white;
+        }
+        
+        /* Maze Game Screen */
+        .maze-container {
+            background: var(--theme-card);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+        }
+        
+        #mazeCanvas {
+            background: #1e293b;
+            border: 3px solid var(--theme-accent);
+            border-radius: 8px;
+            margin: 0 auto;
+            display: block;
+            max-width: 100%;
+        }
+        
+        .mobile-controls {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+            max-width: 300px;
+        }
+        
+        .control-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-size: 1.5rem;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .control-btn:active {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(0.95);
+        }
+        
+        .up-btn {
+            grid-column: 2;
+            grid-row: 1;
+        }
+        
+        .left-btn {
+            grid-column: 1;
+            grid-row: 2;
+        }
+        
+        .down-btn {
+            grid-column: 2;
+            grid-row: 2;
+        }
+        
+        .right-btn {
+            grid-column: 3;
+            grid-row: 2;
+        }
+        
+        /* Result Screen */
+        .result-container {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            border-radius: 20px;
+            padding: 40px;
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+            box-shadow: 0 0 40px rgba(59, 130, 246, 0.5);
+            border: 2px solid var(--theme-accent);
+        }
+        
+        .result-title {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: var(--theme-accent);
+            font-weight: bold;
+            font-family: var(--font-accent);
+            text-shadow: 0 0 10px rgba(255,255,255,0.3);
+        }
+        
+        .result-message {
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+            color: #e0e0e0;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--theme-accent);
+        }
+        
+        .stat-text {
+            font-size: 1.1rem;
+            color: #cbd5e0;
+        }
+        
+        /* Settings Screen */
+        .settings-container {
+            background: var(--theme-card);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            width: 100%;
+            max-width: 800px;
+        }
+        
+        .settings-title {
+            font-size: 2rem;
+            margin-bottom: 25px;
+            text-align: center;
+            color: var(--theme-accent);
+            font-family: var(--font-accent);
+        }
+        
+        .setting-group {
+            margin-bottom: 25px;
+        }
+        
+        .setting-label {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            display: block;
+        }
+        
+        .theme-selector {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            justify-content: center;
+        }
+        
+        .theme-btn {
+            width: 100%;
+            height: 80px;
+            border-radius: 10px;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 0.8rem;
+            text-align: center;
+            padding: 5px;
+            text-shadow: 0 0 3px black;
+        }
+        
+        .theme-btn:hover {
+            transform: scale(1.05);
+        }
+        
+        .theme-btn.active {
+            border-color: white;
+            box-shadow: 0 0 10px white;
+        }
+        
+        /* Progress bar */
+        .progress-container {
+            width: 100%;
+            max-width: 600px;
+            background: rgba(255, 255, 255, 0.1);
+            height: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            border-radius: 10px;
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+        
+        /* Reset Game Button */
+        .reset-game-btn {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 50px;
+            padding: 15px 30px;
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            z-index: 100;
+            transition: all 0.3s;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .reset-game-btn:hover {
+            background: rgba(255, 0, 0, 0.3);
+            transform: translateX(-50%) scale(1.05);
+        }
+        
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .theme-selector {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        
+        @media (max-width: 900px) {
+            .theme-selector {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .game-title {
+                font-size: 2.5rem;
+            }
+            
+            .logo {
+                font-size: 4rem;
+            }
+            
+            .level-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .device-container {
+                flex-direction: column;
+            }
+            
+            .reset-btn, .settings-btn {
+                top: 80px;
+            }
+            
+            .settings-btn {
+                right: 20px;
+            }
+            
+            .reset-btn {
+                right: 80px;
+            }
+            
+            .theme-selector {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .game-title {
+                font-size: 2rem;
+            }
+            
+            .logo {
+                font-size: 3rem;
+            }
+            
+            .game-subtitle {
+                font-size: 1.2rem;
+            }
+            
+            .btn {
+                padding: 12px 30px;
+                font-size: 1rem;
+            }
+            
+            .btn-play {
+                font-size: 1.2rem;
+                padding: 15px 40px;
+            }
+            
+            .device-name {
+                font-size: 1.5rem;
+            }
+            
+            .level-name {
+                font-size: 1.3rem;
+            }
+            
+            .result-title {
+                font-size: 2rem;
+            }
+            
+            .result-message {
+                font-size: 1.2rem;
+            }
+            
+            .level-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .theme-selector {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="background-animation" id="backgroundAnimation"></div>
+    
+    <!-- Navigation buttons -->
+    <button class="nav-btn" id="backButton" style="display: none;">
+        <i class="fas fa-arrow-left"></i>
+    </button>
+    <button class="settings-btn" id="settingsButton">
+        <i class="fas fa-cog"></i>
+    </button>
+    <button class="reset-btn" id="resetButton" style="display: none;">
+        <i class="fas fa-redo"></i>
+    </button>
+    
+    <!-- Reset Game Button -->
+   
+    
+    <div class="container">
+        <!-- Home Screen -->
+        <div class="screen home-screen active" id="homeScreen">
+            <div class="logo">
+                <i class="fas fa-snowflake"></i>
+            </div>
+            <h1 class="game-title">ICE MAZE ADVENTURE</h1>
+            <p class="game-subtitle">Navigate through icy mazes and find your way to the finish!</p>
+            
+            <div class="progress-container">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+            <p>Complete levels to unlock new challenges!</p>
+            
+            <button class="btn btn-play" id="playBtn">
+                <i class="fas fa-play"></i> START ADVENTURE
+            </button>
+             <button class="reset-game-btn" id="resetGameBtn">
+        <i class="fas fa-trash-alt"></i> RESET GAME
+    </button>
+        </div>
+        
+        <!-- Device Selection Screen -->
+        <div class="screen" id="deviceScreen">
+            <h2 class="game-title">SELECT YOUR DEVICE</h2>
+            <p>Choose how you want to play the game</p>
+            
+            <div class="device-container">
+                <div class="device-card" id="pcDevice">
+                    <div class="device-icon">
+                        <i class="fas fa-desktop"></i>
+                    </div>
+                    <div class="device-name">PC / LAPTOP</div>
+                    <div class="device-desc">Use keyboard controls to play</div>
+                </div>
+                
+                <div class="device-card" id="mobileDevice">
+                    <div class="device-icon">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <div class="device-name">MOBILE / TABLET</div>
+                    <div class="device-desc">Use touch controls to play</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Level Selection Screen -->
+        <div class="screen" id="levelScreen">
+            <h2 class="game-title">SELECT YOUR CHALLENGE</h2>
+            <p>Complete levels to unlock new adventures</p>
+            
+            <div class="level-container" id="levelContainer">
+                <!-- Levels will be generated dynamically -->
+            </div>
+        </div>
+        
+        <!-- Maze Game Screen -->
+        <div class="screen" id="mazeScreen">
+            <div class="maze-container">
+                <div class="game-header">
+                    <h2 class="game-title-small">ICE MAZE CHALLENGE</h2>
+                    <div class="stats">
+                        <div class="stat-box">
+                            <div class="stat-value" id="mazeLevel">1</div>
+                            <div class="stat-label">LEVEL</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-value" id="mazeMoves">0</div>
+                            <div class="stat-label">MOVES</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <canvas id="mazeCanvas" width="500" height="500"></canvas>
+                
+                <div class="mobile-controls" id="mobileControls">
+                    <button class="control-btn up-btn" id="upBtn"><i class="fas fa-arrow-up"></i></button>
+                    <button class="control-btn left-btn" id="leftBtn"><i class="fas fa-arrow-left"></i></button>
+                    <button class="control-btn down-btn" id="downBtn"><i class="fas fa-arrow-down"></i></button>
+                    <button class="control-btn right-btn" id="rightBtn"><i class="fas fa-arrow-right"></i></button>
+                </div>
+                
+                <div class="controls">
+                    <button class="btn" id="mazeRestart">
+                        <i class="fas fa-redo"></i> RESTART
+                    </button>
+                    <button class="btn" id="mazeHint">
+                        <i class="fas fa-lightbulb"></i> HINT
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Result Screen -->
+        <div class="screen" id="resultScreen">
+            <div class="result-container">
+                <h2 class="result-title">LEVEL COMPLETE!</h2>
+                <p class="result-message">Congratulations on completing the challenge!</p>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number" id="resultLevel">1</div>
+                        <div class="stat-text">LEVEL</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="resultScore">850</div>
+                        <div class="stat-text">SCORE</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="resultMoves">15</div>
+                        <div class="stat-text">MOVES</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="resultTime">42s</div>
+                        <div class="stat-text">TIME</div>
+                    </div>
+                </div>
+                
+                <p id="unlockMessage" style="margin: 20px 0; font-size: 1.2rem;">You've unlocked the next challenge!</p>
+                
+                <div class="controls">
+                    <button class="btn" id="nextLevelBtn">
+                        <i class="fas fa-arrow-right"></i> NEXT LEVEL
+                    </button>
+                    <button class="btn" id="levelSelectBtn">
+                        <i class="fas fa-list"></i> LEVEL SELECT
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Settings Screen -->
+        <div class="screen" id="settingsScreen">
+            <div class="settings-container">
+                <h2 class="settings-title">GAME SETTINGS</h2>
+                
+                <div class="setting-group">
+                    <label class="setting-label">Select Theme:</label>
+                    <div class="theme-selector" id="themeSelector">
+                        <!-- Themes will be generated dynamically -->
+                    </div>
+                </div>
+                
+                <div class="controls">
+                    <button class="btn" id="saveSettings">
+                        <i class="fas fa-save"></i> SAVE SETTINGS
+                    </button>
+                    <button class="btn" id="closeSettings">
+                        <i class="fas fa-times"></i> CLOSE
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Game state
+        let gameState = {
+            currentScreen: 'home',
+            currentLevel: 1,
+            unlockedLevels: [1],
+            completedLevels: [],
+            deviceType: '',
+            theme: 'default',
+            maze: {
+                level: 1,
+                moves: 0,
+                startTime: null
+            }
+        };
+        
+        // Level definitions
+        const levels = [
+            { number: 1, name: "Frozen Beginnings", icon: "fas fa-igloo", difficulty: "Easy" },
+            { number: 2, name: "Glacial Pathways", icon: "fas fa-icicles", difficulty: "Easy" },
+            { number: 3, name: "Arctic Challenge", icon: "fas fa-snowflake", difficulty: "Easy" },
+            { number: 4, name: "Frostbite Labyrinth", icon: "fas fa-skating", difficulty: "Easy" },
+            { number: 5, name: "Polar Expedition", icon: "fas fa-mountain", difficulty: "Normal" },
+            { number: 6, name: "Ice Caverns", icon: "fas fa-icicles", difficulty: "Normal" },
+            { number: 7, name: "Blizzard Maze", icon: "fas fa-wind", difficulty: "Normal" },
+            { number: 8, name: "Frozen Tundra", icon: "fas fa-snowman", difficulty: "Normal" },
+            { number: 9, name: "Crystal Palace", icon: "fas fa-gem", difficulty: "Hard" },
+            { number: 10, name: "Avalanche Alley", icon: "fas fa-snowplow", difficulty: "Hard" },
+            { number: 11, name: "Glacier Gorge", icon: "fas fa-water", difficulty: "Hard" },
+            { number: 12, name: "Frost Fortress", icon: "fas fa-fort-awesome", difficulty: "Hard" },
+            { number: 13, name: "Grandmaster Glacier", icon: "fas fa-crown", difficulty: "Extreme" },
+            { number: 14, name: "Championship Challenge", icon: "fas fa-trophy", difficulty: "Extreme" },
+            { number: 15, name: "Pro Polar", icon: "fas fa-star", difficulty: "Master" },
+            { number: 16, name: "Ultimate Champion", icon: "fas fa-medal", difficulty: "Master" }
+        ];
+        
+        // Theme definitions
+        const themes = [
+            { id: "default", name: "Default", bg: "linear-gradient(135deg, #1a1a2e, #16213e)", 
+              card: "rgba(30, 30, 50, 0.7)", text: "#f8f9fa", accent: "#ff6b6b", 
+              font: "Orbitron, sans-serif" },
+              
+            { id: "arctic", name: "Arctic", bg: "linear-gradient(135deg, #70d6ff, #3d85c6)", 
+              card: "rgba(109, 178, 209, 0.7)", text: "#1a1a2e", accent: "#3d85c6", 
+              font: "'Montserrat', sans-serif" },
+              
+            { id: "forest", name: "Forest", bg: "linear-gradient(135deg, #2e8b57, #3cb371)", 
+              card: "rgba(46, 139, 87, 0.7)", text: "#f8f9fa", accent: "#8fbc8f", 
+              font: "'Roboto Slab', serif" },
+              
+            { id: "lava", name: "Lava", bg: "linear-gradient(135deg, #ff4500, #ff0000)", 
+              card: "rgba(139, 0, 0, 0.7)", text: "#f8f9fa", accent: "#ff8c00", 
+              font: "'Bangers', cursive" },
+              
+            { id: "galaxy", name: "Galaxy", bg: "linear-gradient(135deg, #4b0082, #00008b)", 
+              card: "rgba(75, 0, 130, 0.7)", text: "#f8f9fa", accent: "#9370db", 
+              font: "'Lobster', cursive" },
+              
+            { id: "sunset", name: "Sunset", bg: "linear-gradient(135deg, #ff5e62, #ff9966)", 
+              card: "rgba(255, 94, 98, 0.7)", text: "#1a1a2e", accent: "#ff9966", 
+              font: "'Pacifico', cursive" },
+              
+            { id: "ocean", name: "Ocean", bg: "linear-gradient(135deg, #00c9ff, #92fe9d)", 
+              card: "rgba(0, 201, 255, 0.7)", text: "#1a1a2e", accent: "#92fe9d", 
+              font: "'Righteous', cursive" },
+              
+            { id: "desert", name: "Desert", bg: "linear-gradient(135deg, #f6d365, #fda085)", 
+              card: "rgba(246, 211, 101, 0.7)", text: "#1a1a2e", accent: "#fda085", 
+              font: "'Chewy', cursive" },
+              
+            { id: "neon", name: "Neon", bg: "linear-gradient(135deg, #ff00cc, #333399)", 
+              card: "rgba(255, 0, 204, 0.7)", text: "#ffffff", accent: "#333399", 
+              font: "'Fredoka One', cursive" },
+              
+            { id: "midnight", name: "Midnight", bg: "linear-gradient(135deg, #0f2027, #203a43, #2c5364)", 
+              card: "rgba(15, 32, 39, 0.7)", text: "#ffffff", accent: "#2c5364", 
+              font: "'Luckiest Guy', cursive" },
+              
+            { id: "candy", name: "Candy", bg: "linear-gradient(135deg, #ff9a9e, #fad0c4)", 
+              card: "rgba(255, 154, 158, 0.7)", text: "#1a1a2e", accent: "#fad0c4", 
+              font: "'Rubik Glitch', cursive" },
+              
+            { id: "vintage", name: "Vintage", bg: "linear-gradient(135deg, #d1913c, #ffd194)", 
+              card: "rgba(209, 145, 60, 0.7)", text: "#1a1a2e", accent: "#ffd194", 
+              font: "'Rubik Wet Paint', cursive" },
+              
+            { id: "cyberpunk", name: "Cyberpunk", bg: "linear-gradient(135deg, #00dbde, #fc00ff)", 
+              card: "rgba(0, 219, 222, 0.7)", text: "#ffffff", accent: "#fc00ff", 
+              font: "'Rubik Moonrocks', cursive" },
+              
+            { id: "jungle", name: "Jungle", bg: "linear-gradient(135deg, #56ab2f, #a8e063)", 
+              card: "rgba(86, 171, 47, 0.7)", text: "#1a1a2e", accent: "#a8e063", 
+              font: "'Rubik Microbe', cursive" },
+              
+            { id: "royal", name: "Royal", bg: "linear-gradient(135deg, #614385, #516395)", 
+              card: "rgba(97, 67, 133, 0.7)", text: "#ffffff", accent: "#516395", 
+              font: "'Press Start 2P', cursive" },
+              
+            { id: "golden", name: "Golden", bg: "linear-gradient(135deg, #f6d365, #fda085)", 
+              card: "rgba(246, 211, 101, 0.7)", text: "#1a1a2e", accent: "#fda085", 
+              font: "'Bangers', cursive" }
+        ];
+        
+        // DOM Elements
+        const screens = {
+            home: document.getElementById('homeScreen'),
+            device: document.getElementById('deviceScreen'),
+            level: document.getElementById('levelScreen'),
+            maze: document.getElementById('mazeScreen'),
+            result: document.getElementById('resultScreen'),
+            settings: document.getElementById('settingsScreen')
+        };
+        
+        // Navigation
+        document.getElementById('playBtn').addEventListener('click', () => showScreen('device'));
+        document.getElementById('backButton').addEventListener('click', goBack);
+        document.getElementById('levelSelectBtn').addEventListener('click', () => showScreen('level'));
+        document.getElementById('nextLevelBtn').addEventListener('click', startNextLevel);
+        document.getElementById('settingsButton').addEventListener('click', () => {
+            gameState.previousScreen = gameState.currentScreen;
+            showScreen('settings');
+        });
+        document.getElementById('closeSettings').addEventListener('click', () => {
+            showScreen(gameState.previousScreen);
+        });
+        document.getElementById('resetGameBtn').addEventListener('click', resetGame);
+        
+        // Device selection
+        document.getElementById('pcDevice').addEventListener('click', () => {
+            gameState.deviceType = 'pc';
+            showScreen('level');
+        });
+        
+        document.getElementById('mobileDevice').addEventListener('click', () => {
+            gameState.deviceType = 'mobile';
+            showScreen('level');
+        });
+        
+        // Maze Controls
+        document.getElementById('mazeRestart').addEventListener('click', () => startMazeGame(gameState.maze.level));
+        document.getElementById('mazeHint').addEventListener('click', showMazeHint);
+        
+        // Maze Mobile Controls
+        document.getElementById('upBtn').addEventListener('click', () => movePlayer('up'));
+        document.getElementById('downBtn').addEventListener('click', () => movePlayer('down'));
+        document.getElementById('leftBtn').addEventListener('click', () => movePlayer('left'));
+        document.getElementById('rightBtn').addEventListener('click', () => movePlayer('right'));
+        
+        // Save settings
+        document.getElementById('saveSettings').addEventListener('click', () => {
+            saveGameState();
+            showScreen(gameState.previousScreen);
+        });
+        
+        // Keyboard controls
+        document.addEventListener('keydown', (e) => {
+            if (gameState.currentScreen === 'maze') {
+                switch(e.key) {
+                    case 'ArrowUp': movePlayer('up'); break;
+                    case 'ArrowDown': movePlayer('down'); break;
+                    case 'ArrowLeft': movePlayer('left'); break;
+                    case 'ArrowRight': movePlayer('right'); break;
+                }
+            }
+        });
+        
+        // Initialize level cards
+        function initializeLevelCards() {
+            const container = document.getElementById('levelContainer');
+            container.innerHTML = '';
+            
+            levels.forEach(level => {
+                const isLocked = !gameState.unlockedLevels.includes(level.number);
+                const isCompleted = gameState.completedLevels.includes(level.number);
+                
+                const card = document.createElement('div');
+                card.className = `level-card ${isLocked ? 'locked' : ''}`;
+                card.dataset.level = level.number;
+                
+                let statusText = "LOCKED";
+                let statusClass = "locked-status";
+                
+                if (!isLocked) {
+                    statusText = isCompleted ? "COMPLETED" : "UNLOCKED";
+                    statusClass = isCompleted ? "completed-status" : "unlocked-status";
+                    
+                    if (level.number > 12) {
+                        statusClass = "master-status";
+                    }
+                }
+                
+                card.innerHTML = `
+                    <div class="level-icon">
+                        <i class="${level.icon}"></i>
+                    </div>
+                    <div class="level-number">LEVEL ${level.number}</div>
+                    <div class="level-name">${level.name}</div>
+                    <div class="level-desc">${level.difficulty} difficulty</div>
+                    <div class="level-status ${statusClass}">${statusText}</div>
+                `;
+                
+                if (!isLocked) {
+                    card.addEventListener('click', () => {
+                        gameState.currentLevel = level.number;
+                        
+                        if (level.number === 5) {
+                            startPencilMode();
+                        } else {
+                            startMazeGame(level.number);
+                        }
+                    });
+                }
+                
+                container.appendChild(card);
+            });
+        }
+        
+        // Initialize theme selector
+        function initializeThemeSelector() {
+            const container = document.getElementById('themeSelector');
+            container.innerHTML = '';
+            
+            themes.forEach(theme => {
+                const btn = document.createElement('button');
+                btn.className = `theme-btn ${gameState.theme === theme.id ? 'active' : ''}`;
+                btn.dataset.theme = theme.id;
+                btn.style.background = theme.bg;
+                btn.textContent = theme.name;
+                
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    gameState.theme = theme.id;
+                    applyTheme();
+                });
+                
+                container.appendChild(btn);
+            });
+        }
+        
+        // Screen management
+        function showScreen(screenName) {
+            Object.values(screens).forEach(screen => screen.classList.remove('active'));
+            screens[screenName].classList.add('active');
+            gameState.currentScreen = screenName;
+            
+            // Update navigation buttons visibility
+            document.getElementById('backButton').style.display = 
+                (screenName === 'device' || screenName === 'level' || 
+                 screenName === 'maze' || screenName === 'result' || 
+                 screenName === 'settings') ? 'block' : 'none';
+            
+            document.getElementById('resetButton').style.display = 
+                (screenName === 'maze') ? 'block' : 'none';
+            
+            // Show settings button only on home screen
+            document.getElementById('settingsButton').style.display = 
+                (screenName === 'home' || screenName === 'settings') ? 'block' : 'none';
+            
+            // Update progress bar
+            updateProgressBar();
+            
+            // Show mobile controls if needed
+            if (screenName === 'maze' && gameState.deviceType === 'mobile') {
+                document.getElementById('mobileControls').style.display = 'grid';
+            } else {
+                document.getElementById('mobileControls').style.display = 'none';
+            }
+        }
+        
+        function goBack() {
+            if (gameState.currentScreen === 'maze') {
+                showScreen('level');
+            } else if (gameState.currentScreen === 'level') {
+                showScreen('device');
+            } else if (gameState.currentScreen === 'device') {
+                showScreen('home');
+            } else if (gameState.currentScreen === 'result' || gameState.currentScreen === 'settings') {
+                showScreen('level');
+            }
+        }
+        
+        function updateProgressBar() {
+            const progress = (gameState.completedLevels.length / levels.length) * 100;
+            document.getElementById('progressBar').style.width = `${progress}%`;
+        }
+        
+        // Theme management
+        function applyTheme() {
+            const bgAnimation = document.getElementById('backgroundAnimation');
+            const root = document.documentElement;
+            const theme = themes.find(t => t.id === gameState.theme) || themes[0];
+            
+            bgAnimation.style.background = 'linear-gradient(-45deg, #EE7752, #E73C7E, #23A6D5, #23D5AB)';
+            root.style.setProperty('--theme-bg', theme.bg);
+            root.style.setProperty('--theme-card', theme.card);
+            root.style.setProperty('--theme-text', theme.text);
+            root.style.setProperty('--theme-accent', theme.accent);
+            root.style.setProperty('--font-accent', theme.font);
+        }
+        
+        // Save and load game state
+        function saveGameState() {
+            localStorage.setItem('iceMazeGameState', JSON.stringify({
+                unlockedLevels: gameState.unlockedLevels,
+                completedLevels: gameState.completedLevels,
+                theme: gameState.theme
+            }));
+        }
+        
+        function loadGameState() {
+            const savedState = localStorage.getItem('iceMazeGameState');
+            if (savedState) {
+                const parsedState = JSON.parse(savedState);
+                gameState.unlockedLevels = parsedState.unlockedLevels;
+                gameState.completedLevels = parsedState.completedLevels;
+                gameState.theme = parsedState.theme;
+            }
+        }
+        
+        function resetGame() {
+            if (confirm("Are you sure you want to reset all game progress? This cannot be undone.")) {
+                localStorage.removeItem('iceMazeGameState');
+                gameState = {
+                    currentScreen: 'home',
+                    currentLevel: 1,
+                    unlockedLevels: [1],
+                    completedLevels: [],
+                    deviceType: '',
+                    theme: 'default',
+                    maze: {
+                        level: 1,
+                        moves: 0,
+                        startTime: null
+                    }
+                };
+                
+                showScreen('home');
+                initializeLevelCards();
+                applyTheme();
+                updateProgressBar();
+            }
+        }
+        
+        // Maze Game Logic
+        let maze, player, ctx;
+        
+        class Coordinate {
+            constructor(X, Y) {
+                this.x = X;
+                this.y = Y;
+            }
+        }
+        
+        function startMazeGame(level = 1) {
+            showScreen('maze');
+            
+            gameState.maze.level = level;
+            gameState.maze.moves = 0;
+            gameState.maze.startTime = new Date();
+            document.getElementById('mazeLevel').textContent = level;
+            document.getElementById('mazeMoves').textContent = 0;
+            
+            const canvas = document.getElementById('mazeCanvas');
+            ctx = canvas.getContext('2d');
+            
+            // Set canvas size based on level and difficulty
+            let size = 500;
+            let difficultyValue = 8;
+            
+            // Increase difficulty based on level
+            if (level <= 4) {
+                difficultyValue = 8; // Easy
+            } else if (level <= 8) {
+                difficultyValue = 12; // Normal
+            } else if (level <= 12) {
+                difficultyValue = 16; // Hard
+            } else {
+                difficultyValue = 20; // Extreme/Master
+            }
+            
+            canvas.width = size;
+            canvas.height = size;
+            
+            // Create maze
+            maze = new Maze(difficultyValue, difficultyValue);
+            drawMaze(maze, ctx, canvas.width / difficultyValue);
+            
+            // Create player
+            player = new Player(
+                maze, 
+                canvas, 
+                canvas.width / difficultyValue, 
+                function() {
+                    const timeTaken = Math.floor((new Date() - gameState.maze.startTime) / 1000);
+                    showResult('maze', true, gameState.maze.moves, timeTaken);
+                }
+            );
+        }
+        
+        function startPencilMode() {
+            showScreen('maze');
+            
+            const canvas = document.getElementById('mazeCanvas');
+            ctx = canvas.getContext('2d');
+            
+            canvas.width = 500;
+            canvas.height = 500;
+            
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#1e293b';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw instructions
+            ctx.fillStyle = 'white';
+            ctx.font = '20px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('Draw your path from start to home', canvas.width/2, 30);
+            ctx.fillText('Press FINISH when done', canvas.width/2, 60);
+            
+            // Draw start and end points
+            ctx.beginPath();
+            ctx.arc(100, 100, 20, 0, Math.PI * 2);
+            ctx.fillStyle = '#f87171';
+            ctx.fill();
+            ctx.fillStyle = 'white';
+            ctx.font = '16px Arial';
+            ctx.fillText('Start', 100, 150);
+            
+            ctx.beginPath();
+            ctx.arc(400, 400, 20, 0, Math.PI * 2);
+            ctx.fillStyle = '#4ade80';
+            ctx.fill();
+            ctx.fillStyle = 'white';
+            ctx.fillText('Home', 400, 450);
+            
+            gameState.pencilMode = true;
+            gameState.maze.path = [];
+            gameState.isDrawing = false;
+            
+            canvas.addEventListener('mousedown', startDrawing);
+            canvas.addEventListener('mousemove', draw);
+            canvas.addEventListener('mouseup', stopDrawing);
+            canvas.addEventListener('mouseout', stopDrawing);
+            
+            canvas.addEventListener('touchstart', handleTouchStart, {passive: false});
+            canvas.addEventListener('touchmove', handleTouchMove, {passive: false});
+            canvas.addEventListener('touchend', handleTouchEnd);
+            
+           
+        }
+        
+        function startDrawing(e) {
+            if (!gameState.pencilMode) return;
+            gameState.isDrawing = true;
+            draw(e);
+        }
+        
+        function draw(e) {
+            if (!gameState.isDrawing) return;
+            
+            const canvas = document.getElementById('mazeCanvas');
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            ctx.lineWidth = 5;
+            ctx.lineCap = 'round';
+            ctx.strokeStyle = '#facc15';
+            
+            if (gameState.lastX === undefined || gameState.lastY === undefined) {
+                ctx.beginPath();
+                ctx.moveTo(x, y);
+                gameState.maze.path.push({x, y});
+            } else {
+                ctx.beginPath();
+                ctx.moveTo(gameState.lastX, gameState.lastY);
+                ctx.lineTo(x, y);
+                ctx.stroke();
+                gameState.maze.path.push({x, y});
+            }
+            
+            gameState.lastX = x;
+            gameState.lastY = y;
+        }
+        
+        function handleTouchStart(e) {
+            e.preventDefault();
+            const touch = e.touches[0];
+            const mouseEvent = new MouseEvent('mousedown', {
+                clientX: touch.clientX,
+                clientY: touch.clientY
+            });
+            startDrawing(mouseEvent);
+        }
+        
+        function handleTouchMove(e) {
+            e.preventDefault();
+            const touch = e.touches[0];
+            const mouseEvent = new MouseEvent('mousemove', {
+                clientX: touch.clientX,
+                clientY: touch.clientY
+            });
+            draw(mouseEvent);
+        }
+        
+        function handleTouchEnd(e) {
+            e.preventDefault();
+            const mouseEvent = new MouseEvent('mouseup', {});
+            stopDrawing(mouseEvent);
+        }
+        
+        function stopDrawing() {
+            gameState.isDrawing = false;
+            gameState.lastX = undefined;
+            gameState.lastY = undefined;
+        }
+        
+        function finishPencilMode() {
+            const canvas = document.getElementById('mazeCanvas');
+            canvas.removeEventListener('mousedown', startDrawing);
+            canvas.removeEventListener('mousemove', draw);
+            canvas.removeEventListener('mouseup', stopDrawing);
+            canvas.removeEventListener('mouseout', stopDrawing);
+            
+            canvas.removeEventListener('touchstart', handleTouchStart);
+            canvas.removeEventListener('touchmove', handleTouchMove);
+            canvas.removeEventListener('touchend', handleTouchEnd);
+            
+            // Check if path connects start and end
+            if (gameState.maze.path.length > 10) {
+                showResult('maze', true, gameState.maze.path.length, 0);
+            } else {
+                alert("Please draw a longer path connecting start and home!");
+            }
+        }
+        
+        function showMazeHint() {
+            if (gameState.pencilMode) {
+                finishPencilMode();
+            } else {
+                alert("Hint: Find the shortest path to the goal!");
+            }
+        }
+        
+        function Maze(Width, Height) {
+            let mazeMap;
+            let width = Width;
+            let height = Height;
+            let startCoord, endCoord;
+            let dirs = ["n", "s", "e", "w"];
+            let modDir = {
+                n: { y: -1, x: 0, o: "s" },
+                s: { y: 1, x: 0, o: "n" },
+                e: { y: 0, x: 1, o: "w" },
+                w: { y: 0, x: -1, o: "e" }
+            };
+            
+            this.map = function() { return mazeMap; };
+            this.startCoord = function() { return startCoord; };
+            this.endCoord = function() { return endCoord; };
+            
+            function genMap() {
+                mazeMap = new Array(height);
+                for (let y = 0; y < height; y++) {
+                    mazeMap[y] = new Array(width);
+                    for (let x = 0; x < width; x++) {
+                        mazeMap[y][x] = {
+                            n: false, s: false, e: false, w: false,
+                            visited: false, priorPos: null
+                        };
+                    }
+                }
+            }
+            
+            function defineMaze() {
+                let isComp = false;
+                let move = false;
+                let cellsVisited = 1;
+                let numLoops = 0;
+                let maxLoops = 0;
+                let pos = new Coordinate(0, 0);
+                let numCells = width * height;
+                
+                while (!isComp) {
+                    move = false;
+                    mazeMap[pos.x][pos.y].visited = true;
+                    
+                    if (numLoops >= maxLoops) {
+                        shuffle(dirs);
+                        maxLoops = Math.round(rand(height / 8));
+                        numLoops = 0;
+                    }
+                    numLoops++;
+                    
+                    for (let index = 0; index < dirs.length; index++) {
+                        let direction = dirs[index];
+                        let nx = pos.x + modDir[direction].x;
+                        let ny = pos.y + modDir[direction].y;
+                        
+                        if (nx >= 0 && nx < width && ny >= 0 && ny < height) {
+                            if (!mazeMap[nx][ny].visited) {
+                                mazeMap[pos.x][pos.y][direction] = true;
+                                mazeMap[nx][ny][modDir[direction].o] = true;
+                                mazeMap[nx][ny].priorPos = pos;
+                                pos = new Coordinate(nx, ny);
+                                cellsVisited++;
+                                move = true;
+                                break;
+                            }
+                        }
+                    }
+                    
+                    if (!move) {
+                        pos = mazeMap[pos.x][pos.y].priorPos;
+                    }
+                    
+                    if (numCells === cellsVisited) {
+                        isComp = true;
+                    }
+                }
+            }
+        
+            function defineStartEnd() {
+                switch (Math.floor(Math.random() * 4)) {
+                    case 0:
+                        startCoord = new Coordinate(0, 0);
+                        endCoord = new Coordinate(height - 1, width - 1);
+                        break;
+                    case 1:
+                        startCoord = new Coordinate(0, width - 1);
+                        endCoord = new Coordinate(height - 1, 0);
+                        break;
+                    case 2:
+                        startCoord = new Coordinate(height - 1, 0);
+                        endCoord = new Coordinate(0, width - 1);
+                        break;
+                    case 3:
+                        startCoord = new Coordinate(height - 1, width - 1);
+                        endCoord = new Coordinate(0, 0);
+                        break;
+                }
+            }
+            
+            function shuffle(array) {
+                for (let i = array.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [array[i], array[j]] = [array[j], array[i]];
+                }
+                return array;
+            }
+            
+            function rand(max) {
+                return Math.floor(Math.random() * max);
+            }
+            
+            genMap();
+            defineStartEnd();
+            defineMaze();
+        }
+        
+        function drawMaze(Maze, ctx, cellsize) {
+            let map = Maze.map();
+            let cellSize = cellsize;
+            
+            function drawCell(xCord, yCord, cell) {
+                let x = xCord * cellSize;
+                let y = yCord * cellSize;
+                
+                ctx.strokeStyle = "#e2e8f0";
+                ctx.lineWidth = cellSize / 25;
+                
+                if (cell.n === false) {
+                    ctx.beginPath();
+                    ctx.moveTo(x, y);
+                    ctx.lineTo(x + cellSize, y);
+                    ctx.stroke();
+                }
+                if (cell.s === false) {
+                    ctx.beginPath();
+                    ctx.moveTo(x, y + cellSize);
+                    ctx.lineTo(x + cellSize, y + cellSize);
+                    ctx.stroke();
+                }
+                if (cell.e === false) {
+                    ctx.beginPath();
+                    ctx.moveTo(x + cellSize, y);
+                    ctx.lineTo(x + cellSize, y + cellSize);
+                    ctx.stroke();
+                }
+                if (cell.w === false) {
+                    ctx.beginPath();
+                    ctx.moveTo(x, y);
+                    ctx.lineTo(x, y + cellSize);
+                    ctx.stroke();
+                }
+            }
+            
+            function drawMap() {
+                for (let x = 0; x < map.length; x++) {
+                    for (let y = 0; y < map[x].length; y++) {
+                        drawCell(x, y, map[x][y]);
+                    }
+                }
+            }
+            
+            function drawEnd(coord) {
+                ctx.beginPath();
+                ctx.arc(
+                    (coord.x + 0.5) * cellSize,
+                    (coord.y + 0.5) * cellSize,
+                    cellSize / 3,
+                    0,
+                    2 * Math.PI
+                );
+                ctx.fillStyle = "#4ade80";
+                ctx.fill();
+                
+                // Draw flag
+                ctx.beginPath();
+                ctx.moveTo((coord.x + 0.5) * cellSize, (coord.y + 0.5) * cellSize - cellSize/4);
+                ctx.lineTo((coord.x + 0.5) * cellSize, (coord.y + 0.5) * cellSize + cellSize/4);
+                ctx.lineWidth = 3;
+                ctx.strokeStyle = "#d32f2f";
+                ctx.stroke();
+                
+                ctx.beginPath();
+                ctx.moveTo((coord.x + 0.5) * cellSize, (coord.y + 0.5) * cellSize - cellSize/4);
+                ctx.lineTo((coord.x + 0.5) * cellSize + cellSize/4, (coord.y + 0.5) * cellSize - cellSize/8);
+                ctx.lineTo((coord.x + 0.5) * cellSize, (coord.y + 0.5) * cellSize);
+                ctx.fillStyle = "#f44336";
+                ctx.fill();
+            }
+            
+            function drawStart(coord) {
+                // Draw player emoji
+                ctx.font = `${cellSize/1.5}px Arial`;
+                ctx.textAlign = "center";
+                ctx.textBaseline = "middle";
+                ctx.fillText("😀", (coord.x + 0.5) * cellSize, (coord.y + 0.5) * cellSize);
+            }
+            
+            function clear() {
+                let canvasSize = cellSize * map.length;
+                ctx.clearRect(0, 0, canvasSize, canvasSize);
+            }
+            
+            clear();
+            drawMap();
+            drawEnd(Maze.endCoord());
+            drawStart(Maze.startCoord());
+        }
+        
+        function Player(maze, c, _cellsize, onComplete) {
+            let ctx = c.getContext("2d");
+            let moves = 0;
+            let player = this;
+            let map = maze.map();
+            let preCoord = new Coordinate(maze.startCoord().x, maze.startCoord().y);
+            let cellSize = _cellsize;
+            let halfCellSize = cellSize / 2;
+            
+            this.redrawPlayer = function(_cellsize) {
+                cellSize = _cellsize;
+                drawPlayer(preCoord);
+            }
+            
+            function drawPlayer(coord) {
+                // Draw player emoji
+                ctx.font = `${cellSize/1.5}px Arial`;
+                ctx.textAlign = "center";
+                ctx.textBaseline = "middle";
+                ctx.fillText("😀", (coord.x + 0.5) * cellSize, (coord.y + 0.5) * cellSize);
+                
+                if (coord.x === maze.endCoord().x && coord.y === maze.endCoord().y) {
+                    onComplete();
+                }
+            }
+            
+            function removePlayer(coord) {
+                // Instead of clearing, redraw the maze cell
+                let x = coord.x * cellSize;
+                let y = coord.y * cellSize;
+                
+                ctx.clearRect(x, y, cellSize, cellSize);
+                
+                // Redraw the cell walls
+                let cell = map[coord.x][coord.y];
+                ctx.strokeStyle = "#e2e8f0";
+                ctx.lineWidth = cellSize / 25;
+                
+                if (cell.n === false) {
+                    ctx.beginPath();
+                    ctx.moveTo(x, y);
+                    ctx.lineTo(x + cellSize, y);
+                    ctx.stroke();
+                }
+                if (cell.s === false) {
+                    ctx.beginPath();
+                    ctx.moveTo(x, y + cellSize);
+                    ctx.lineTo(x + cellSize, y + cellSize);
+                    ctx.stroke();
+                }
+                if (cell.e === false) {
+                    ctx.beginPath();
+                    ctx.moveTo(x + cellSize, y);
+                    ctx.lineTo(x + cellSize, y + cellSize);
+                    ctx.stroke();
+                }
+                if (cell.w === false) {
+                    ctx.beginPath();
+                    ctx.moveTo(x, y);
+                    ctx.lineTo(x, y + cellSize);
+                    ctx.stroke();
+                }
+                
+                // Redraw the end flag if needed
+                if (coord.x === maze.endCoord().x && coord.y === maze.endCoord().y) {
+                    ctx.beginPath();
+                    ctx.arc(
+                        (coord.x + 0.5) * cellSize,
+                        (coord.y + 0.5) * cellSize,
+                        cellSize / 3,
+                        0,
+                        2 * Math.PI
+                    );
+                    ctx.fillStyle = "#4ade80";
+                    ctx.fill();
+                    
+                    // Draw flag
+                    ctx.beginPath();
+                    ctx.moveTo((coord.x + 0.5) * cellSize, (coord.y + 0.5) * cellSize - cellSize/4);
+                    ctx.lineTo((coord.x + 0.5) * cellSize, (coord.y + 0.5) * cellSize + cellSize/4);
+                    ctx.lineWidth = 3;
+                    ctx.strokeStyle = "#d32f2f";
+                    ctx.stroke();
+                    
+                    ctx.beginPath();
+                    ctx.moveTo((coord.x + 0.5) * cellSize, (coord.y + 0.5) * cellSize - cellSize/4);
+                    ctx.lineTo((coord.x + 0.5) * cellSize + cellSize/4, (coord.y + 0.5) * cellSize - cellSize/8);
+                    ctx.lineTo((coord.x + 0.5) * cellSize, (coord.y + 0.5) * cellSize);
+                    ctx.fillStyle = "#f44336";
+                    ctx.fill();
+                }
+            }
+            
+            function move(direction) {
+                if (!player) return;
+                
+                let cell = map[preCoord.x][preCoord.y];
+                moves++;
+                gameState.maze.moves = moves;
+                document.getElementById('mazeMoves').textContent = moves;
+                
+                switch(direction) {
+                    case 'up':
+                        if (cell.n) {
+                            removePlayer(preCoord);
+                            preCoord = new Coordinate(preCoord.x, preCoord.y - 1);
+                            drawPlayer(preCoord);
+                        }
+                        break;
+                    case 'down':
+                        if (cell.s) {
+                            removePlayer(preCoord);
+                            preCoord = new Coordinate(preCoord.x, preCoord.y + 1);
+                            drawPlayer(preCoord);
+                        }
+                        break;
+                    case 'left':
+                        if (cell.w) {
+                            removePlayer(preCoord);
+                            preCoord = new Coordinate(preCoord.x - 1, preCoord.y);
+                            drawPlayer(preCoord);
+                        }
+                        break;
+                    case 'right':
+                        if (cell.e) {
+                            removePlayer(preCoord);
+                            preCoord = new Coordinate(preCoord.x + 1, preCoord.y);
+                            drawPlayer(preCoord);
+                        }
+                        break;
+                }
+                
+                // Check if reached end
+                if (preCoord.x === maze.endCoord().x && preCoord.y === maze.endCoord().y) {
+                    const timeTaken = Math.floor((new Date() - gameState.maze.startTime) / 1000);
+                    showResult('maze', true, moves, timeTaken);
+                }
+            }
+            
+            this.move = move;
+            
+            drawPlayer(maze.startCoord());
+        }
+        
+        function movePlayer(direction) {
+            if (player) {
+                player.move(direction);
+            }
+        }
+        
+        // Result Screen
+        function showResult(gameType, success, moves = 0, time = 0) {
+            showScreen('result');
+            
+            document.getElementById('resultLevel').textContent = gameState.currentLevel;
+            
+            if (success) {
+                if (!gameState.completedLevels.includes(gameState.currentLevel)) {
+                    gameState.completedLevels.push(gameState.currentLevel);
+                }
+                
+                // Unlock next level
+                const nextLevel = gameState.currentLevel + 1;
+                if (!gameState.unlockedLevels.includes(nextLevel) && nextLevel <= levels.length) {
+                    gameState.unlockedLevels.push(nextLevel);
+                    document.getElementById('unlockMessage').textContent = 
+                        `You've unlocked Level ${nextLevel}!`;
+                } else {
+                    document.getElementById('unlockMessage').textContent = 
+                        "Continue to the next challenge!";
+                }
+                
+                // Calculate score
+                const baseScore = 1000 - (gameState.currentLevel * 10);
+                const movePenalty = moves * 2;
+                const timeBonus = Math.max(0, 100 - time);
+                const score = Math.max(100, baseScore - movePenalty + timeBonus);
+                
+                document.getElementById('resultScore').textContent = score;
+                document.getElementById('resultMoves').textContent = moves;
+                document.getElementById('resultTime').textContent = time + 's';
+                
+                // Save game state
+                saveGameState();
+            } else {
+                document.getElementById('resultScore').textContent = 0;
+                document.getElementById('resultMoves').textContent = moves;
+                document.getElementById('resultTime').textContent = time + 's';
+                document.getElementById('unlockMessage').textContent = 
+                    "Try again to unlock the next level!";
+            }
+            
+            updateProgressBar();
+            initializeLevelCards();
+        }
+        
+        function startNextLevel() {
+            const nextLevel = gameState.currentLevel + 1;
+            
+            if (nextLevel > levels.length) {
+                showScreen('level');
+                return;
+            }
+            
+            if (!gameState.unlockedLevels.includes(nextLevel)) {
+                alert("You need to complete the current level first!");
+                showScreen('level');
+                return;
+            }
+            
+            gameState.currentLevel = nextLevel;
+            
+            if (nextLevel === 5) {
+                startPencilMode();
+            } else {
+                startMazeGame(nextLevel);
+            }
+        }
+        
+        // Initialize the game
+        function initGame() {
+            loadGameState();
+            initializeLevelCards();
+            initializeThemeSelector();
+            applyTheme();
+            updateProgressBar();
+        }
+        
+        initGame();
+    </script>
+</body>
+</html>

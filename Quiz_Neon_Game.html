@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AA Gamerz Quiz Game</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: radial-gradient(circle, #000428, #004e92);
+      color: white;
+      text-align: center;
+      padding: 20px;
+      animation: bgAnimation 10s infinite alternate;
+    }
+    @keyframes bgAnimation {
+      0% { background: radial-gradient(circle, #000428, #004e92); }
+      100% { background: radial-gradient(circle, #1a2980, #26d0ce); }
+    }
+    h1 {
+      font-size: 36px;
+      color: cyan;
+      text-shadow: 0 0 10px cyan, 0 0 20px blue;
+    }
+    .hidden { display: none; }
+    .container {
+      background: rgba(0, 0, 0, 0.85);
+      padding: 20px;
+      border-radius: 20px;
+      width: 90%;
+      max-width: 500px;
+      margin: auto;
+      box-shadow: 0 0 30px cyan;
+    }
+    button {
+      background: transparent;
+      border: 2px solid cyan;
+      color: cyan;
+      padding: 10px;
+      width: 100%;
+      margin: 10px 0;
+      font-size: 18px;
+      cursor: pointer;
+      border-radius: 12px;
+      transition: 0.3s;
+    }
+    button:hover {
+      background: cyan;
+      color: black;
+      box-shadow: 0 0 15px cyan, 0 0 45px blue;
+    }
+    #menu-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: cyan;
+      color: black;
+      width: auto;
+      padding: 5px 15px;
+    }
+    #menu-panel {
+      position: fixed;
+      top: 60px;
+      right: 20px;
+      background: rgba(0,0,0,0.95);
+      padding: 15px;
+      border-radius: 12px;
+      box-shadow: 0 0 20px cyan;
+    }
+    .board {
+      display: flex;
+      justify-content: space-around;
+      margin-bottom: 20px;
+    }
+    .board div {
+      background: rgba(0, 0, 0, 0.75);
+      padding: 10px 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px cyan;
+      font-size: 18px;
+    }
+    .level-complete {
+      font-size: 24px;
+      color: lime;
+      margin: 20px auto;
+      display: none;
+      background: rgba(0, 0, 0, 0.9);
+      padding: 25px;
+      border-radius: 15px;
+      max-width: 90%;
+      box-shadow: 0 0 30px lime;
+      font-weight: bold;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 1001;
+    }
+    .overlay-blur {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0,0,0,0.6);
+      z-index: 1000;
+    }
+    
+    
+    #help-screen {
+  animation: fadeInUp 1s ease;
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+  
+@keyframes star-pop {
+  0% { transform: scale(0); opacity: 0; }
+  50% { transform: scale(1.5); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+#level-stars span {
+  display: inline-block;
+  margin: 5px;
+  animation: star-pop 0.5s ease forwards;
+}
+  #timeline {
+  width: 100%;
+  height: 12px; /* thoda mota */
+  background: #333; /* dark background */
+  border-radius: 8px;
+  overflow: hidden;
+  margin-top: 15px;
+  box-shadow: 0 0 10px #222;
+}
+
+#timeline-bar {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, lime, yellow, orange, red);
+  box-shadow: 0 0 10px lime, 0 0 20px lime;
+  transition: width 0.05s linear, box-shadow 0.5s ease, background 0.5s ease;
+  border-radius: 8px;
+}
+
+  #timeline-bar {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(270deg, lime, yellow, orange, red);
+  background-size: 600% 600%;
+  animation: gradientShift 5s ease infinite;
+  box-shadow: 0 0 10px lime, 0 0 20px lime;
+  transition: width 0.05s linear, box-shadow 0.5s ease;
+  border-radius: 8px;
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+  @keyframes shrinkTimeline {
+  from { width: 100%; }
+  to { width: 0%; }
+}
+
+#timeline-bar.animate {
+  animation: shrinkTimeline 10s linear forwards; /* 10 seconds timer */
+}
+  </style>
+</head>
+<body>
+  <h1>AA Gamerz Quiz Game</h1>  
+  <button id="menu-btn" class="hidden">Menu</button>  
+  <div id="menu-panel" class="hidden">  
+    <button onclick="resumeGame()">Resume</button>  
+    <button onclick="goHome()">Home</button>  
+  </div>    <div id="home-screen" class="container">  
+    <h2 style="color: cyan; text-shadow: 0 0 8px blue;">🎮 Welcome to the Ultimate Quiz Challenge! 🎯</h2>  
+    <button onclick="startGame()">🚀 Start Game</button>  
+    <audio id="timer-sound" src="timer.mp3" preload="auto"></audio>  
+<audio id="sad-sound" src="sad.mp3" preload="auto"></audio>  
+    <audio id="click-sound" src="click_button.mp3"></audio>  
+<audio id="blink-sound" src="blink.mp3"></audio>  
+<audio id="correct-sound" src="correct.mp3"></audio>  
+<audio id="wrong-sound" src="wrong.mp3"></audio>  <button onclick="showLevelSelect()">📂 Select Level</button>  
+<button onclick="showHelp()">❓ Help & Tips</button>
+
+  </div>    <div id="level-select" class="container hidden">  
+    <h2>Select Completed Level</h2>  
+    <div id="level-buttons"></div>  
+    <button onclick="goHome()">⬅ Back to Home</button>  
+  </div>    <div id="board" class="board hidden">  
+    <div id="level">Level: 1</div>  
+    <div id="score">Your Score: 0</div>  
+  </div>    <div id="quiz-container" class="container hidden">  
+      <div id="timeline" style="width: 100%; height: 8px; background: gray; overflow: hidden; margin-top: 10px;">  
+  <div id="timeline-bar" style="width: 100%; height: 100%; background: lime;"></div>  
+      </div>  
+        <h2 id="question">Loading...</h2> 
+    <div id="answer-buttons"></div>  
+ 
+  </div>  <div id="level-complete" class="level-complete">  
+  🎉 Level Complete! 🎉<br><br>  
+  <div id="level-stars" style="font-size: 40px; color: gold; margin: 10px;"></div>  
+  <button id="next-btn">Next</button>    </div>    <div id="result-container" class="container hidden">  
+    <h2>🎉 Game Over!</h2>  
+    <p id="final-score"></p>  
+    <p id="final-level"></p>  
+    
+    <button onclick="restartGame()">🔁 Restart Game</button>  
+    <button onclick="goHome()">🏠 Back to Home</button>  
+  </div>  
+<div id="help-screen" class="container hidden">  
+  <h2 style="color: cyan; text-shadow: 0 0 12px blue, 0 0 18px cyan;">💡 Game Help & Tips 💡</h2>
+<div style="text-align: left; font-size: 17px; line-height: 1.9; padding: 15px; border: 2px solid cyan; border-radius: 12px; background-color: rgba(0, 0, 0, 0.7); animation: fadeInUp 1.5s ease;">
+  
+  <p>🎮 <strong style="color: gold;">Game Name:</strong> <span style="color: lime; font-weight: bold;">AA Gamerz Quiz Game</span></p>
+  
+  <p>🧠 <strong style="color: gold;">Total Questions:</strong> <span style="color: cyan;">175 All Type Questions</span></p>
+  
+  <p>🏆 <strong style="color: gold;">Total Levels:</strong> <span style="color: cyan;">58 Exciting Levels</span></p>
+  
+  <p>🎯 <strong style="color: gold;">Max Score:</strong> <span style="color: lime;">1750 Points</span></p>
+  
+  <p style="color: gold; font-size: 18px;">📚 <strong>Question Types Included:</strong></p>
+  <ul style="color: cyan; list-style-type: '✨ '; padding-left: 25px;">
+    <li>Computer & Software</li>
+    <li>Mathematics & Logic</li>
+    <li>Physics & Chemistry</li>
+    <li>Biology & Human Body</li>
+    <li>World Mysteries & Riddles</li>
+    <li>General Knowledge</li>
+    <li>Truth & Myth Buster Questions</li>
+    <li>Geography & Space</li>
+    <li>History & Famous Events</li>
+    <li>Fun Brain Teasers</li>
+  </ul>
+  
+  <p style="color: gold; font-size: 18px;">🚀 <strong>How to Play:</strong></p>
+  <ul style="color: lightgreen; list-style-type: '✅ '; padding-left: 25px;">
+    <li>Select the correct answer to score points.</li>
+    <li>Each wrong answer will reveal the correct option — learn & retry!</li>
+    <li>Beat all levels to become a true <strong>Quiz Master!</strong></li>
+    <li>Every right answer = +10 points!</li>
+  </ul>
+  
+  <p style="color: gold; font-size: 18px;">💎 <strong>Tips & Tricks:</strong></p>
+  <ul style="color: lightgreen; list-style-type: '💡 '; padding-left: 25px;">
+    <li>Focus and read each question carefully.</li>
+    <li>Higher levels will be more challenging — stay sharp!</li>
+    <li>Play again to improve your score and speed.</li>
+    <li>Challenge friends & share your best score!</li>
+  </ul>
+  
+  <p>👨‍💻 <strong style="color: gold;">Developed by:</strong> <span style="color: cyan;">AA Gamerz</span></p>
+  
+  <p style="text-align: center; color: gold; font-size: 20px; font-weight: bold; margin-top: 20px;">✨ Good luck, and enjoy the game! ✨</p>
+</div>
+  
+    
+  <button onclick="goHome()" style="margin-top: 20px;">🏠 Back to Home</button>  
+</div>  
+    <p id="best-score-text" style="color: gold; font-weight: bold; font-size: 18px;"></p>
+  <script>
+    const questions = [
+  
+  { question: "What is the capital of France?", answers: ["Paris", "London", "Rome", "Madrid"], correct: 0 },
+  { question: "Which planet is known as the Red Planet?", answers: ["Earth", "Mars", "Venus", "Jupiter"], correct: 1 },
+  { question: "Who invented the light bulb?", answers: ["Nikola Tesla", "Thomas Edison", "Alexander Bell", "James Watt"], correct: 1 },
+  { question: "What is the speed of light?", answers: ["300,000 km/s", "150,000 km/s", "500,000 km/s", "100,000 km/s"], correct: 0 },
+  { question: "Which is the largest ocean on Earth?", answers: ["Atlantic Ocean", "Indian Ocean", "Pacific Ocean", "Arctic Ocean"], correct: 2 },
+  { question: "What increases but can never be decreased?", answers: ["Age", "Weight", "House", "Road"], correct: 0 },
+  { question: "What can break but never makes a sound?", answers: ["Silence", "Glass", "Heart", "House"], correct: 0 },
+  { question: "I’m made of water, but I die if I get water. What am I?", answers: ["Fire", "Stone", "Ice", "Soap"], correct: 0 },
+  { question: "What keeps moving but never gets tired?", answers: ["Clock", "Car", "Wind", "Human"], correct: 0 },
+  { question: "There’s a room with no light, but everything is visible. What is it?", answers: ["Dream", "Darkness", "Heart", "Mirror"], correct: 0 },
+  { question: "What belongs to you but is used more by others?", answers: ["Your name", "Your phone", "Your house", "Your book"], correct: 0 },
+  { question: "Everyone has it, but no one can see it. What is it?", answers: ["Breath", "Heart", "Love", "Eyes"], correct: 0 },
+  { question: "The more you fill me, the lighter I become. What am I?", answers: ["Balloon", "Jug", "Water", "Stomach"], correct: 0 },
+  { question: "What comes and goes but never stops?", answers: ["Time", "Train", "Moon", "Wind"], correct: 0 },
+  { question: "I am neither on the ground nor in the sky, neither alive nor dead. What am I?", answers: ["Shadow", "Darkness", "Dream", "Sound"], correct: 0 },
+  { question: "Which gas do plants absorb from the atmosphere?", answers: ["Oxygen", "Carbon Dioxide", "Nitrogen", "Hydrogen"], correct: 1 },
+  { question: "Which country is known as the Land of the Rising Sun?", answers: ["China", "Japan", "South Korea", "Thailand"], correct: 1 },
+  { question: "Which organ purifies our blood?", answers: ["Heart", "Liver", "Kidney", "Lungs"], correct: 2 },
+  { question: "What is H2O commonly known as?", answers: ["Hydrogen", "Water", "Oxygen", "Acid"], correct: 1 },
+  { question: "What is the unit of force?", answers: ["Watt", "Newton", "Joule", "Pascal"], correct: 1 },
+  { question: "What does E = mc² represent?", answers: ["Energy equals mass times velocity", "Energy equals mass times speed of light squared", "Energy equals motion times time", "Electricity equals mass times constant"], correct: 1 },
+  { question: "What is the speed of sound in air?", answers: ["343 m/s", "1000 m/s", "300 m/s", "1200 m/s"], correct: 0 },
+  { question: "Which law explains why we wear seatbelts?", answers: ["Newton's First Law", "Newton's Second Law", "Law of Gravity", "Law of Conservation"], correct: 0 },
+  { question: "What is the unit of electric current?", answers: ["Ohm", "Volt", "Ampere", "Watt"], correct: 2 },
+  { question: "What type of energy is stored in a stretched spring?", answers: ["Kinetic Energy", "Chemical Energy", "Potential Energy", "Thermal Energy"], correct: 2 },
+  { question: "Which subatomic particle has a negative charge?", answers: ["Proton", "Electron", "Neutron", "Photon"], correct: 1 },
+  { question: "Who discovered the law of gravity?", answers: ["Albert Einstein", "Isaac Newton", "Galileo Galilei", "Nikola Tesla"], correct: 1 },
+  { question: "What is the resistance unit in physics?", answers: ["Watt", "Ohm", "Volt", "Ampere"], correct: 1 },
+  { question: "Which device is used to measure electric current?", answers: ["Voltmeter", "Ammeter", "Thermometer", "Barometer"], correct: 1 },
+  { question: "Which animal is called the King of the Jungle?", answers: ["Elephant", "Lion", "Tiger", "Bear"], correct: 1 },
+  { question: "How many continents are there in the world?", answers: ["5", "6", "7", "8"], correct: 2 },
+  { question: "What is the largest organ in the human body?", answers: ["Heart", "Skin", "Liver", "Brain"], correct: 1 },
+  { question: "Which planet is closest to the Sun?", answers: ["Mercury", "Venus", "Earth", "Mars"], correct: 0 },
+  { question: "Which blood type is known as the universal donor?", answers: ["O+", "AB+", "O−", "A−"], correct: 2 },
+  { question: "What does CPU stand for?", answers: ["Central Process Unit", "Computer Personal Unit", "Central Processing Unit", "Control Panel Unit"], correct: 2 },
+  { question: "What gas do humans need to breathe?", answers: ["Carbon Dioxide", "Oxygen", "Hydrogen", "Nitrogen"], correct: 1 },
+  { question: "Which is the hardest natural substance on Earth?", answers: ["Iron", "Diamond", "Steel", "Gold"], correct: 1 },
+  { question: "Which bird is known for its ability to mimic sounds?", answers: ["Sparrow", "Parrot", "Crow", "Eagle"], correct: 1 },
+  { question: "How many bones are there in the adult human body?", answers: ["206", "205", "201", "210"], correct: 0 },
+  { question: "Which instrument is used to measure temperature?", answers: ["Barometer", "Thermometer", "Speedometer", "Altimeter"], correct: 1 },
+  { question: "Which desert is the largest in the world?", answers: ["Sahara", "Gobi", "Thar", "Kalahari"], correct: 0 },
+{ question: "Which part of the body helps in digestion of food?", answers: ["Heart", "Stomach", "Lungs", "Kidney"], correct: 1 },
+{ question: "Which natural satellite orbits the Earth?", answers: ["Mars", "Moon", "Venus", "Jupiter"], correct: 1 },
+{ question: "Which month has the least number of days?", answers: ["January", "February", "April", "June"], correct: 1 },
+{ question: "Which festival is known as the Festival of Lights?", answers: ["Christmas", "Diwali", "Eid", "Holi"], correct: 1 },
+{ question: "How many players are there in a cricket team?", answers: ["9", "10", "11", "12"], correct: 2 },
+{ question: "Which is the longest river in the world?", answers: ["Amazon", "Nile", "Yangtze", "Mississippi"], correct: 1 },
+{ question: "What is the largest planet in our solar system?", answers: ["Earth", "Jupiter", "Saturn", "Neptune"], correct: 1 },
+{ question: "Which planet is known for its beautiful rings?", answers: ["Mars", "Jupiter", "Saturn", "Uranus"], correct: 2 },
+{ question: "What galaxy do we live in?", answers: ["Andromeda", "Milky Way", "Whirlpool", "Sombrero"], correct: 1 },
+{ question: "What is the hottest planet in our solar system?", answers: ["Mercury", "Venus", "Mars", "Earth"], correct: 1 },
+{ question: "Which planet has the most moons?", answers: ["Jupiter", "Saturn", "Uranus", "Mars"], correct: 1 },
+{ question: "What is the name of the first man-made satellite?", answers: ["Apollo 11", "Sputnik 1", "Voyager 1", "Hubble"], correct: 1 },
+{ question: "Which planet is tilted on its side?", answers: ["Earth", "Uranus", "Neptune", "Saturn"], correct: 1 },
+{ question: "What is a black hole?", answers: ["A bright star", "A hole in the moon", "An area in space with strong gravity", "A type of planet"], correct: 2 },
+{ question: "Which space telescope has captured deep space images since 1990?", answers: ["Voyager 1", "James Webb", "Hubble", "Kepler"], correct: 2 },
+{ question: "Which planet is known as an 'ice giant'?", answers: ["Jupiter", "Uranus", "Mars", "Venus"], correct: 1 },
+{ question: "What is the chemical symbol for gold?", answers: ["Au", "Ag", "Fe", "Cu"], correct: 0 },
+{ question: "Which is the smallest country in the world?", answers: ["Monaco", "Vatican City", "Malta", "Liechtenstein"], correct: 1 },
+{ question: "I speak without a mouth and hear without ears. I have nobody, but I come alive with the wind. What am I?", answers: ["Shadow", "Echo", "Whistle", "Wave"], correct: 1 },
+
+{ question: "What type of software is Microsoft Word?", answers: ["Operating System", "Word Processor", "Database", "Spreadsheet"], correct: 1 },
+
+{ question: "What is the main use of Adobe Photoshop?", answers: ["Video editing", "Image editing", "Audio editing", "Programming"], correct: 1 },
+
+{ question: "Which software is used to browse the internet?", answers: ["Media Player", "Browser", "Antivirus", "Word Processor"], correct: 1 },
+
+{ question: "What is the name of the spreadsheet software from Microsoft?", answers: ["Word", "PowerPoint", "Excel", "Access"], correct: 2 },
+
+{ question: "Which company makes the 'Chrome' browser?", answers: ["Apple", "Mozilla", "Google", "Microsoft"], correct: 2 },
+
+{ question: "What type of software is VLC Media Player?", answers: ["Browser", "Video player", "Graphics editor", "Text editor"], correct: 1 },
+
+{ question: "Which is an example of open-source software?", answers: ["MS Office", "Photoshop", "Linux", "Windows 11"], correct: 2 },
+
+{ question: "What is the purpose of antivirus software?", answers: ["Play games", "Detect and remove malware", "Edit images", "Create videos"], correct: 1 },
+
+{ question: "Which software is used for creating presentations?", answers: ["Excel", "Word", "PowerPoint", "Access"], correct: 2 },
+
+{ question: "Which software helps you compress files?", answers: ["Paint", "VLC", "WinRAR", "Notepad"], correct: 2 },
+  
+{ question: "The more you take, the more you leave behind. What am I?", answers: ["Memories", "Footsteps", "Time", "Air"], correct: 1 },
+
+{ question: "I have cities, but no houses. I have mountains, but no trees. I have water, but no fish. What am I?", answers: ["A dream", "A book", "A map", "A computer"], correct: 2 },
+
+{ question: "What disappears as soon as you say its name?", answers: ["Shadow", "Echo", "Secret", "Silence"], correct: 3 },
+
+{ question: "I am tall when I am young and short when I am old. What am I?", answers: ["Tree", "Candle", "Human", "Pencil"], correct: 1 },
+
+{ question: "What can run but never walks, has a bed but never sleeps, has a mouth but never talks?", answers: ["Car", "Train", "River", "Clock"], correct: 2 },
+
+{ question: "What has hands but cannot clap?", answers: ["Clock", "Statue", "Mirror", "Glove"], correct: 0 },
+
+{ question: "What comes once in a minute, twice in a moment, but never in a thousand years?", answers: ["Air", "The letter M", "Time", "Sun"], correct: 1 },
+
+{ question: "What has many keys but can’t open a single lock?", answers: ["Piano", "Keyboard", "Keyring", "Map"], correct: 0 },
+
+{ question: "What has a head, a tail, but no body?", answers: ["Coin", "Snake", "Worm", "Lizard"], correct: 0 },
+
+{ question: "What can you hold in your left hand but not in your right?", answers: ["Pen", "Your shadow", "Your right hand", "Glove"], correct: 2 },
+
+{ question: "The more of me you take, the more you leave behind. What am I?", answers: ["Footsteps", "Water", "Light", "Thoughts"], correct: 0 },
+
+{ question: "I have a neck but no head, and I wear a cap. What am I?", answers: ["Shirt", "Bottle", "Pencil", "Jar"], correct: 1 },
+
+{ question: "I shrink smaller every time I take a bath. What am I?", answers: ["Soap", "Ice", "Sponge", "Towel"], correct: 0 },
+
+{ question: "What is full of holes but still holds water?", answers: ["Net", "Cup", "Bucket", "Sponge"], correct: 3 },
+
+{ question: "What can fill a room but takes up no space?", answers: ["Air", "Light", "Sound", "Hope"], correct: 1 },
+
+{ question: "What invention lets you look right through a wall?", answers: ["X-ray", "Window", "Periscope", "Camera"], correct: 1 },
+
+{ question: "What goes up but never comes down?", answers: ["Balloon", "Smoke", "Age", "Temperature"], correct: 2 },
+
+{ question: "You see me once in June, twice in November, but not at all in May. What am I?", answers: ["The letter E", "The sun", "Snow", "Leaves"], correct: 0 },
+
+{ question: "I have one eye but can’t see. What am I?", answers: ["Needle", "Storm", "Bat", "Cyclops"], correct: 0 },
+{ question: "What has four legs in the morning, two legs at noon, and three legs in the evening?", answers: ["Dog", "Clock", "Human", "Spider"], correct: 2 },
+
+{ question: "The more you take away from me, the bigger I become. What am I?", answers: ["Hole", "Balloon", "Stone", "Mountain"], correct: 0 },
+
+{ question: "What gets wetter the more it dries?", answers: ["Sponge", "Water", "Towel", "Rain"], correct: 2 },
+
+{ question: "What can travel around the world while staying in one spot?", answers: ["Moon", "Letter", "Postcard", "Stamp"], correct: 3 },
+
+{ question: "I go up and down but never move. What am I?", answers: ["Lift", "Wave", "Stairs", "Heart"], correct: 2 },
+
+{ question: "If you drop me, I’m sure to crack, but give me a smile and I’ll smile back. What am I?", answers: ["Mirror", "Egg", "Friend", "Balloon"], correct: 0 },
+
+{ question: "What belongs to you, but other people use it more than you do?", answers: ["Phone", "Name", "Car", "Face"], correct: 1 },
+
+{ question: "I can fill a room, but I take up no space. What am I?", answers: ["Wind", "Sound", "Voice", "Light"], correct: 3 },
+
+{ question: "What has no beginning, end, or middle?", answers: ["Circle", "Rope", "Loop", "Zero"], correct: 0 },
+
+{ question: "Which word becomes shorter when you add two letters to it?", answers: ["Tall", "Short", "Big", "Tiny"], correct: 1 },
+
+{ question: "I have keys but no locks, space but no room, and you can enter but not go in. What am I?", answers: ["House", "Piano", "Computer Keyboard", "Puzzle"], correct: 2 },
+{ question: "What is the name of the mysterious ancient city buried under the sea?", answers: ["Atlantis", "El Dorado", "Pompeii", "Shambhala"], correct: 0 },
+
+  { question: "Which desert has mysterious stones that move on their own?", answers: ["Gobi Desert", "Atacama Desert", "Racetrack Playa", "Sahara Desert"], correct: 2 },
+
+  { question: "Where do planes and ships mysteriously disappear?", answers: ["Drake Passage", "Bermuda Triangle", "Sargasso Sea", "Devil’s Sea"], correct: 1 },
+
+  { question: "Which mountain in Russia is known for a mysterious event where hikers died in strange ways?", answers: ["Mount Elbrus", "Dyatlov Pass", "Mount Everest", "Mount Fuji"], correct: 1 },
+
+  { question: "What is the mysterious island full of giant stone statues?", answers: ["Skull Island", "Easter Island", "Treasure Island", "Dragon Island"], correct: 1 },
+
+  { question: "In which country is the ancient site called 'Stonehenge'?", answers: ["France", "Ireland", "England", "Germany"], correct: 2 },
+
+{ question: "What does 'SSD' stand for in computers?", answers: ["Solid State Drive", "Super Speed Disk", "System Storage Device", "Serial Storage Drive"], correct: 0 },
+
+{ question: "Which programming language is known for its snake logo?", answers: ["Python", "Java", "C++", "PHP"], correct: 0 },
+
+{ question: "Which company owns GitHub?", answers: ["Google", "Amazon", "Microsoft", "Apple"], correct: 2 },
+
+{ question: "What is the shortcut to 'paste' on Windows?", answers: ["Ctrl + X", "Ctrl + P", "Ctrl + V", "Ctrl + D"], correct: 2 },
+
+{ question: "What is 'Linux'?", answers: ["A browser", "An operating system", "A computer game", "A type of hardware"], correct: 1 },
+
+{ question: "What does 'VPN' stand for?", answers: ["Virtual Public Network", "Virtual Private Network", "Verified Personal Network", "Virtual Process Node"], correct: 1 },
+
+{ question: "Which key combination locks a Windows computer?", answers: ["Ctrl + Alt + Del", "Windows + L", "Alt + F4", "Ctrl + L"], correct: 1 },
+
+{ question: "What is 'phishing' in computer terms?", answers: ["Playing online games", "Hacking passwords", "Stealing personal data using fake websites", "Sending spam emails"], correct: 2 },
+
+{ question: "Which programming language runs in a browser?", answers: ["Python", "JavaScript", "C++", "Java"], correct: 1 },
+
+{ question: "What does 'URL' stand for?", answers: ["Uniform Resource Locator", "Universal Reading Link", "Uniform Reading Locator", "Universal Resource Link"], correct: 0 },
+
+{ question: "What is the name of Apple's desktop OS?", answers: ["iOS", "MacOS", "iMac OS", "AppleOS"], correct: 1 },
+
+{ question: "In which year was Google founded?", answers: ["1998", "2000", "1995", "1999"], correct: 0 },
+
+{ question: "What is the use of a GPU?", answers: ["Data storage", "Graphic processing", "Sound processing", "Network connection"], correct: 1 },
+
+{ question: "What type of file is '.exe'?", answers: ["Image file", "Executable file", "Text file", "Video file"], correct: 1 },
+
+{ question: "What does 'HTTP' stand for?", answers: ["HyperText Transfer Protocol", "HyperTool Transfer Program", "High Transfer Text Protocol", "HyperText Tracking Program"], correct: 0 },
+
+{ question: "What is the primary purpose of a firewall?", answers: ["Cooling the CPU", "Storing data", "Protecting against hackers", "Speeding up the computer"], correct: 2 },
+
+{ question: "Which is NOT an input device?", answers: ["Keyboard", "Mouse", "Printer", "Scanner"], correct: 2 },
+
+{ question: "What is the meaning of 'Cloud Computing'?", answers: ["Storing data on hard drives", "Storing data on internet servers", "Programming websites", "Gaming online"], correct: 1 },
+
+{ question: "Which company develops the Android operating system?", answers: ["Apple", "Microsoft", "Google", "Intel"], correct: 2 },
+
+{ question: "What does 'bit' stand for?", answers: ["Binary Digit", "Basic Information Tool", "Byte Information Transfer", "Binary Internet Terminal"], correct: 0 },
+  
+  { question: "What is the name of the mysterious circles seen in fields worldwide?", answers: ["Stone Circles", "Alien Symbols", "Crop Circles", "Rune Circles"], correct: 2 },
+
+  { question: "Where are the mysterious Moai statues found?", answers: ["Hawaii", "Easter Island", "Galapagos Islands", "New Zealand"], correct: 1 },
+
+  { question: "What is the name of the unexplained humming sound heard in places like Taos, New Mexico?", answers: ["Sky Roar", "Taos Hum", "Desert Howl", "Phantom Sound"], correct: 1 },
+
+  { question: "Where is the Gate to Hell — a burning gas crater that has been on fire for decades?", answers: ["Iceland", "Russia", "Turkmenistan", "Iran"], correct: 2 },
+
+  { question: "Which lake is known as the world’s deepest and is full of mysterious legends?", answers: ["Lake Victoria", "Lake Tahoe", "Lake Superior", "Lake Baikal"], correct: 3 },
+
+  { question: "What ancient structure is still a mystery to scientists due to how it was built?", answers: ["Colosseum", "Petra", "Great Wall of China", "Great Pyramid of Giza"], correct: 3 },
+
+  { question: "Where can you find mysterious Nazca Lines?", answers: ["Egypt", "Peru", "Mexico", "Brazil"], correct: 1 },
+
+  { question: "Which forest is known as one of the most haunted and mysterious forests?", answers: ["Aokigahara Forest", "Black Forest", "Sherwood Forest", "Epping Forest"], correct: 0 },
+
+  { question: "What mysterious creature is said to live in Loch Ness?", answers: ["Kraken", "Loch Ness Monster", "Mermaid", "Sea Serpent"], correct: 1 },
+
+  { question: "Which part of the world is known for mysterious fairy circles?", answers: ["Amazon", "Namib Desert", "Outback Australia", "Mongolia"], correct: 1 },
+
+  { question: "Where is the mysterious 'Door to Heaven' cave known as Son Doong Cave?", answers: ["Thailand", "Vietnam", "China", "Philippines"], correct: 1 },
+
+  { question: "What is the name of the mysterious creature also known as Bigfoot?", answers: ["Abominable Snowman", "Yetis", "Sasquatch", "Kraken"], correct: 2 },
+
+  { question: "What ancient computer-like device was found in a Greek shipwreck?", answers: ["Antikythera Mechanism", "Archimedes Device", "Spartan Gears", "Plato’s Clock"], correct: 0 },
+
+  { question: "Which mysterious place is famous for strange gravity hills where cars roll uphill?", answers: ["Mystery Spot", "Devil's Hill", "Witch Road", "Gravity Mountain"], correct: 0 },
+
+{ question: "What is seen in the middle of March and April that can't be seen at the beginning or end of either month?", answers: ["Sun", "The letter R", "Time", "Wind"], correct: 1 },
+
+{ question: "What can’t talk but will reply when spoken to?", answers: ["Robot", "Echo", "Ghost", "Book"], correct: 1 },
+
+{ question: "I have teeth but cannot bite. What am I?", answers: ["Fork", "Comb", "Zipper", "Saw"], correct: 1 },
+
+{ question: "What has one eye, but can’t see?", answers: ["Storm", "Needle", "Bat", "Button"], correct: 1 },
+
+{ question: "What has a thumb and four fingers but isn’t alive?", answers: ["Hand", "Glove", "Puppet", "Doll"], correct: 1 },
+
+{ question: "I am not alive, but I grow; I don’t have lungs, but I need air. What am I?", answers: ["Fire", "Plant", "Bubble", "Shadow"], correct: 0 },
+
+{ question: "I am taken from a mine, and shut in a wooden case. Used by students daily. What am I?", answers: ["Iron", "Gold", "Pencil lead", "Eraser"], correct: 2 },
+
+{ question: "What has many teeth but never eats?", answers: ["Comb", "Clock", "Wheel", "Chain"], correct: 0 },
+
+{ question: "I am always hungry, I must always be fed. The finger I touch, will soon turn red. What am I?", answers: ["Ant", "Fire", "Dragon", "Snake"], correct: 1 },
+{ question: "Who wrote 'Romeo and Juliet'?", answers: ["William Shakespeare", "Charles Dickens", "Mark Twain", "Jane Austen"], correct: 0 },
+{ question: "What comes next in the pattern? 2, 4, 8, 16, ?", answers: ["20", "24", "32", "30"], correct: 2 },
+
+{ question: "I am a number. Multiply me by 4, add 6, you get 50. What am I?", answers: ["11", "12", "13", "14"], correct: 1 },
+
+{ question: "What is 1111 × 1111?", answers: ["1234321", "123321", "1111", "1212121"], correct: 0 },
+
+{ question: "A bat and ball cost $1.10. The bat costs $1.00 more than the ball. How much is the ball?", answers: ["5 cents", "10 cents", "15 cents", "20 cents"], correct: 0 },
+
+{ question: "Which number is missing: 3, 6, 9, __, 15, 18?", answers: ["10", "12", "13", "11"], correct: 1 },
+{ question: "What is half of 2 + 2?", answers: ["2", "3", "4", "1"], correct: 0 },
+
+
+{ question: "If you have 3 apples and take away 2, how many do you have?", answers: ["1", "2", "3", "0"], correct: 1 },
+
+{ question: "I am an odd number. Take away one letter and I become even. What am I?", answers: ["Five", "Seven", "Nine", "Eleven"], correct: 0 },
+
+{ question: "How many sides does a dodecagon have?", answers: ["10", "12", "14", "16"], correct: 1 },
+
+{ question: "What is the sum of angles in a triangle?", answers: ["90°", "180°", "360°", "270°"], correct: 1 },
+
+{ question: "If 3 cats catch 3 mice in 3 minutes, how many cats are needed to catch 100 mice in 100 minutes?", answers: ["3", "100", "33", "1"], correct: 0 },
+
+{ question: "Which weighs more: 1 kg of feathers or 1 kg of bricks?", answers: ["Bricks", "Feathers", "Same", "Can't say"], correct: 2 },
+
+{ question: "I am a number less than 100. My digits add to 9, and I am divisible by 9. What number am I?", answers: ["9", "18", "27", "36"], correct: 3 },
+
+{ question: "What number multiplied by itself equals 144?", answers: ["10", "12", "14", "16"], correct: 1 },
+
+{ question: "If 5 workers take 5 days to build 5 walls, how many days for 1 worker to build 1 wall?", answers: ["1", "5", "25", "10"], correct: 1 },
+
+{ question: "What is the next prime number after 7?", answers: ["9", "10", "11", "13"], correct: 2 },
+
+{ question: "A farmer has 17 sheep, all but 9 run away. How many are left?", answers: ["8", "9", "17", "0"], correct: 1 },
+
+{ question: "What comes next: 1, 1, 2, 3, 5, 8, ?", answers: ["10", "11", "13", "15"], correct: 2 },
+
+{ question: "What is the value of π (pi) approximately?", answers: ["2.14", "3.14", "4.14", "5.14"], correct: 1 },
+
+{ question: "How many zeros are there in one million?", answers: ["5", "6", "7", "8"], correct: 1 }
+
+];
+
+    let allUsedQuestions = new Set();
+    let level = 1;
+    let score = 0;
+    let currentLevelQuestions = [];
+    let index = 0;
+
+    const homeScreen = document.getElementById("home-screen");
+    const levelSelect = document.getElementById("level-select");
+    const quizContainer = document.getElementById("quiz-container");
+    const board = document.getElementById("board");
+    const questionEl = document.getElementById("question");
+    const answerBtns = document.getElementById("answer-buttons");
+    const levelText = document.getElementById("level");
+    const scoreText = document.getElementById("score");
+    const resultBox = document.getElementById("result-container");
+    const finalScore = document.getElementById("final-score");
+    const finalLevel = document.getElementById("final-level");
+    const nextBtn = document.getElementById("next-btn");
+    const levelComplete = document.getElementById("level-complete");
+
+    document.getElementById("menu-btn").onclick = () => {
+      document.getElementById("menu-panel").classList.toggle("hidden");
+    };
+
+    function getRandomUnusedQuestions(count = 3) {
+      const available = questions.filter((_, i) => !allUsedQuestions.has(i));
+      if (available.length < count) return null;
+      const selected = available.sort(() => 0.5 - Math.random()).slice(0, count);
+      selected.forEach(q => allUsedQuestions.add(questions.indexOf(q)));
+      return selected;
+    }
+
+    function startGame(lvl = 1) {
+  if (lvl === 1) allUsedQuestions.clear();
+  level = lvl;
+  score = lvl === 1 ? 0 : score;
+  index = 0;
+  const qSet = getRandomUnusedQuestions();
+  if (!qSet) return endGame();
+  currentLevelQuestions = qSet;
+  updateBoard();
+  homeScreen.classList.add("hidden");
+  levelSelect.classList.add("hidden");
+  quizContainer.classList.remove("hidden");
+  board.classList.remove("hidden");
+  document.getElementById("menu-btn").classList.remove("hidden");
+  document.querySelector(".overlay-blur")?.remove();
+  levelComplete.style.display = "none";
+
+  // Force browser to allow all sounds (unlock)
+  ['correct-sound','wrong-sound','blink-sound','timer-sound','sad-sound'].forEach(id => {
+      let sound = document.getElementById(id);
+      if (sound) {
+          sound.play().catch(()=>{}); 
+          sound.pause(); 
+          sound.currentTime = 0;
+      }
+  });
+
+  showQuestion();
+}
+
+    function updateBoard() {
+      levelText.innerText = `Level: ${level}`;
+      scoreText.innerText = `Your Score: ${score}`;
+    }
+
+    function showQuestion() {
+      const q = currentLevelQuestions[index];
+      questionEl.innerText = q.question;
+      answerBtns.innerHTML = "";
+      q.answers.forEach((ans, i) => {
+        const btn = document.createElement("button");
+        btn.innerText = ans;
+        btn.onclick = () => selectAnswer(i === q.correct, btn);
+        answerBtns.appendChild(btn);
+      });
+    }
+
+    function selectAnswer(correct, btn) {
+      if (correct) score += 10;
+      btn.style.background = correct ? "lime" : "red";
+      Array.from(answerBtns.children).forEach(b => b.disabled = true);
+      updateBoard();
+      setTimeout(() => {
+        index++;
+        if (index >= currentLevelQuestions.length) {
+          const overlay = document.createElement("div");
+          overlay.className = "overlay-blur";
+          document.body.appendChild(overlay);
+          levelComplete.style.display = "block";
+        } else {
+          showQuestion();
+        }
+      }, 1000);
+    }
+
+    nextBtn.onclick = () => {
+      document.querySelector(".overlay-blur")?.remove();
+      level++;
+      startGame(level);
+    };
+
+    function endGame() {
+      quizContainer.classList.add("hidden");
+      board.classList.add("hidden");
+      document.getElementById("menu-btn").classList.add("hidden");
+      resultBox.classList.remove("hidden");
+      finalScore.innerText = `🎯 Your Final Score: ${score}`;
+      finalLevel.innerText = `📊 Reached Level: ${level}`;
+    }
+
+    function goHome() {
+      homeScreen.classList.remove("hidden");
+      levelSelect.classList.add("hidden");
+      quizContainer.classList.add("hidden");
+      resultBox.classList.add("hidden");
+      board.classList.add("hidden");
+      document.getElementById("menu-panel").classList.add("hidden");
+      document.getElementById("menu-btn").classList.add("hidden");
+      document.querySelector(".overlay-blur")?.remove();
+      levelComplete.style.display = "none";
+    }
+
+    function restartGame() {
+      allUsedQuestions.clear();
+      level = 1;
+      score = 0;
+      startGame();
+    }
+
+    function resumeGame() {
+      document.getElementById("menu-panel").classList.add("hidden");
+    }
+
+    function showLevelSelect() {
+      homeScreen.classList.add("hidden");
+      levelSelect.classList.remove("hidden");
+      const levelBtns = document.getElementById("level-buttons");
+      levelBtns.innerHTML = "";
+      for (let i = 1; i <= level; i++) {
+        const btn = document.createElement("button");
+        btn.innerText = `Level ${i}`;
+        btn.onclick = () => startGame(i);
+        levelBtns.appendChild(btn);
+      }
+    }
+  let levelStars = 0;
+let timelineInterval;
+
+function selectAnswer(correct, btn) {
+  clearInterval(timelineInterval);
+
+  const correctSound = document.getElementById("correct-sound");
+  const wrongSound = document.getElementById("wrong-sound");
+  const blinkSound = document.getElementById("blink-sound");
+
+  if (correct) {
+    score += 10;
+    levelStars += 1;
+    btn.style.background = "lime";
+    btn.style.color = "black";
+    btn.style.boxShadow = "0 0 15px lime, 0 0 30px green";
+
+    correctSound.pause();
+    correctSound.currentTime = 0;
+    correctSound.play().catch(e => console.log("Sound error", e));
+
+  } else {
+    btn.style.background = "red";
+    btn.style.color = "black";
+    btn.style.boxShadow = "0 0 15px red, 0 0 30px darkred";
+
+    const correctBtn = Array.from(answerBtns.children)[currentLevelQuestions[index].correct];
+    correctBtn.style.background = "lime";
+    correctBtn.style.color = "black";
+    correctBtn.style.boxShadow = "0 0 15px lime, 0 0 30px green";
+
+    wrongSound.pause();
+    wrongSound.currentTime = 0;
+    wrongSound.play().catch(e => console.log("Sound error", e));
+  }
+
+  Array.from(answerBtns.children).forEach(b => b.disabled = true);
+  updateBoard();
+
+  setTimeout(() => {
+    index++;
+    if (index >= currentLevelQuestions.length) {
+      showLevelComplete();
+    } else {
+      showQuestion();
+    }
+  }, 2500);
+}
+
+function startTimeline() {
+  clearInterval(timelineInterval);
+
+  const timelineBar = document.getElementById("timeline-bar");
+  let timeLeft = 15; // 15 seconds
+
+  timelineBar.style.width = "100%";
+  timelineBar.style.background = "lime";
+  timelineBar.style.boxShadow = "0 0 10px lime, 0 0 20px lime";
+  timelineBar.style.transition = "width 0.05s linear, background 0.5s ease, box-shadow 0.5s ease";
+
+  timelineInterval = setInterval(() => {
+    timeLeft -= 0.05;
+    const percent = Math.max(0, (timeLeft / 15) * 100);
+    timelineBar.style.width = percent + "%";
+
+    // When 3 seconds left
+    if (timeLeft <= 3 && timeLeft > 2.95) {
+      timelineBar.style.background = "red";
+      timelineBar.style.boxShadow = "0 0 12px red, 0 0 20px red";
+
+      if (navigator.vibrate) {
+        navigator.vibrate([200, 100, 200]);
+      }
+
+      const timerSound = document.getElementById("timer-sound");
+      timerSound.pause();
+      timerSound.currentTime = 0;
+      timerSound.play().catch(e => console.log("Timer sound error", e));
+    }
+
+    if (timeLeft <= 0) {
+      clearInterval(timelineInterval);
+
+      Array.from(answerBtns.children).forEach(b => b.disabled = true);
+
+      const sadSound = document.getElementById("sad-sound");
+      sadSound.pause();
+      sadSound.currentTime = 0;
+      sadSound.play().catch(e => console.log("Sad sound error", e));
+
+      setTimeout(() => {
+        index++;
+        if (index >= currentLevelQuestions.length) {
+          showLevelComplete();
+        } else {
+          showQuestion();
+        }
+      }, 1000);
+    }
+  }, 50);
+}
+
+function showLevelComplete() {
+  const overlay = document.createElement("div");
+  overlay.className = "overlay-blur";
+  document.body.appendChild(overlay);
+
+  const starsContainer = document.getElementById("level-stars");
+  starsContainer.innerHTML = "";
+  starsContainer.style.display = "flex";
+  starsContainer.style.justifyContent = "center";
+  starsContainer.style.gap = "15px";
+  starsContainer.style.transform = "rotate(-5deg)";
+
+  for (let i = 0; i < levelStars; i++) {
+    const star = document.createElement("span");
+    star.textContent = "⭐";
+    star.style.animation = "star-pop 0.5s ease forwards";
+    star.style.animationDelay = `${i * 0.3}s`;
+    starsContainer.appendChild(star);
+  }
+
+  levelComplete.style.display = "block";
+
+  const blinkSound = document.getElementById("blink-sound");
+  blinkSound.pause();
+  blinkSound.currentTime = 0;
+  blinkSound.play().catch(e => console.log("Sound error", e));
+}
+
+function showQuestion() {
+  levelStars = levelStars; // keep stars from last level
+  // your existing code to show new question...
+  startTimeline(); // start the 15-second timeline
+}
+function showHelp() {
+  homeScreen.classList.add("hidden");
+  levelSelect.classList.add("hidden");
+  quizContainer.classList.add("hidden");
+  resultBox.classList.add("hidden");
+  board.classList.add("hidden");
+  document.getElementById("help-screen").classList.remove("hidden");
+}
+function goHome() {
+  homeScreen.classList.remove("hidden");
+  levelSelect.classList.add("hidden");
+  quizContainer.classList.add("hidden");
+  resultBox.classList.add("hidden");
+  board.classList.add("hidden");
+  document.getElementById("menu-panel").classList.add("hidden");
+  document.getElementById("menu-btn").classList.add("hidden");
+  document.querySelector(".overlay-blur")?.remove();
+  levelComplete.style.display = "none";
+  
+  // ADD THIS LINE to hide Help screen:
+  document.getElementById("help-screen").classList.add("hidden");
+}
+  
+  function showQuestion() {
+  // Clear timeline
+  startTimeline();
+
+  // Get current question
+  const questionData = currentLevelQuestions[index];
+
+  // Show question text
+  const questionElement = document.getElementById("question");
+  questionElement.textContent = questionData.question;
+
+  // Clear previous answers
+  answerBtns.innerHTML = "";
+
+  // Create answer buttons
+  questionData.answers.forEach((answer, i) => {
+    const button = document.createElement("button");
+    button.textContent = answer;
+    button.className = "answer-btn";
+    button.onclick = () => selectAnswer(i === questionData.correct, button);
+    answerBtns.appendChild(button);
+  });
+
+  // Reset stars at start of level
+  if (index === 0) {
+    levelStars = 0;
+  }
+
+  // Make quiz visible
+  document.getElementById("quiz-container").classList.remove("hidden");
+  document.getElementById("board").classList.remove("hidden");
+
+  updateBoard();
+}
+  
+  // Play click sound on any button click
+const clickSound = document.getElementById("click-sound");
+
+document.addEventListener("click", function(e) {
+  if (e.target.tagName === "BUTTON") {
+    clickSound.pause();
+    clickSound.currentTime = 0;
+    clickSound.play().catch(err => console.log("Click sound error", err));
+  }
+});  
+  </script>
+  <script>
+let timelineInterval;
+
+document.getElementById("start-btn").addEventListener("click", () => {
+    // Unlock sounds
+    ["timer-sound", "sad-sound", "correct-sound", "wrong-sound", "blink-sound"].forEach(id => {
+        const audio = document.getElementById(id);
+        audio.play().then(() => {
+            audio.pause();
+            audio.currentTime = 0;
+        }).catch(e => console.log("Preload blocked", e));
+    });
+
+    // Start game
+    startTimeline();
+
+    // Hide Start button
+    document.getElementById("start-btn").style.display = "none";
+});
+
+function startTimeline() {
+    clearInterval(timelineInterval);
+
+    const timelineBar = document.getElementById("timeline-bar");
+    let timeLeft = 15; // 15 seconds
+
+    timelineBar.style.width = "100%";
+    timelineBar.style.background = "lime";
+
+    timelineInterval = setInterval(() => {
+        timeLeft -= 0.05;
+        const percent = Math.max(0, (timeLeft / 15) * 100);
+        timelineBar.style.width = percent + "%";
+
+        if (timeLeft <= 3 && timeLeft > 2.95) {
+            timelineBar.style.background = "red";
+
+            if (navigator.vibrate) {
+                navigator.vibrate([100, 100, 100]);
+            }
+
+            const timerSound = document.getElementById("timer-sound");
+            timerSound.pause();
+            timerSound.currentTime = 0;
+            timerSound.play().catch(e => console.log("Timer sound error", e));
+        }
+
+        if (timeLeft <= 0) {
+            clearInterval(timelineInterval);
+
+            const sadSound = document.getElementById("sad-sound");
+            sadSound.pause();
+            sadSound.currentTime = 0;
+            sadSound.play().catch(e => console.log("Sad sound error", e));
+
+            // If you want to restart timeline automatically after fail
+            setTimeout(() => {
+                startTimeline();
+            }, 2000);
+        }
+    }, 50);
+}
+  </script>
+</body>
+</html>
