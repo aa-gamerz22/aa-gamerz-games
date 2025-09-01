@@ -1,0 +1,19 @@
+
+.game__cell {
+  width: var(--cell);
+  height: var(--cell);
+  background-color: aliceblue;
+}
+.game__cell--rock {
+  background: #000038;
+}
+.game__cell--lava {
+  background: linear-gradient(45deg, orange, #ff7d66 150%);
+}
+.game__cell--stop {
+  position: relative;
+  background: linear-gradient(45deg, #78d6c6 -50%, #fff 100%);
+}
+.game__cell--end {
+  background: #80c0a1;
+}

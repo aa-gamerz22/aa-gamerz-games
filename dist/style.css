@@ -1,0 +1,358 @@
+@import url("https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap");
+html {
+  font-size: 3vh;
+}
+@media (orientation: portrait) {
+  html {
+    font-size: 2.9vw;
+  }
+}
+
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+  color: #fff;
+  background-color: #000038;
+  overflow: hidden;
+  font-family: "Archivo Black", sans-serif;
+  font-weight: 700;
+  font-size: 1.5rem;
+}
+
+.level {
+  position: absolute;
+  top: 0.75rem;
+  left: 1rem;
+}
+@media (min-height: 500px), (orientation: portrait) {
+  .level {
+    top: 0.5rem;
+  }
+}
+
+.refresh,
+.fullscreen {
+  position: absolute;
+  padding: 0.2rem 0.6rem;
+  border: 1px solid #fff;
+  font-weight: 500;
+  background-color: #000038;
+  cursor: pointer;
+  text-transform: uppercase;
+}
+.refresh:hover,
+.fullscreen:hover {
+  color: #000038;
+  background-color: #fff;
+}
+@media (min-height: 500px), (orientation: portrait) {
+  .refresh,
+.fullscreen {
+    font-size: 1rem;
+  }
+}
+
+.refresh {
+  top: 0.5rem;
+  right: 1rem;
+}
+
+.fullscreen {
+  top: 0.5rem;
+  left: 4rem;
+}
+
+.controls {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+  height: 100%;
+}
+.controls__arrow {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.controls__arrow:after {
+  content: "";
+  width: 0;
+  height: 0;
+  margin: 1rem;
+  opacity: 0.3;
+}
+.controls__arrow--top, .controls__arrow--bottom {
+  width: 100%;
+  height: 40vh;
+}
+.controls__arrow--left, .controls__arrow--right {
+  flex-direction: column;
+  width: 50%;
+  height: 20vh;
+}
+.controls__arrow--top, .controls__arrow--left {
+  align-items: flex-start;
+}
+.controls__arrow--bottom, .controls__arrow--right {
+  align-items: flex-end;
+}
+.controls__arrow--top:after {
+  border-left: 1rem solid transparent;
+  border-right: 1rem solid transparent;
+  border-bottom: 1rem solid #fff;
+}
+.controls__arrow--left:after {
+  border-top: 1rem solid transparent;
+  border-right: 1rem solid #fff;
+  border-bottom: 1rem solid transparent;
+}
+.controls__arrow--right:after {
+  border-top: 1rem solid transparent;
+  border-left: 1rem solid #fff;
+  border-bottom: 1rem solid transparent;
+}
+.controls__arrow--bottom:after {
+  border-left: 1rem solid transparent;
+  border-right: 1rem solid transparent;
+  border-top: 1rem solid #fff;
+}
+
+.timer {
+  position: absolute;
+  top: 55%;
+  font-size: 3rem;
+}
+
+.title-screen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 56, 0.8);
+}
+.title-screen--hidden {
+  display: none;
+}
+.title-screen__title {
+  position: relative;
+  font-size: 12vw;
+  color: #fff;
+}
+.title-screen__word {
+  color: #eb80b1;
+}
+.title-screen__button {
+  position: relative;
+  border: 1px solid #fff;
+  color: #fff;
+  padding: 0.3rem 0.6rem;
+  background-color: transparent;
+  font-size: 3vw;
+  font-family: "Archivo Black", sans-serif;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.title-screen__button:hover {
+  color: #000038;
+  background-color: #fff;
+}
+@media (orientation: portrait) {
+  .title-screen__title {
+    font-size: 18vw;
+  }
+  .title-screen__button {
+    font-size: 4.5vw;
+  }
+}
+
+.game {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  width: 29.03rem;
+}
+.game--tutorial:before {
+  position: absolute;
+  bottom: -4rem;
+  content: "Use arrow keys (recommended) or click the arrows to play";
+  color: #fff;
+  font-size: 1.2rem;
+  font-weight: 500;
+  text-align: center;
+  text-transform: uppercase;
+}
+@media (max-width: 767px) {
+  .game--tutorial:before {
+    display: none;
+  }
+}
+.game--win:after, .game--lose:after, .game--final-win:after {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  color: #fff;
+  background-color: rgba(0, 0, 56, 0.5);
+  font-size: 2rem;
+  text-transform: uppercase;
+}
+.game--win:after {
+  content: "You win! Next level";
+}
+.game--lose:after {
+  content: "You lose! Try again!";
+}
+.game--final-win:after {
+  content: "Game completed!";
+}
+.game__player {
+  position: absolute;
+  width: var(--cell);
+  height: var(--cell);
+  
+  /* Ice Cube Base */
+  background: linear-gradient(
+    135deg,
+    rgba(224, 247, 250, 0.9) 0%,
+    rgba(178, 235, 242, 0.8) 50%,
+    rgba(128, 222, 234, 0.9) 100%
+  );
+  
+  /* Realistic Ice Shape */
+  border-radius: 15% 25% 15% 25%;
+  transform: rotate(5deg);
+  
+  /* 3D Border Effect */
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  border-top: 3px solid rgba(255, 255, 255, 0.9);
+  border-right: 1px solid rgba(200, 240, 255, 0.7);
+  
+  /* Lighting and Shine */
+  box-shadow:
+    inset 0 0 25px rgba(255, 255, 255, 0.6),
+    inset -5px -5px 15px rgba(0, 100, 120, 0.1),
+    0 0 15px rgba(100, 220, 255, 0.5),
+    0 0 30px rgba(100, 220, 255, 0.3);
+  
+  /* Positioning */
+  top: calc(var(--positionTop) * var(--cell));
+  left: calc(var(--positionLeft) * var(--cell));
+  
+  /* Transitions */
+  transition: 
+    top 0.2s ease,
+    left 0.2s ease,
+    transform 0.3s ease,
+    box-shadow 0.5s ease;
+  
+  /* Animation */
+  animation: 
+    iceShine 3s infinite alternate,
+    iceFloat 5s infinite ease-in-out;
+}
+
+@keyframes iceShine {
+  0% {
+    box-shadow:
+      inset 0 0 25px rgba(255, 255, 255, 0.6),
+      inset -5px -5px 15px rgba(0, 100, 120, 0.1),
+      0 0 15px rgba(100, 220, 255, 0.5),
+      0 0 30px rgba(100, 220, 255, 0.3);
+  }
+  100% {
+    box-shadow:
+      inset 0 0 35px rgba(255, 255, 255, 0.8),
+      inset -8px -8px 20px rgba(0, 100, 120, 0.15),
+      0 0 25px rgba(100, 220, 255, 0.7),
+      0 0 45px rgba(100, 220, 255, 0.5);
+  }
+}
+
+@keyframes iceFloat {
+  0%, 100% {
+    transform: rotate(5deg) translateY(0);
+  }
+  50% {
+    transform: rotate(5deg) translateY(-3px);
+  }
+}
+
+/* Frost Effect (optional pseudo-element) */
+.game__player::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    linear-gradient(
+      45deg,
+      transparent 45%,
+      rgba(255, 255, 255, 0.3) 50%,
+      transparent 55%
+    );
+  border-radius: inherit;
+  pointer-events: none;
+  animation: frostShine 6s infinite linear;
+}
+
+@keyframes frostShine {
+  0% {
+    background-position: -100% 0;
+  }
+  100% {
+    background-position: 100% 0;
+  }
+}
+
+@media (max-width: 767px) {
+  .game__player {
+    transition-duration: 0.1s;
+    animation: 
+      iceShine 2s infinite alternate,
+      iceFloat 3s infinite ease-in-out;
+  }
+}
+.game__cell {
+  width: var(--cell);
+  height: var(--cell);
+  background-color: rgb(47, 136, 158);
+}
+.game__cell--rock {
+  background-image: url("wall.jpg");
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+.game__cell--lava {
+   background-image: url("lava.gif");
+  background-size: cover;
+}
+.game__cell--stop {
+  position: relative;
+  background-image: url("stop.jpg");
+  background-size: cover;
+  background-repeat: no-repeat;
+ }
+.game__cell--end {
+  background-image: url("win.jpg");
+  background-size: cover;
+  background-repeat: no-repeat;
+}
