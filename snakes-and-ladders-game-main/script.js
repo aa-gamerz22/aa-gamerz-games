@@ -179,13 +179,13 @@ const updateUserProfile = (playerNo, value) => {
   // Change profile to next profile in order
   const baseURL = "images/avatars/";
   if (value === 1) {
-    players[playerNo - 1].image = (players[playerNo - 1].image + 1) % 13;
+    players[playerNo - 1].image = (players[playerNo - 1].image + 1) % 8;
   } else {
     if (players[playerNo - 1].image === 0) {
-      players[playerNo - 1].image = 12;
+      players[playerNo - 1].image = 7;
     } else {
       players[playerNo - 1].image = Math.abs(
-        (players[playerNo - 1].image - 1) % 13
+        (players[playerNo - 1].image - 1) % 8
       );
     }
   }
@@ -330,3 +330,4 @@ const specialMoveSnake = (value, playerNumber) => {
     }
   }, 400);
 };
+
