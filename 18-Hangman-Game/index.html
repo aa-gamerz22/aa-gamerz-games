@@ -1136,7 +1136,31 @@
                 </button>
             </div>
         </div>
+        <button id="fullscreenBtn" style="
+  position: fixed;
+  top: 15px;
+  right: 15px;
+  padding: 8px 12px;
+  font-size: 18px;
+  border: none;
+  border-radius: 6px;
+  background: red;
+  color: white;
+  cursor: pointer;
+  z-index: 9999;
+">⛶</button>
+
     </div>
+
+    <script>
+  document.getElementById("fullscreenBtn").addEventListener("click", () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen();
+    } else {
+      document.exitFullscreen();
+    }
+  });
+</script>
 
     <script>
         // Enhanced word bank with difficulty levels
