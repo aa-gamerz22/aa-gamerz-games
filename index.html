@@ -2833,5 +2833,197 @@
             initPuzzle();
         };
     </script>
+
+
+
+    
+<!-- AA ChatApp Auto Download Card -->
+<style>
+    #aaChatAppCard {
+        margin-top: 28px;
+        padding: 22px;
+        border-radius: 18px;
+        background: linear-gradient(145deg, rgba(5, 20, 45, .96), rgba(20, 35, 75, .96));
+        border: 1px solid var(--neon-blue);
+        box-shadow: 0 0 20px rgba(0, 216, 255, .15);
+        color: white;
+        text-align: center;
+    }
+
+    #aaChatAppCard .aa-app-icon {
+        width: 65px;
+        height: 65px;
+        margin: 0 auto 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 18px;
+        background: linear-gradient(135deg, #00d8ff, #5145ff);
+        color: white;
+        font-size: 30px;
+        box-shadow: 0 0 18px rgba(0, 216, 255, .35);
+    }
+
+    #aaChatAppCard h3 {
+        color: var(--neon-blue);
+        font-size: 23px;
+        margin-bottom: 8px;
+    }
+
+    #aaChatAppCard .aa-description {
+        color: #d6e5ff;
+        font-size: 13px;
+        line-height: 1.7;
+        margin-bottom: 18px;
+    }
+
+    #aaChatAppCard .aa-features {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 8px;
+        margin: 16px 0;
+    }
+
+    #aaChatAppCard .aa-feature {
+        padding: 7px 10px;
+        border-radius: 20px;
+        background: rgba(0, 216, 255, .10);
+        border: 1px solid rgba(0, 216, 255, .25);
+        color: #e8faff;
+        font-size: 11px;
+    }
+
+    #aaChatAppCard .aa-details {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 9px;
+        margin: 18px 0;
+        text-align: left;
+    }
+
+    #aaChatAppCard .aa-detail {
+        padding: 11px;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, .07);
+        font-size: 12px;
+    }
+
+    #aaChatAppCard .aa-detail strong {
+        display: block;
+        color: var(--neon-blue);
+        margin-bottom: 5px;
+    }
+
+    #aaChatAppCard .aa-download {
+        display: block;
+        width: 100%;
+        padding: 14px 12px;
+        margin-top: 18px;
+        border-radius: 12px;
+        background: linear-gradient(90deg, #007bff, #00c6ff);
+        color: white;
+        font-size: 15px;
+        font-weight: bold;
+        text-decoration: none;
+        box-shadow: 0 5px 18px rgba(0, 180, 255, .25);
+        transition: .25s ease;
+    }
+
+    #aaChatAppCard .aa-download:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 24px rgba(0, 180, 255, .4);
+    }
+
+    #aaChatAppCard .aa-note {
+        color: #a9bfdc;
+        font-size: 10px;
+        margin-top: 12px;
+        line-height: 1.6;
+    }
+</style>
+
+<script>
+(function () {
+    const settingsPanel = document.getElementById('settingsPanel');
+
+    if (!settingsPanel || document.getElementById('aaChatAppCard')) {
+        return;
+    }
+
+    const card = `
+        <div id="aaChatAppCard">
+
+            <div class="aa-app-icon">
+                <i class="fas fa-comments"></i>
+            </div>
+
+            <h3>AA ChatApp</h3>
+
+            <p class="aa-description">
+                One modern platform to connect, communicate and collaborate.
+                Enjoy messaging, group conversations, file sharing and your
+                built-in AI assistant — Aaron AI.
+            </p>
+
+            <div class="aa-features">
+                <span class="aa-feature">Private Messaging</span>
+                <span class="aa-feature">Group Chats</span>
+                <span class="aa-feature">Voice Calls</span>
+                <span class="aa-feature">Video Calls</span>
+                <span class="aa-feature">File Sharing</span>
+                <span class="aa-feature">Aaron AI</span>
+                <span class="aa-feature">Themes & Fonts</span>
+                <span class="aa-feature">GIFs & Stickers</span>
+                <span class="aa-feature">Scheduled Messages</span>
+                <span class="aa-feature">AI Web Analysis</span>
+            </div>
+
+            <div class="aa-details">
+                <div class="aa-detail">
+                    <strong><i class="fab fa-windows"></i> Platform</strong>
+                    Windows PC
+                </div>
+
+                <div class="aa-detail">
+                    <strong><i class="fas fa-code-branch"></i> Version</strong>
+                    3.2.0
+                </div>
+
+                <div class="aa-detail">
+                    <strong><i class="fas fa-file-download"></i> File Size</strong>
+                    Approx. 79 MB
+                </div>
+
+                <div class="aa-detail">
+                    <strong><i class="fas fa-download"></i> File Type</strong>
+                    EXE Installer
+                </div>
+            </div>
+
+            <a class="aa-download"
+               href="https://aa-gamerz22.github.io/aa-gamerz-games/downloads/AA-Chat-Setup.exe"
+               download="AA-Chat-Setup.exe">
+
+                <i class="fas fa-download"></i>
+                Download AA ChatApp
+            </a>
+
+            <p class="aa-note">
+                Official AA Gamerz download • Windows Installer<br>
+                Download only from the official AA Gamerz website.
+            </p>
+
+        </div>
+    `;
+
+    settingsPanel.insertAdjacentHTML('beforeend', card);
+})();
+</script>
+<!-- End AA ChatApp Auto Download Card -->
+
+
+
+    
 </body>
 </html>
